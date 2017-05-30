@@ -4,24 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 class BotConfig {
-	private static File Ldir = new File("Logs");
-	private static File Config = new File("Config.yml");
-	private static ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-	private static List<String> Whitetemp = new ArrayList<String>();
+	private static final File Ldir = new File("Logs");
+	private static final File Config = new File("Config.yml");
+	private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+	private static final List<String> Whitetemp = new ArrayList<>();
 	private static String Whitelist[];
-	private static List<String> AdminTemp = new ArrayList<String>();
+	private static final List<String> AdminTemp = new ArrayList<>();
 	private static String AdminRoles[];
 	private static BotYaml config;
 
 	static void loadConfig(){
 		try{
-			if(!Ldir.exists()) Ldir.mkdir();
+			if(!Ldir.exists()) //noinspection ResultOfMethodCallIgnored
+				Ldir.mkdir();
 			if(!Config.exists()){
 				FileWriter newFile = new FileWriter(Config);
 				newFile.write("#This file contains all of the configuration options available (for now)"+System.lineSeparator()+"token: Bots Token Here"+System.lineSeparator()+System.lineSeparator()+"adminrole: The admin role ID(s) separated by spaces"+System.lineSeparator()+"whitelist: Channel ID(s) Separated by spaces");

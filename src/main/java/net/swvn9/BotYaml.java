@@ -1,12 +1,6 @@
 package net.swvn9;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
-import java.io.File;
-
+@SuppressWarnings("unused")
 class BotYaml {
     private String Token;
     private String Adminrole;

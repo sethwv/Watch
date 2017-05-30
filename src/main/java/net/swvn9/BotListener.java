@@ -46,7 +46,7 @@ class ReadyListener implements EventListener {
 class BotListener extends ListenerAdapter {
 
 	private static final String SETH = "111592329424470016";
-    private static String LITERAL = "!";
+    private static final String LITERAL = "!";
 	private static final String DEVLITERAL = "::";
     private static final Color blurple = new Color(148,168,249);
 	private static String WHITELIST[] = BotConfig.getWhitelist();
@@ -54,7 +54,7 @@ class BotListener extends ListenerAdapter {
 	private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
 	private static final String EMPTYCACHE[] = {"","","",""};
 	private static final int CACHES[] = {3};
-	private static String BOTCACHE[] = EMPTYCACHE;
+	private static final String[] BOTCACHE = EMPTYCACHE;
     private static FileWriter log;
     private static Guild Home;
 
@@ -103,6 +103,7 @@ class BotListener extends ListenerAdapter {
 		return "["+timeStamp+"] ["+logType+"] [Log]: "; //create and return the log prefix
 	}
 
+	@SuppressWarnings("unused")
 	static void editCache(String MessageID){
 		if(BOTCACHE[0].contains(MessageID)){
 			BotListener.BOTCACHE[0] = BOTCACHE[0].replace(MessageID+",","");
