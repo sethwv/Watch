@@ -1,4 +1,9 @@
 Manifest-Version: 1.0
+<<<<<<< HEAD
 Class-Path: net.swvn9
 Main-Class: net.swvn9.Bot
+=======
+Class-Path: src.net.swvn9
+Main-Class: src.net.swvn9.Bot
+>>>>>>> 628b115... Initial Commit
 
