@@ -1,4 +1,4 @@
-package src.net.swvn9;
+package net.swvn9;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
