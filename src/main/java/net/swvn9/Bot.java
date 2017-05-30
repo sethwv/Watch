@@ -12,6 +12,8 @@ class Bot{
 
     static JDA jda;
 
+    //HANDLER BRANCH
+
 
     public static void main(String[] args) {
             try{
