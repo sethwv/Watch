@@ -14,7 +14,7 @@ class Config {
 	private static String Whitelist[];
 	private static final List<String> AdminTemp = new ArrayList<>();
 	private static String AdminRoles[];
-	private static Yaml config;
+	static Yaml config;
 	private static Map<String,String[]> Groups;
 
 	static void loadConfig(){
@@ -45,19 +45,19 @@ class Config {
 		}
 		net.swvn9.Config.AdminRoles = AdminTemp.toArray(new String[0]);
 		for(String key:config.getGroups().keySet()){
-			System.out.println(key+":");
-			System.out.println("\tid:");
-			for(String zz:config.getGroups().get(key).id) System.out.println("\t- "+zz);
-			System.out.println("\tisadmin: "+config.getGroups().get(key).isadmin);
-			System.out.println("\tpermissions:");
-			for(String zz:config.getGroups().get(key).permissions) System.out.println("\t- "+zz);
+			//System.out.println(key+":");
+			//System.out.println("\tid:");
+			//for(String zz:config.getGroups().get(key).id) System.out.println("\t- "+zz);
+			//System.out.println("\tisadmin: "+config.getGroups().get(key).isadmin);
+			//System.out.println("\tpermissions:");
+			//for(String zz:config.getGroups().get(key).permissions) System.out.println("\t- "+zz);
 		}
 		for(String key:config.getUsers().keySet()){
-			System.out.println(key+":");
-			System.out.println("\tid: "+config.getUsers().get(key).id);
-			System.out.println("\tisadmin: "+config.getUsers().get(key).isadmin);
-			System.out.println("\tpermissions:");
-			for(String zz:config.getUsers().get(key).permissions) System.out.println("\t- "+zz);
+			//System.out.println(key+":");
+			//System.out.println("\tid: "+config.getUsers().get(key).id);
+			//System.out.println("\tisadmin: "+config.getUsers().get(key).isadmin);
+			//System.out.println("\tpermissions:");
+			//for(String zz:config.getUsers().get(key).permissions) System.out.println("\t- "+zz);
 		}
 	}
 
@@ -86,11 +86,13 @@ class Config {
 class configUser {
 	public String id;
 	public boolean isadmin;
+	public int power;
 	public List<String> permissions;
 }
 class configGroup {
 	public List<String> id;
 	public boolean isadmin;
+	public int power;
 	public List<String> permissions;
 }
 class Yaml { //this is my yaml bean thingamahooza

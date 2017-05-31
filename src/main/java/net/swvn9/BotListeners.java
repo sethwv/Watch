@@ -253,100 +253,150 @@ class EventListener extends ListenerAdapter {
 	    	if(e.getChannelType().equals(ChannelType.PRIVATE)||isAdmin(e.getGuild(),e.getAuthor())||isSeth(e.getAuthor())){
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
-			if(command.hasNext()){
-				switch(command.next().toLowerCase()) {
-					case "roles":
-						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
-						EmbedBuilder roles = new EmbedBuilder();
-						roles.setFooter("Roles for " + e.getGuild().getName(), Bot.jda.getSelfUser().getAvatarUrl());
-						roles.setThumbnail(e.getGuild().getIconUrl());
-						for (Object s : e.getGuild().getRoles().toArray()) {
-							String trimmed = s.toString().replace("R:", "");
-							StringBuilder sid = new StringBuilder();
-							for (int i = trimmed.length() - 19; i < trimmed.length() - 1; i++) {
-								sid.append(trimmed.charAt(i));
-							}
-							StringBuilder sname = new StringBuilder();
-							for (int i = 0; i < trimmed.length() - 20; i++) {
-								sname.append(trimmed.charAt(i));
-							}
-							roles.addField(sname.toString(), "`"+sid.toString()+"`", true);
+			if(command.hasNext()) switch (command.next().toLowerCase()) {
+				case "roles":
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+					EmbedBuilder roles = new EmbedBuilder();
+					roles.setFooter("Roles for " + e.getGuild().getName(), Bot.jda.getSelfUser().getAvatarUrl());
+					roles.setThumbnail(e.getGuild().getIconUrl());
+					for (Object s : e.getGuild().getRoles().toArray()) {
+						String trimmed = s.toString().replace("R:", "");
+						StringBuilder sid = new StringBuilder();
+						for (int i = trimmed.length() - 19; i < trimmed.length() - 1; i++) {
+							sid.append(trimmed.charAt(i));
 						}
-						roles.setColor(blurple);
-						e.getChannel().sendMessage(roles.build()).queue();
-						break;
-					case "react":
-						e.getChannel().sendMessage("Add, or click a reaction.").queue(msg -> {
-							//msg.addReaction(Home.getEmoteById(310928672389464064L)).queue();
-							msg.addReaction("\uD83D\uDD27").queue();
-							editCache(msg.getId(), 1);
-						});
-						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
-						break;
-					case "embed":
-						EmbedBuilder testEmbed = new EmbedBuilder();
-						testEmbed.setColor(Color.GRAY);
-						testEmbed.setFooter("Test Rich Embed", Bot.jda.getSelfUser().getAvatarUrl());
-						testEmbed.setImage("http://u.swvn9.net/2017/5jXhJ.jpg");
-						e.getChannel().sendMessage(testEmbed.build()).queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
-						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
-						break;
-					case "cache":
-						EmbedBuilder cache = new EmbedBuilder();
-						cache.setFooter("Instance Cache. Admins can react with ❌ to clear the cache.", Bot.jda.getSelfUser().getAvatarUrl());
-						for (int i = 0; i < BOTCACHE.length; i++) {
-							cache.addField("Cache Layer " + i, "```\n"+BOTCACHE[i].replace(",", " ")+"\n```", false);
+						StringBuilder sname = new StringBuilder();
+						for (int i = 0; i < trimmed.length() - 20; i++) {
+							sname.append(trimmed.charAt(i));
 						}
-						cache.setColor(blurple);
-						//cache.setDescription("If you're an admin, you can react with the ❌ emoji to clear the message cache.");
-						e.getChannel().sendMessage(cache.build()).queue(msg -> {
-							//msg.addReaction("❌").queue();
-							editCache(msg.getId(), 2);
-						});
-						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
-						break;
-					case "pullconfig":
-						Config.loadConfig();
-						EventListener.ADMINROLES = Config.getAdminRoles();
-						EventListener.WHITELIST = Config.getWhitelist();
-						e.getChannel().addReactionById(e.getMessageId(),"👍").queue();
-						if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
-						break;
-					case "kill":
-						if (e.getChannelType().isGuild()) e.getMessage().delete().complete();
-						EmbedBuilder kill = new EmbedBuilder();
-						kill.setColor(blurple);
-						if(command.hasNext()){
-							switch(command.next().toLowerCase()){
-								case "k":
-									Bot.jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
-									Bot.jda.shutdown(false);
-									break;
-								case "r":
-									Bot.jda.removeEventListener(Bot.jda.getRegisteredListeners().get(0));
-									Bot.restart();
-									break;
-								default:
-									kill.addField("Are you sure you want to kill the bot?","`❌` to cancel.\n`\uD83C\uDD70` to **kill** the bot.\n`\uD83C\uDD71` to **restart** the bot.",false);
-									e.getChannel().sendMessage(kill.build()).queue(msg ->{
-										msg.addReaction("❌").queue();
-										msg.addReaction("\uD83C\uDD70").queue();
-										msg.addReaction("\uD83C\uDD71").queue();
-										editCache(msg.getId(),3);
-									});
-									break;
-							}
+						roles.addField(sname.toString(), "`" + sid.toString() + "`", true);
+					}
+					roles.setColor(blurple);
+					e.getChannel().sendMessage(roles.build()).queue();
+					break;
+				case "react":
+					e.getChannel().sendMessage("Add, or click a reaction.").queue(msg -> {
+						//msg.addReaction(Home.getEmoteById(310928672389464064L)).queue();
+						msg.addReaction("\uD83D\uDD27").queue();
+						editCache(msg.getId(), 1);
+					});
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+					break;
+				case "embed":
+					EmbedBuilder testEmbed = new EmbedBuilder();
+					testEmbed.setColor(Color.GRAY);
+					testEmbed.setFooter("Test Rich Embed", Bot.jda.getSelfUser().getAvatarUrl());
+					testEmbed.setImage("http://u.swvn9.net/2017/5jXhJ.jpg");
+					e.getChannel().sendMessage(testEmbed.build()).queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+					break;
+				case "cache":
+					EmbedBuilder cache = new EmbedBuilder();
+					cache.setFooter("Instance Cache. Admins can react with ❌ to clear the cache.", Bot.jda.getSelfUser().getAvatarUrl());
+					for (int i = 0; i < BOTCACHE.length; i++) {
+						cache.addField("Cache Layer " + i, "```\n" + BOTCACHE[i].replace(",", " ") + "\n```", false);
+					}
+					cache.setColor(blurple);
+					//cache.setDescription("If you're an admin, you can react with the ❌ emoji to clear the message cache.");
+					e.getChannel().sendMessage(cache.build()).queue(msg -> {
+						//msg.addReaction("❌").queue();
+						editCache(msg.getId(), 2);
+					});
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+					break;
+				case "config":
+					EmbedBuilder other = new EmbedBuilder();
+					StringBuilder whitelisted = new StringBuilder();
+					other.setColor(blurple);
+					for (String a : WHITELIST)
+						whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
+					other.addField("Whitelist", whitelisted.toString(), false);
+					other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+
+					//EmbedBuilder groups = new EmbedBuilder();
+					//groups.setColor(blurple);
+					other.addBlankField(false);
+					for (String key : Config.config.getGroups().keySet()) {
+						StringBuilder ids = new StringBuilder();
+						ids.append("Group IDs").append(System.lineSeparator());
+						for (String zz : Config.config.getGroups().get(key).id)
+							ids.append("- `").append(zz).append("`").append(System.lineSeparator());
+						other.addField(key,ids.toString(), true);
+						StringBuilder perms = new StringBuilder();
+						perms.append("Permissions").append(System.lineSeparator());
+						for (String zz : Config.config.getGroups().get(key).permissions)
+							perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+						if (Config.config.getGroups().get(key).isadmin) {
+							other.addField("Type: SuperUser Group", perms.toString(), true);
 						} else {
-							kill.addField("Are you sure you want to kill the bot?","`❌` to cancel.\n`\uD83C\uDD70` to **kill** the bot.\n`\uD83C\uDD71` to **restart** the bot.",false);
-							e.getChannel().sendMessage(kill.build()).queue(msg ->{
-								msg.addReaction("❌").queue();
-								msg.addReaction("\uD83C\uDD70").queue();
-								msg.addReaction("\uD83C\uDD71").queue();
-								editCache(msg.getId(),3);
-							});
+							other.addField("Type: User Group", perms.toString(), true);
 						}
-						break;
-				}
+						other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
+					}
+					//groups.setFooter("Groups from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+					//e.getChannel().sendMessage(groups.build()).queue( msg -> msg.delete().queueAfter(1,TimeUnit.MINUTES));
+
+					//EmbedBuilder user = new EmbedBuilder();
+					//user.setColor(blurple);
+					other.addBlankField(false);
+					for (String key : Config.config.getUsers().keySet()) {
+						other.addField(key, "User ID" + System.lineSeparator() + "`" + Config.config.getUsers().get(key).id + "`", true);
+						StringBuilder perms = new StringBuilder();
+						perms.append("Permissions").append(System.lineSeparator());
+						for (String zz : Config.config.getUsers().get(key).permissions)
+							perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+						if (Config.config.getUsers().get(key).isadmin) {
+							other.addField("Type: SuperUser", perms.toString(), true);
+						} else {
+							other.addField("Type: User", perms.toString(), true);
+						}
+						other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
+					}
+					other.setFooter("Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+					e.getChannel().sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+					break;
+				case "pullconfig":
+					Config.loadConfig();
+					EventListener.ADMINROLES = Config.getAdminRoles();
+					EventListener.WHITELIST = Config.getWhitelist();
+					e.getChannel().addReactionById(e.getMessageId(), "👍").queue();
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+					break;
+				case "kill":
+					if (e.getChannelType().isGuild()) e.getMessage().delete().complete();
+					EmbedBuilder kill = new EmbedBuilder();
+					kill.setColor(blurple);
+					if (command.hasNext()) {
+						switch (command.next().toLowerCase()) {
+							case "k":
+								Bot.jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
+								Bot.jda.shutdown(false);
+								break;
+							case "r":
+								Bot.jda.removeEventListener(Bot.jda.getRegisteredListeners().get(0));
+								Bot.restart();
+								break;
+							default:
+								kill.addField("Are you sure you want to kill the bot?", "`❌` to cancel.\n`\uD83C\uDD70` to **kill** the bot.\n`\uD83C\uDD71` to **restart** the bot.", false);
+								e.getChannel().sendMessage(kill.build()).queue(msg -> {
+									msg.addReaction("❌").queue();
+									msg.addReaction("\uD83C\uDD70").queue();
+									msg.addReaction("\uD83C\uDD71").queue();
+									editCache(msg.getId(), 3);
+								});
+								break;
+						}
+					} else {
+						kill.addField("Are you sure you want to kill the bot?", "`❌` to cancel.\n`\uD83C\uDD70` to **kill** the bot.\n`\uD83C\uDD71` to **restart** the bot.", false);
+						e.getChannel().sendMessage(kill.build()).queue(msg -> {
+							msg.addReaction("❌").queue();
+							msg.addReaction("\uD83C\uDD70").queue();
+							msg.addReaction("\uD83C\uDD71").queue();
+							editCache(msg.getId(), 3);
+						});
+					}
+					break;
 			}
 			}
 		}
