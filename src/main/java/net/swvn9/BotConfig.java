@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 class Config {
 	private static final File Ldir = new File("Logs");
@@ -18,21 +15,24 @@ class Config {
 	private static final List<String> AdminTemp = new ArrayList<>();
 	private static String AdminRoles[];
 	private static Yaml config;
+	private static Map<String,String[]> Groups;
 
 	static void loadConfig(){
 		try{
 			if(!Ldir.exists()) //noinspection ResultOfMethodCallIgnored
 				Ldir.mkdir();
-			if(!Config.exists()){
+			/*if(!Config.exists()){
 				FileWriter newFile = new FileWriter(Config);
 				newFile.write("#This file contains all of the configuration options available (for now)"+System.lineSeparator()+"token: Bots Token Here"+System.lineSeparator()+System.lineSeparator()+"adminrole: The admin role ID(s) separated by spaces"+System.lineSeparator()+"whitelist: Channel ID(s) Separated by spaces");
 				newFile.close();
 				System.out.println("The Config.yml file has been created, fill it in with the relevant information.");
 				System.exit(0);
-			}
+			}*/
 			net.swvn9.Config.config = mapper.readValue(new File("Config.yml"), Yaml.class);
-		} catch(IOException ee){
-			ee.printStackTrace();
+		} catch(IOException | NullPointerException ee){
+			System.out.println("There was an error with the configuration file."+System.lineSeparator()+"Please ensure that you copy the \"example_Config.yml\""+System.lineSeparator()+"fill it with your configuration choices"+System.lineSeparator()+"and rename it to \"Config.yml\"");
+			System.out.println("Below is the error message.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
+			System.exit(0);
 		}
 		Scanner a = new Scanner(config.getWhitelist());
 		while(a.hasNext()){
@@ -44,7 +44,21 @@ class Config {
 			AdminTemp.add(b.next());
 		}
 		net.swvn9.Config.AdminRoles = AdminTemp.toArray(new String[0]);
-		System.out.println(config.getGroups().toString());
+		for(String key:config.getGroups().keySet()){
+			System.out.println(key+":");
+			System.out.println("\tid:");
+			for(String zz:config.getGroups().get(key).id) System.out.println("\t- "+zz);
+			System.out.println("\tisadmin: "+config.getGroups().get(key).isadmin);
+			System.out.println("\tpermissions:");
+			for(String zz:config.getGroups().get(key).permissions) System.out.println("\t- "+zz);
+		}
+		for(String key:config.getUsers().keySet()){
+			System.out.println(key+":");
+			System.out.println("\tid: "+config.getUsers().get(key).id);
+			System.out.println("\tisadmin: "+config.getUsers().get(key).isadmin);
+			System.out.println("\tpermissions:");
+			for(String zz:config.getUsers().get(key).permissions) System.out.println("\t- "+zz);
+		}
 	}
 
 	static String getToken(){
@@ -58,13 +72,34 @@ class Config {
 	static String[] getAdminRoles(){
 		return AdminRoles;
 	}
+	static String[] getPerms(String Key){
+		return Groups.get(Key);
+	}
+	static String[] getGroups(){
+		String[] keys = new String[Groups.keySet().toArray().length];
+		for(int i = 0; i<Groups.keySet().toArray().length;i++){
+			keys[i] = Groups.keySet().toArray()[i].toString();
+		}
+		return keys;
+	}
 }
-
+class configUser {
+	public String id;
+	public boolean isadmin;
+	public List<String> permissions;
+}
+class configGroup {
+	public List<String> id;
+	public boolean isadmin;
+	public List<String> permissions;
+}
 class Yaml { //this is my yaml bean thingamahooza
+
 	private String Token;
 	private String Adminrole;
 	private String Whitelist;
-	private Map<String,String[]> Groups;
+	private Map<String,configUser> Users;
+	private Map<String,configGroup> Groups;
 
 	String getToken() {
 		return Token;
@@ -87,10 +122,17 @@ class Yaml { //this is my yaml bean thingamahooza
 		this.Whitelist = Whitelist;
 	}
 
-	Map<String,String[]> getGroups(){
+	Map<String,configGroup> getGroups(){
 		return Groups;
 	}
-	void setGroups(Map<String,String[]> Groups){
+	void setGroups(Map<String,configGroup> Groups){
 		this.Groups = Groups;
+	}
+
+	Map<String,configUser> getUsers(){
+		return Users;
+	}
+	void setUsers(Map<String,configUser> Users){
+		this.Users = Users;
 	}
 }
