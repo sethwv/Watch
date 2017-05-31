@@ -6,9 +6,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
-class BotConfig {
+class Config {
 	private static final File Ldir = new File("Logs");
 	private static final File Config = new File("Config.yml");
 	private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -16,7 +17,7 @@ class BotConfig {
 	private static String Whitelist[];
 	private static final List<String> AdminTemp = new ArrayList<>();
 	private static String AdminRoles[];
-	private static BotYaml config;
+	private static Yaml config;
 
 	static void loadConfig(){
 		try{
@@ -29,7 +30,7 @@ class BotConfig {
 				System.out.println("The Config.yml file has been created, fill it in with the relevant information.");
 				System.exit(0);
 			}
-			BotConfig.config = mapper.readValue(new File("Config.yml"), BotYaml.class);
+			net.swvn9.Config.config = mapper.readValue(new File("Config.yml"), Yaml.class);
 		} catch(IOException ee){
 			ee.printStackTrace();
 		}
@@ -37,12 +38,13 @@ class BotConfig {
 		while(a.hasNext()){
 			Whitetemp.add(a.next());
 		}
-		BotConfig.Whitelist = Whitetemp.toArray(new String[0]);
+		net.swvn9.Config.Whitelist = Whitetemp.toArray(new String[0]);
 		Scanner b = new Scanner(config.getAdminrole());
 		while(b.hasNext()){
 			AdminTemp.add(b.next());
 		}
-		BotConfig.AdminRoles = AdminTemp.toArray(new String[0]);
+		net.swvn9.Config.AdminRoles = AdminTemp.toArray(new String[0]);
+		System.out.println(config.getGroups().toString());
 	}
 
 	static String getToken(){
@@ -55,5 +57,40 @@ class BotConfig {
 
 	static String[] getAdminRoles(){
 		return AdminRoles;
+	}
+}
+
+class Yaml { //this is my yaml bean thingamahooza
+	private String Token;
+	private String Adminrole;
+	private String Whitelist;
+	private Map<String,String[]> Groups;
+
+	String getToken() {
+		return Token;
+	}
+	void setToken(String Token) {
+		this.Token = Token;
+	}
+
+	String getAdminrole() {
+		return Adminrole;
+	}
+	void setAdminrole(String AdminRole) {
+		this.Adminrole = AdminRole;
+	}
+
+	String getWhitelist() {
+		return Whitelist;
+	}
+	void setWhitelist(String Whitelist) {
+		this.Whitelist = Whitelist;
+	}
+
+	Map<String,String[]> getGroups(){
+		return Groups;
+	}
+	void setGroups(Map<String,String[]> Groups){
+		this.Groups = Groups;
 	}
 }

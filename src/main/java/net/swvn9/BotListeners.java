@@ -6,7 +6,6 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
@@ -18,24 +17,25 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-class ReadyListener implements EventListener {
+class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
 	public void onEvent(net.dv8tion.jda.core.events.Event event)
 	{
 		if(event instanceof ReadyEvent){
+
 			for(Guild a : event.getJDA().getGuilds()){
 				switch(a.getId()){
 					default:
-						BotListener.logger(BotListener.logPrefix(0) + "I'm in "+a.getName()+"! ID:"+a.getId());
+						EventListener.logger(EventListener.logPrefix(0) + "I'm in "+a.getName()+"! ID:"+a.getId());
 						break;
 					case "123527831664852992":
 						event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-						BotListener.logger(BotListener.logPrefix(0) + "I'm in seb's server!");
+						EventListener.logger(EventListener.logPrefix(0) + "I'm in seb's server!");
 						break;
 					case "243112682142695446":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
 						event.getJDA().getPresence().setGame(Game.of("in Dev Mode"));
-						BotListener.logger(BotListener.logPrefix(0) + "I'm in the test server!");
+						EventListener.logger(EventListener.logPrefix(0) + "I'm in the test server!");
 						break;
 				}
 			}
@@ -43,14 +43,14 @@ class ReadyListener implements EventListener {
 	}
 }
 
-class BotListener extends ListenerAdapter {
+class EventListener extends ListenerAdapter {
 
 	private static final String SETH = "111592329424470016";
     private static final String LITERAL = "!";
 	private static final String DEVLITERAL = "::";
     private static final Color blurple = new Color(148,168,249);
-	private static String WHITELIST[] = BotConfig.getWhitelist();
-	private static String ADMINROLES[] = BotConfig.getAdminRoles();
+	private static String WHITELIST[] = Config.getWhitelist();
+	private static String ADMINROLES[] = Config.getAdminRoles();
 	private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
 	private static final String EMPTYCACHE[] = {"","","",""};
 	private static final int CACHES[] = {3};
@@ -106,10 +106,10 @@ class BotListener extends ListenerAdapter {
 	@SuppressWarnings("unused")
 	static void editCache(String MessageID){
 		if(BOTCACHE[0].contains(MessageID)){
-			BotListener.BOTCACHE[0] = BOTCACHE[0].replace(MessageID+",","");
+			EventListener.BOTCACHE[0] = BOTCACHE[0].replace(MessageID+",","");
 			logger(logPrefix(4)+"Removed "+MessageID+" from cache row 0");
 		} else {
-			BotListener.BOTCACHE[0] = BOTCACHE[0]+MessageID+",";
+			EventListener.BOTCACHE[0] = BOTCACHE[0]+MessageID+",";
 			logger(logPrefix(4)+"Added "+MessageID+" to cache row 0");
 		}
 	}
@@ -120,12 +120,12 @@ class BotListener extends ListenerAdapter {
 		}
 		if(cacheExists){
 			if(BOTCACHE[cache].contains(MessageID)||BOTCACHE[0].contains(MessageID)){
-				BotListener.BOTCACHE[0] = BOTCACHE[0].replace(MessageID+",","");
-				BotListener.BOTCACHE[cache] = BOTCACHE[cache].replace(MessageID+",","");
+				EventListener.BOTCACHE[0] = BOTCACHE[0].replace(MessageID+",","");
+				EventListener.BOTCACHE[cache] = BOTCACHE[cache].replace(MessageID+",","");
 				logger(logPrefix(4)+"Removed "+MessageID+" from cache rows 0 and "+cache);
 			} else {
-				BotListener.BOTCACHE[0] = BOTCACHE[0]+MessageID+",";
-				BotListener.BOTCACHE[cache] = BOTCACHE[cache]+MessageID+",";
+				EventListener.BOTCACHE[0] = BOTCACHE[0]+MessageID+",";
+				EventListener.BOTCACHE[cache] = BOTCACHE[cache]+MessageID+",";
 				logger(logPrefix(4)+"Added "+MessageID+" to cache rows 0 and "+cache);
 			}
 		} else {
@@ -134,7 +134,7 @@ class BotListener extends ListenerAdapter {
 	}
 	static void logger(String input){
 		try {
-			BotListener.log =new FileWriter("Logs"+File.separator+"LOG_"+LOGTIME+".txt",true);
+			EventListener.log =new FileWriter("Logs"+File.separator+"LOG_"+LOGTIME+".txt",true);
 			log.write(input+System.lineSeparator());
 			log.close();
 			System.out.println(input);
@@ -162,7 +162,7 @@ class BotListener extends ListenerAdapter {
 
     @Override //any reaction that is added that the bot can see
     public void onMessageReactionAdd(MessageReactionAddEvent e){
-	    if(Home==null) BotListener.Home= e.getGuild();
+	    if(Home==null) EventListener.Home= e.getGuild();
 	    if((e.getUser().isBot()||e.getUser().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||!channelWhitelisted(e.getChannel().getId()+""))&&e.getChannelType().isGuild()){
 		    return;
 	    }
@@ -192,7 +192,7 @@ class BotListener extends ListenerAdapter {
 				switch(e.getReaction().getEmote().getName()){
 					case "❌":
 						editCache(e.getMessageId(),2);
-						for(int i=0;i<BOTCACHE.length;i++) BotListener.BOTCACHE[i]="";
+						for(int i=0;i<BOTCACHE.length;i++) EventListener.BOTCACHE[i]="";
 						logger(logPrefix(0)+"The cache has been cleared and re-initialised.");
 						e.getChannel().sendMessage("*The Cache has been cleared by "+e.getMember().getAsMention()+".*").queue(msg -> msg.delete().queueAfter(10,TimeUnit.SECONDS));
 						if(e.getChannelType().equals(ChannelType.TEXT))e.getTextChannel().clearReactionsById(e.getMessageId()).queue();
@@ -224,7 +224,7 @@ class BotListener extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
-    	if(Home==null) BotListener.Home= e.getGuild();
+    	if(Home==null) EventListener.Home= e.getGuild();
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
 		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getChannelType().equals(ChannelType.PRIVATE)))){
@@ -305,11 +305,12 @@ class BotListener extends ListenerAdapter {
 						});
 						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
-					case "pullsettings":
-						BotConfig.loadConfig();
-						BotListener.ADMINROLES = BotConfig.getAdminRoles();
-						BotListener.WHITELIST = BotConfig.getWhitelist();
-						e.getMessage().delete().queue();
+					case "pullconfig":
+						Config.loadConfig();
+						EventListener.ADMINROLES = Config.getAdminRoles();
+						EventListener.WHITELIST = Config.getWhitelist();
+						e.getChannel().addReactionById(e.getMessageId(),"👍").queue();
+						if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
 						break;
 					case "kill":
 						if (e.getChannelType().isGuild()) e.getMessage().delete().complete();
@@ -349,7 +350,7 @@ class BotListener extends ListenerAdapter {
 			}
 			}
 		}
-		if(e.getGuild().getId().equalsIgnoreCase("123527831664852992")){
+		if(!e.getChannelType().equals(ChannelType.PRIVATE)&&e.getGuild().getId().equalsIgnoreCase("123527831664852992")){
 			if(!isCommand(e.getMessage())&&!isDevCommand(e.getMessage())){
 				String newmessage = e.getMessage().getContent().toLowerCase();
 				if(newmessage.contains("can")&&newmessage.contains("i")&&newmessage.contains("come")&&newmessage.contains("over")){

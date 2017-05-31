@@ -1,0 +1,13 @@
+token: #The Bot's Token
+adminrole: #Master Admin roles, separated by spaces
+whitelist: #Channel whitelist, separated by spaces
+groups: #(NYI) permission groups, and commands they are allowed to use. New groups can be created in the same format
+  group1:
+    - test
+    - test2
+  group2:
+    - test
+    - test2
+  ANOTHERGROUP:
+    - test
+    - test2
