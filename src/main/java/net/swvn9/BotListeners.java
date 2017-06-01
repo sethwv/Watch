@@ -268,10 +268,11 @@ class EventListener extends ListenerAdapter {
 					case "clan":
 						String Clan = "Zamorak Cult";
 						if(command.hasNext()){
-							Clan = command.next();
+							StringBuilder ClanBuilder = new StringBuilder(command.next());
 							while(command.hasNext()){
-								Clan = Clan+" "+command.next();
+								ClanBuilder.append(" ").append(command.next());
 							}
+							Clan = ClanBuilder.toString();
 						}
 						try{
 							Levenshtein l = new Levenshtein();
@@ -350,9 +351,12 @@ class EventListener extends ListenerAdapter {
 										for(Member b:e.getGuild().getMembers()){
 											if(comapare(b.getEffectiveName(),a.getName())){
 												if(!Five.toString().contains(b.getAsMention())&&!Six.toString().contains(b.getAsMention()))
-													if(admincount<=admins)Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-													if(admincount>admins)Six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-												//Five.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+													if(admincount<=admins)
+														Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+														//Five.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												if(admincount>admins)
+														Six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+														//Six.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 													break;
 											}
