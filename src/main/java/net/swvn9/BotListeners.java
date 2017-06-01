@@ -1,5 +1,12 @@
 package net.swvn9;
 
+import com.google.common.collect.Table;
+import com.mikebull94.rsapi.hiscores.ClanMate;
+import com.mikebull94.rsapi.hiscores.HiscoreTable;
+import com.mikebull94.rsapi.hiscores.Hiscores;
+import com.mikebull94.rsapi.hiscores.Player;
+import info.debatty.java.stringsimilarity.JaroWinkler;
+import info.debatty.java.stringsimilarity.Levenshtein;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
@@ -7,14 +14,15 @@ import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import com.mikebull94.rsapi.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
@@ -57,6 +65,8 @@ class EventListener extends ListenerAdapter {
 	private static final String[] BOTCACHE = EMPTYCACHE;
     private static FileWriter log;
     private static Guild Home;
+	private static RuneScapeAPI api = RuneScapeAPI.createHttp();
+	private static Hiscores hiscores = api.hiscores();
 
 	//check if a specific channel ID is on the whitelist
     private boolean channelWhitelisted (String channelID){
@@ -159,6 +169,16 @@ class EventListener extends ListenerAdapter {
 		}
 		return true;
 	}
+	private static boolean comapare(String a,String b){
+		Levenshtein l = new Levenshtein();
+		JaroWinkler jw = new JaroWinkler();
+		if(a.contains(b)) return true;
+		if(b.contains(a)) return true;
+		if(a.equalsIgnoreCase(b)) return true;
+		if(l.distance(a,b)<2) return true;
+		if(jw.similarity(a,b)>0.89d) return true;
+		return false;
+	}
 
     @Override //any reaction that is added that the bot can see
     public void onMessageReactionAdd(MessageReactionAddEvent e){
@@ -244,6 +264,126 @@ class EventListener extends ListenerAdapter {
 					case "id":
 						e.getChannel().sendMessage(e.getAuthor().getAsMention()+", Your ID is "+e.getAuthor()+".").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
 						if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+						break;
+					case "clan":
+						String Clan = "Zamorak Cult";
+						if(command.hasNext()){
+							Clan = command.next();
+							while(command.hasNext()){
+								Clan = Clan+" "+command.next();
+							}
+						}
+						try{
+							Levenshtein l = new Levenshtein();
+							JaroWinkler jw = new JaroWinkler();
+							java.util.List<ClanMate> clanMates = hiscores.clanInformation(Clan);
+							EmbedBuilder Ranks = new EmbedBuilder();
+							StringBuilder One = new StringBuilder();
+							if(e.getGuild().getId().equals("254861442799370240")&&Clan.equals("Zamorak Cult"))One.append(e.getGuild().getRoleById(254883837757227008L).getAsMention()).append(System.lineSeparator());
+							StringBuilder Two = new StringBuilder();
+							if(e.getGuild().getId().equals("254861442799370240")&&Clan.equals("Zamorak Cult"))Two.append(e.getGuild().getRoleById(268490396617801729L).getAsMention()).append(System.lineSeparator());
+							StringBuilder Three = new StringBuilder();
+							if(e.getGuild().getId().equals("254861442799370240")&&Clan.equals("Zamorak Cult"))Three.append(e.getGuild().getRoleById(258350529229357057L).getAsMention()).append(System.lineSeparator());
+							StringBuilder Four = new StringBuilder();
+							if(e.getGuild().getId().equals("254861442799370240")&&Clan.equals("Zamorak Cult"))Four.append(e.getGuild().getRoleById(254881136524656640L).getAsMention()).append(System.lineSeparator());
+							StringBuilder Five = new StringBuilder();
+							StringBuilder Six = new StringBuilder();
+							int admins = StringUtils.countMatches(clanMates.toString(),"Admin")/2+1;
+							//int Owners = StringUtils.countMatches(clanMates.toString(),"Owner");
+							//int DeputyOwners = StringUtils.countMatches(clanMates.toString(),"Deputy Owner");
+							//int Overseers = StringUtils.countMatches(clanMates.toString(),"Overseer");
+							//int Ministers = StringUtils.countMatches(clanMates.toString(),"Coordinator");
+							int admincount = 0;
+							for(ClanMate a : clanMates){
+								boolean found = false;
+								switch (a.getRank()){
+									case "Owner":
+										for(Member b:e.getGuild().getMembers()){
+											if(comapare(b.getEffectiveName(),a.getName())){
+												if(!One.toString().contains(b.getAsMention())) One.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+												//One.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												found = true;
+												break;
+											}
+										}
+										if(!found) One.append(a.getName());
+										One.append(System.lineSeparator());
+										break;
+									case "Deputy Owner":
+										for(Member b:e.getGuild().getMembers()){
+											if(comapare(b.getEffectiveName(),a.getName())){
+												if(!Two.toString().contains(b.getAsMention())) Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+												//Two.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												found = true;
+												break;
+											}
+										}
+										if(!found) Two.append(a.getName());
+										Two.append(System.lineSeparator());
+										break;
+									case "Overseer":
+										for(Member b:e.getGuild().getMembers()){
+											if(comapare(b.getEffectiveName(),a.getName())){
+												if(!Three.toString().contains(b.getAsMention())) Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+												//Three.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												found = true;
+												break;
+											}
+										}
+										if(!found) Three.append(a.getName());
+										Three.append(System.lineSeparator());
+										break;
+									case "Coordinator":
+										for(Member b:e.getGuild().getMembers()){
+											if(comapare(b.getEffectiveName(),a.getName())){
+												if(!Four.toString().contains(b.getAsMention())) Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+												//Four.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												found = true;
+												break;
+											}
+										}
+										if(!found) Four.append(a.getName());
+										Four.append(System.lineSeparator());
+										break;
+									case "Admin":
+										admincount++;
+										for(Member b:e.getGuild().getMembers()){
+											if(comapare(b.getEffectiveName(),a.getName())){
+												if(!Five.toString().contains(b.getAsMention())&&!Six.toString().contains(b.getAsMention()))
+													if(admincount<=admins)Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+													if(admincount>admins)Six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+												//Five.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
+												found = true;
+													break;
+											}
+										}
+										if(admincount<=admins)
+											if(!found) Five.append(a.getName());
+											Five.append(System.lineSeparator());
+										if(admincount>admins)
+											if(!found) Six.append(a.getName());
+											Six.append(System.lineSeparator());
+										break;
+								}
+							}
+							Ranks.addField("Owner",One.toString(),false);
+							Ranks.addField("Deputy Owner",Two.toString(),true);
+							//Ranks.addBlankField(false);
+							Ranks.addField("Overseer",Three.toString(),true);
+							Ranks.addField("Coordinator",Four.toString(),false);
+							//Ranks.addBlankField(false);
+							Ranks.addField("Admin",Five.toString(),true);
+							if(admincount>admins) Ranks.addField("\u200B",Six.toString(),true);
+							Ranks.setColor(blurple);
+							Ranks.setDescription("The bot has matched the accounts with it's best guess of what their discord tag might be. There is still a significant margin for error, so let me know if something goes wrong, or something is omitted that should not be. However if you're running the command for a clan other than that which owns the discord server, things will be matched wrong.");
+							String Time = new SimpleDateFormat("MM/dd/YYYY hh:mma zzz").format(new Date());
+							Ranks.setFooter("Generated "+Time+" For "+Clan,Bot.jda.getSelfUser().getAvatarUrl());
+							e.getChannel().sendMessage(Ranks.build()).queue( msg -> msg.delete().queueAfter(2,TimeUnit.MINUTES));
+						}catch(java.lang.NoClassDefFoundError|IOException eeeee){
+							System.out.println(eeeee.getMessage());
+							eeeee.printStackTrace();
+						}
+						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
 				}
 			}
