@@ -267,7 +267,7 @@ class EventListener extends ListenerAdapter {
 						if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
 					case "id":
-						if(!author.hasPermission("command.id")){
+						if(!author.hasPermission("command.id")&&!author.isIsadmin()){
 							if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(6)+""+e.getAuthor().getName()+" was denied access to the command.");
 							if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
 							return;
