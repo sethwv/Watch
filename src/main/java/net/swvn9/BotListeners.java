@@ -109,6 +109,9 @@ class EventListener extends ListenerAdapter {
 			case 5:
 				logType = "DBUG";
 				break;
+			case 6:
+				logType = "Perm";
+				break;
 		}
 		return "["+timeStamp+"] ["+logType+"] [Log]: "; //create and return the log prefix
 	}
@@ -244,28 +247,42 @@ class EventListener extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
-    	if(Home==null) EventListener.Home= e.getGuild();
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
-		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getChannelType().equals(ChannelType.PRIVATE)))){
+		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("pullconfig")||e.getChannelType().equals(ChannelType.PRIVATE)))){
             return;
         }
-        String input = e.getMessage().getRawContent();
+		BotUser author = new BotUser(e.getAuthor(),e.getGuild());
+		if(Home==null) EventListener.Home= e.getGuild();
+
+		String input = e.getMessage().getRawContent();
         if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2)+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
 	    if(e.isFromType(ChannelType.PRIVATE)) logger(logPrefix(2)+"(Private Message) "+e.getAuthor().getName()+": "+input);
-
 	    if(isCommand(e.getMessage())){
 			input=input.replaceFirst(LITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()){
 				switch(command.next().toLowerCase()){
 					default:
+						if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
 					case "id":
+						if(!author.hasPermission("command.id")){
+							if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(6)+""+e.getAuthor().getName()+" was denied access to the command.");
+							if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+							return;
+						}
 						e.getChannel().sendMessage(e.getAuthor().getAsMention()+", Your ID is "+e.getAuthor()+".").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+						e.getChannel().sendMessage(author.getPermissions().toString()).queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+						e.getChannel().sendMessage(author.isIsadmin()+"").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
 						if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
 					case "clan":
+						if(!author.hasPermission("command.clan")&&!author.isIsadmin()){
+							if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(6)+""+e.getAuthor().getName()+" was denied access to the command.");
+							if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+							return;
+						}
 						String Clan = "Zamorak Cult";
 						if(command.hasNext()){
 							StringBuilder ClanBuilder = new StringBuilder(command.next());
@@ -275,8 +292,6 @@ class EventListener extends ListenerAdapter {
 							Clan = ClanBuilder.toString();
 						}
 						try{
-							Levenshtein l = new Levenshtein();
-							JaroWinkler jw = new JaroWinkler();
 							java.util.List<ClanMate> clanMates = hiscores.clanInformation(Clan);
 							EmbedBuilder Ranks = new EmbedBuilder();
 							StringBuilder One = new StringBuilder();
@@ -290,10 +305,6 @@ class EventListener extends ListenerAdapter {
 							StringBuilder Five = new StringBuilder();
 							StringBuilder Six = new StringBuilder();
 							int admins = StringUtils.countMatches(clanMates.toString(),"Admin")/2+1;
-							//int Owners = StringUtils.countMatches(clanMates.toString(),"Owner");
-							//int DeputyOwners = StringUtils.countMatches(clanMates.toString(),"Deputy Owner");
-							//int Overseers = StringUtils.countMatches(clanMates.toString(),"Overseer");
-							//int Ministers = StringUtils.countMatches(clanMates.toString(),"Coordinator");
 							int admincount = 0;
 							for(ClanMate a : clanMates){
 								boolean found = false;
@@ -302,7 +313,6 @@ class EventListener extends ListenerAdapter {
 										for(Member b:e.getGuild().getMembers()){
 											if(comapare(b.getEffectiveName(),a.getName())){
 												if(!One.toString().contains(b.getAsMention())) One.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-												//One.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 												break;
 											}
@@ -314,7 +324,6 @@ class EventListener extends ListenerAdapter {
 										for(Member b:e.getGuild().getMembers()){
 											if(comapare(b.getEffectiveName(),a.getName())){
 												if(!Two.toString().contains(b.getAsMention())) Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-												//Two.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 												break;
 											}
@@ -326,7 +335,6 @@ class EventListener extends ListenerAdapter {
 										for(Member b:e.getGuild().getMembers()){
 											if(comapare(b.getEffectiveName(),a.getName())){
 												if(!Three.toString().contains(b.getAsMention())) Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-												//Three.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 												break;
 											}
@@ -338,7 +346,6 @@ class EventListener extends ListenerAdapter {
 										for(Member b:e.getGuild().getMembers()){
 											if(comapare(b.getEffectiveName(),a.getName())){
 												if(!Four.toString().contains(b.getAsMention())) Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-												//Four.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 												break;
 											}
@@ -353,10 +360,8 @@ class EventListener extends ListenerAdapter {
 												if(!Five.toString().contains(b.getAsMention())&&!Six.toString().contains(b.getAsMention()))
 													if(admincount<=admins)
 														Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-														//Five.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												if(admincount>admins)
 														Six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
-														//Six.append(" *S: `").append(jw.similarity(b.getEffectiveName(),a.getName())).append("`*");
 												found = true;
 													break;
 											}
@@ -372,10 +377,8 @@ class EventListener extends ListenerAdapter {
 							}
 							Ranks.addField("Owner",One.toString(),false);
 							Ranks.addField("Deputy Owner",Two.toString(),true);
-							//Ranks.addBlankField(false);
 							Ranks.addField("Overseer",Three.toString(),true);
 							Ranks.addField("Coordinator",Four.toString(),false);
-							//Ranks.addBlankField(false);
 							Ranks.addField("Admin",Five.toString(),true);
 							if(admincount>admins) Ranks.addField("\u200B",Six.toString(),true);
 							Ranks.setColor(blurple);
@@ -389,12 +392,13 @@ class EventListener extends ListenerAdapter {
 						}
 						if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
 						break;
+
 				}
 			}
 		}
 
 		if((isDevCommand(e.getMessage()))){
-	    	if(e.getChannelType().equals(ChannelType.PRIVATE)||isAdmin(e.getGuild(),e.getAuthor())||isSeth(e.getAuthor())){
+	    	if(e.getChannelType().equals(ChannelType.PRIVATE)||author.isIsadmin()||isSeth(e.getAuthor())){
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()) switch (command.next().toLowerCase()) {
@@ -456,9 +460,6 @@ class EventListener extends ListenerAdapter {
 						whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
 					other.addField("Whitelist", whitelisted.toString(), false);
 					other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
-
-					//EmbedBuilder groups = new EmbedBuilder();
-					//groups.setColor(blurple);
 					other.addBlankField(false);
 					for (String key : Config.config.getGroups().keySet()) {
 						StringBuilder ids = new StringBuilder();
@@ -477,11 +478,6 @@ class EventListener extends ListenerAdapter {
 						}
 						other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
 					}
-					//groups.setFooter("Groups from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
-					//e.getChannel().sendMessage(groups.build()).queue( msg -> msg.delete().queueAfter(1,TimeUnit.MINUTES));
-
-					//EmbedBuilder user = new EmbedBuilder();
-					//user.setColor(blurple);
 					other.addBlankField(false);
 					for (String key : Config.config.getUsers().keySet()) {
 						other.addField(key, "User ID" + System.lineSeparator() + "`" + Config.config.getUsers().get(key).id + "`", true);
