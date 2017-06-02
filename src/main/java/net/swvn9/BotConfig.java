@@ -71,15 +71,15 @@ class Config {
 }
 class configUser {
 	public String id;
-	boolean isadmin;
-	int power;
-	List<String> permissions;
+	public boolean isadmin;
+	public int power;
+	public List<String> permissions;
 }
 class configGroup {
 	public List<String> id;
-	boolean isadmin;
-	int power;
-	List<String> permissions;
+	public boolean isadmin;
+	public int power;
+	public List<String> permissions;
 }
 class Yaml { //this is my yaml bean thingamahooza
 
