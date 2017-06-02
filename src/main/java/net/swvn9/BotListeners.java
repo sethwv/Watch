@@ -1,12 +1,11 @@
 package net.swvn9;
 
-import com.google.common.collect.Table;
 import com.mikebull94.rsapi.hiscores.ClanMate;
-import com.mikebull94.rsapi.hiscores.HiscoreTable;
 import com.mikebull94.rsapi.hiscores.Hiscores;
-import com.mikebull94.rsapi.hiscores.Player;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
+import net.dv8tion.jda.client.events.group.GroupUserJoinEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
@@ -15,6 +14,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import com.mikebull94.rsapi.*;
+import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JFrame;
 
 class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
@@ -45,9 +46,37 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 						event.getJDA().getPresence().setGame(Game.of("in Dev Mode"));
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in the test server!");
 						break;
+					case "254861442799370240":
+						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult public server");
+						MyBackgroudMethod thread = new MyBackgroudMethod();
+						thread.setDaemon(true);
+						thread.start();
+
+						java.awt.EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								EventListener.clanRanks(a);
+							}
+						});
+						break;
+				}
+			}
+
+		}
+	}
+	public static class MyBackgroudMethod extends Thread {
+
+		@Override
+		public void run() {
+			while (true) {
+				EventListener.logger(EventListener.logPrefix(0) + "Updated Zamorak Cult clan ranks.");
+				try {
+					Thread.sleep(3600000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
+
 	}
 }
 
@@ -172,15 +201,140 @@ class EventListener extends ListenerAdapter {
 		}
 		return true;
 	}
-	private static boolean comapare(String a,String b){
+	private static boolean comapare(String a,String b) {
 		Levenshtein l = new Levenshtein();
 		JaroWinkler jw = new JaroWinkler();
-		if(a.contains(b)) return true;
-		if(b.contains(a)) return true;
-		if(a.equalsIgnoreCase(b)) return true;
-		if(l.distance(a,b)<2) return true;
-		if(jw.similarity(a,b)>0.89d) return true;
-		return false;
+		return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
+	}
+	static void clanRanks(Guild g){
+		String Clan = "Zamorak Cult";
+		try{
+			java.util.List<ClanMate> clanMates = hiscores.clanInformation(Clan);
+			//EmbedBuilder Ranks = new EmbedBuilder();
+			StringBuilder One = new StringBuilder();
+			StringBuilder Two = new StringBuilder();
+			StringBuilder Three = new StringBuilder();
+			StringBuilder Four = new StringBuilder();
+			StringBuilder Five = new StringBuilder();
+			//StringBuilder Six = new StringBuilder();
+			GuildController controller = g.getController();
+			for(ClanMate a : clanMates){
+				boolean found = false;
+				String roleIds[] = new String[]{
+						"320252998867615765","320252946422038530","320258202069499914","320252736035880960","320253083474984961"
+				};
+				switch (a.getRank()){
+					case "Owner":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if(v.getId().equals(c)&&!v.getId().equals("320252998867615765")) b.getRoles().remove(b.getGuild().getRoleById(c));
+									}
+								}
+								if(!b.getRoles().contains(b.getGuild().getRoleById("320252998867615765")))controller.addRolesToMember(b,b.getGuild().getRoleById("320252998867615765")).queue();
+								if(!One.toString().contains(b.getAsMention())) One.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) One.append(a.getName());
+						One.append(System.lineSeparator());
+						break;
+					case "Deputy Owner":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if(v.getId().equals(c)&&!v.getId().equals("320252946422038530")) b.getRoles().remove(b.getGuild().getRoleById(c));
+									}
+								}
+								if(!b.getRoles().contains(b.getGuild().getRoleById("320252946422038530")))controller.addRolesToMember(b,b.getGuild().getRoleById("320252946422038530")).queue();
+								if(!Two.toString().contains(b.getAsMention())) Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Two.append(a.getName());
+						Two.append(System.lineSeparator());
+						break;
+					case "Overseer":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if(v.getId().equals(c)&&!v.getId().equals("320258202069499914")) b.getRoles().remove(b.getGuild().getRoleById(c));
+									}
+								}
+								if(!b.getRoles().contains(b.getGuild().getRoleById("320258202069499914")))controller.addRolesToMember(b,b.getGuild().getRoleById("320258202069499914")).queue();
+								if(!Three.toString().contains(b.getAsMention())) Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Three.append(a.getName());
+						Three.append(System.lineSeparator());
+						break;
+					case "Coordinator":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if(v.getId().equals(c)&&!v.getId().equals("320252736035880960")) b.getRoles().remove(b.getGuild().getRoleById(c));
+									}
+								}
+								if(!b.getRoles().contains(b.getGuild().getRoleById("320252736035880960")))controller.addRolesToMember(b,b.getGuild().getRoleById("320252736035880960")).queue();
+								if(!Four.toString().contains(b.getAsMention())) Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Four.append(a.getName());
+						Four.append(System.lineSeparator());
+						break;
+					case "Admin":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if(v.getId().equals(c)&&!v.getId().equals("320253083474984961")) b.getRoles().remove(b.getGuild().getRoleById(c));
+									}
+								}
+								if(!b.getRoles().contains(b.getGuild().getRoleById("320253083474984961")))controller.addRolesToMember(b,b.getGuild().getRoleById("320253083474984961")).queue();
+								if(!Five.toString().contains(b.getAsMention())) Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Five.append(a.getName());
+						Five.append(System.lineSeparator());
+						break;
+					default:
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role v:b.getRoles()){
+									for(String c:roleIds){
+										if((One.toString()+Two.toString()+Three.toString()+Four.toString()+Five.toString()).contains(a.getName())) break;
+										if(v.getId().equals(c)) controller.removeRolesFromMember(b,b.getGuild().getRoleById(c)).queue();
+									}
+								}
+
+								break;
+							}
+						}
+						break;
+				}
+			}
+		}catch(java.lang.NoClassDefFoundError|IOException eeeee){
+			System.out.println(eeeee.getMessage());
+			eeeee.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent e){
+		if(e.getGuild().getId().equals("254861442799370240")) clanRanks(e.getGuild());
+		EventListener.logger(EventListener.logPrefix(0) + "Updated Zamorak Cult clan ranks.");
 	}
 
     @Override //any reaction that is added that the bot can see
@@ -402,6 +556,11 @@ class EventListener extends ListenerAdapter {
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()) switch (command.next().toLowerCase()) {
+				case "clanroles":
+					clanRanks(e.getGuild());
+					e.getChannel().addReactionById(e.getMessageId(), "👍").queue();
+					if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
+					break;
 				case "roles":
 					if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
 					EmbedBuilder roles = new EmbedBuilder();
