@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
-import javax.swing.JFrame;
 
 class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
@@ -70,7 +69,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 			while (true) {
 				EventListener.logger(EventListener.logPrefix(0) + "Updated Zamorak Cult clan ranks.");
 				try {
-					Thread.sleep(3600000);
+					Thread.sleep(7200000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -249,7 +248,7 @@ class EventListener extends ListenerAdapter {
 										if(v.getId().equals(c)&&!v.getId().equals("320252946422038530")) b.getRoles().remove(b.getGuild().getRoleById(c));
 									}
 								}
-								if(!b.getRoles().contains(b.getGuild().getRoleById("320252946422038530")))controller.addRolesToMember(b,b.getGuild().getRoleById("320252946422038530")).queue();
+								controller.addRolesToMember(b,b.getGuild().getRoleById("320252946422038530")).queue();
 								if(!Two.toString().contains(b.getAsMention())) Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
 								found = true;
 								break;
@@ -266,7 +265,7 @@ class EventListener extends ListenerAdapter {
 										if(v.getId().equals(c)&&!v.getId().equals("320258202069499914")) b.getRoles().remove(b.getGuild().getRoleById(c));
 									}
 								}
-								if(!b.getRoles().contains(b.getGuild().getRoleById("320258202069499914")))controller.addRolesToMember(b,b.getGuild().getRoleById("320258202069499914")).queue();
+								controller.addRolesToMember(b,b.getGuild().getRoleById("320258202069499914")).queue();
 								if(!Three.toString().contains(b.getAsMention())) Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
 								found = true;
 								break;
@@ -283,7 +282,7 @@ class EventListener extends ListenerAdapter {
 										if(v.getId().equals(c)&&!v.getId().equals("320252736035880960")) b.getRoles().remove(b.getGuild().getRoleById(c));
 									}
 								}
-								if(!b.getRoles().contains(b.getGuild().getRoleById("320252736035880960")))controller.addRolesToMember(b,b.getGuild().getRoleById("320252736035880960")).queue();
+								controller.addRolesToMember(b,b.getGuild().getRoleById("320252736035880960")).queue();
 								if(!Four.toString().contains(b.getAsMention())) Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
 								found = true;
 								break;
@@ -300,7 +299,7 @@ class EventListener extends ListenerAdapter {
 										if(v.getId().equals(c)&&!v.getId().equals("320253083474984961")) b.getRoles().remove(b.getGuild().getRoleById(c));
 									}
 								}
-								if(!b.getRoles().contains(b.getGuild().getRoleById("320253083474984961")))controller.addRolesToMember(b,b.getGuild().getRoleById("320253083474984961")).queue();
+								controller.addRolesToMember(b,b.getGuild().getRoleById("320253083474984961")).queue();
 								if(!Five.toString().contains(b.getAsMention())) Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
 								found = true;
 								break;
