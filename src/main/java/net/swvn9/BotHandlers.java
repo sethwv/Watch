@@ -45,6 +45,7 @@ class BotUser {
         return permissions;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean hasPermission(String perm){
         for(String a:permissions){
             if(a.equalsIgnoreCase(perm))return true;
