@@ -12,6 +12,11 @@ import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.events.role.GenericRoleEvent;
+import net.dv8tion.jda.core.events.guild.member.GenericGuildMemberEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
+
 import com.mikebull94.rsapi.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +36,6 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	public void onEvent(net.dv8tion.jda.core.events.Event event)
 	{
 		if(event instanceof ReadyEvent){
-
 			for(Guild a : event.getJDA().getGuilds())
 				switch (a.getId()) {
 					default:
@@ -47,12 +51,22 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in the test server!");
 						break;
 					case "254861442799370240":
+						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult public server");
 						MyBackgroudMethod thread = new MyBackgroudMethod();
 						thread.setDaemon(true);
 						thread.start();
 
 						invokeLater(() -> EventListener.clanRanks(a));
+						break;
+					case "319606739550863360":
+						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
+						MyBackgroudMethod thread2 = new MyBackgroudMethod();
+						thread2.setDaemon(true);
+						thread2.start();
+
+						invokeLater(() -> EventListener.clanRanks2(a));
 						break;
 				}
 
@@ -63,7 +77,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 		@Override
 		public void run() {
 			while (true) {
-				EventListener.logger(EventListener.logPrefix(0) + "Updated Zamorak Cult clan ranks.");
+				EventListener.logger(EventListener.logPrefix(0) + "Updated clan ranks.");
 				try {
 					Thread.sleep(7200000);
 				} catch (InterruptedException e) {
@@ -201,6 +215,162 @@ class EventListener extends ListenerAdapter {
 		JaroWinkler jw = new JaroWinkler();
 		return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
 	}
+	static void clanRanks2(Guild g){
+		String Clan = "Zamorak Cult";
+		try{
+			java.util.List<ClanMate> clanMates = hiscores.clanInformation(Clan);
+			//EmbedBuilder Ranks = new EmbedBuilder();
+			StringBuilder One = new StringBuilder();
+			StringBuilder Two = new StringBuilder();
+			StringBuilder Three = new StringBuilder();
+			StringBuilder Four = new StringBuilder();
+			StringBuilder Five = new StringBuilder();
+			//StringBuilder Six = new StringBuilder();
+			GuildController controller = g.getController();
+			@SuppressWarnings("unused") String roleIds[] = new String[]{
+					"319607520307970051","320617625300369408","320616748833439744","319607280540712961","319607318595502091"
+			};
+			for(ClanMate a : clanMates){
+				Role roleArray1[] = new Role[]{
+						g.getRoleById("319607520307970051"),g.getRoleById("320617625300369408"),g.getRoleById("320616748833439744"),g.getRoleById("319607280540712961"),g.getRoleById("319607318595502091")
+				};
+				Role roleArray2[] = new Role[]{
+						g.getRoleById("319607520307970051")
+				};
+				Collection<Role> roles = Arrays.asList(roleArray1);
+
+				boolean found = false;
+				boolean verified = false;
+				switch (a.getRank()){
+					case "Owner":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								if(verified){
+									roleArray2[0]=roleArray1[0];
+									roleArray1[0]=roleArray1[1];
+									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
+								}else{
+									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
+
+								}
+								if(!One.toString().contains(b.getAsMention())) One.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) One.append(a.getName());
+						One.append(System.lineSeparator());
+						break;
+					case "Deputy Owner":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								if(verified){
+									roleArray2[0]=roleArray1[1];
+									roleArray1[1]=roleArray1[0];
+									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
+								}else{
+									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
+								}
+								if(!Two.toString().contains(b.getAsMention())) Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Two.append(a.getName());
+						Two.append(System.lineSeparator());
+						break;
+					case "Overseer":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								if(verified){
+									roleArray2[0]=roleArray1[2];
+									roleArray1[2]=roleArray1[1];
+									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
+								}else{
+									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
+								}
+								if(!Three.toString().contains(b.getAsMention())) Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Three.append(a.getName());
+						Three.append(System.lineSeparator());
+						break;
+					case "Coordinator":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								if(verified){
+									roleArray2[0]=roleArray1[3];
+									roleArray1[3]=roleArray1[2];
+									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
+								}else{
+									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
+								}
+								if(!Four.toString().contains(b.getAsMention())&&verified) Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Four.append(a.getName());
+						Four.append(System.lineSeparator());
+						break;
+					case "Admin":
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								if(verified){
+									roleArray2[0]=roleArray1[4];
+									roleArray1[4]=roleArray1[3];
+									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
+								}else{
+									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
+								}
+								if(!Five.toString().contains(b.getAsMention())) Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+								found = true;
+								break;
+							}
+						}
+						if(!found) Five.append(a.getName());
+						Five.append(System.lineSeparator());
+						break;
+					default:
+						for(Member b:g.getMembers()){
+							if(comapare(b.getEffectiveName(),a.getName())){
+								for(Role role:b.getRoles()){
+									if(role.getName().contains("✔")) verified = true;
+								}
+								for(Role v:b.getRoles()){
+									if(roles.contains(v)){
+										if((One.toString()+Two.toString()+Three.toString()+Four.toString()+Five.toString()).contains(a.getName())) break;
+										break;
+									}
+								}
+								break;
+							}
+						}
+						break;
+				}
+			}
+		}catch(java.lang.NoClassDefFoundError|IOException eeeee){
+			System.out.println(eeeee.getMessage());
+			eeeee.printStackTrace();
+		}
+	}
 	static void clanRanks(Guild g){
 		String Clan = "Zamorak Cult";
 		try{
@@ -236,7 +406,7 @@ class EventListener extends ListenerAdapter {
 								}
 								if(verified){
 									roleArray2[0]=roleArray1[0];
-									roleArray1[0]=roleArray1[5];
+									roleArray1[0]=roleArray1[2];
 									controller.modifyMemberRoles(b,Arrays.asList(roleArray2),Arrays.asList(roleArray1)).queue();
 								}else{
 									controller.removeRolesFromMember(b,Arrays.asList(roleArray1)).queue();
@@ -358,7 +528,9 @@ class EventListener extends ListenerAdapter {
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e){
 		if(e.getGuild().getId().equals("254861442799370240")) clanRanks(e.getGuild());
-		EventListener.logger(EventListener.logPrefix(0) + "Updated Zamorak Cult clan ranks.");
+		if(e.getGuild().getId().equals("319606739550863360")) clanRanks2(e.getGuild());
+
+		EventListener.logger(EventListener.logPrefix(0) + "Updated clan ranks.");
 	}
 
     @Override //any reaction that is added that the bot can see
@@ -422,6 +594,19 @@ class EventListener extends ListenerAdapter {
 			}
 		}
     }
+
+    @Override
+	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e){
+		if(e.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
+			clanRanks2(e.getGuild());
+		}
+	}
+	@Override
+	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
+		if(e.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
+			clanRanks2(e.getGuild());
+		}
+	}
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
@@ -575,13 +760,61 @@ class EventListener extends ListenerAdapter {
 			}
 		}
 
+		if(input.charAt(0)=='<'){
+			if(e.getChannel().getId().equals("320615332840472576")){
+				Scanner command = new Scanner(input);
+				if(!author.hasPermission("command.v")){
+					return;
+				}
+				if(command.hasNext()){
+					String user = command.next();
+					for(Member m:e.getGuild().getMembers()){
+						if(m.getAsMention().equals(user)&&!m.equals(e.getGuild().getMemberById("320611242366730241"))&&!m.isOwner()){
+							if(m.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
+								if(e.getAuthor().equals(m.getUser())){
+									if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+									return;
+								}
+								e.getChannel().sendMessage(user+", you have been un-verified by "+e.getAuthor().getName()+".\n**You have lost all access to rank-based channels,** and may once again speak in <#320615332840472576>.").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+								e.getGuild().getController().setNickname(m,"").queue();
+								e.getGuild().getController().removeRolesFromMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
+
+							} else {
+								if(command.hasNext()){
+									String nickname = command.next();
+									if(command.hasNext()){
+										nickname = nickname+" "+command.next();
+									}
+									if(e.getAuthor().equals(m.getUser())){
+										if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+										return;
+									}
+									e.getChannel().sendMessage(user+", you have been verified by "+e.getAuthor().getName()+", who has set your nickname to "+nickname+". \nAny ranks you have in-game will be applied here, either now or within two hours.\n**You can no longer send messages in <#320615332840472576>**,\nbut **you may now speak in <#320638866103074816> if you are at least Minister or above in-game.**\n*(This message will stay for ten minutes and delete itself. Please make sure you read it.)").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+									e.getGuild().getController().setNickname(m,nickname).queue();
+								} else {
+									if(e.getAuthor().equals(m.getUser())){
+										if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+										return;
+									}
+									e.getChannel().sendMessage(user+", you have been verified by "+e.getAuthor().getName()+". \nAny ranks you have in-game will be applied here, either now or within two hours.\n**You can no longer send messages in <#320615332840472576>**,\nbut **you may now speak in <#320638866103074816> if you are at least Minister or above in-game.**\n*(This message will stay for ten minutes and delete itself. Please make sure you read it.)").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+								}
+								e.getGuild().getController().addRolesToMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
+							}
+						}
+					}
+				}
+				if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
+			}
+		}
+
 		if((isDevCommand(e.getMessage()))){
 	    	if(e.getChannelType().equals(ChannelType.PRIVATE)||author.isIsadmin()||isSeth(e.getAuthor())){
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()) switch (command.next().toLowerCase()) {
 				case "clanroles":
-					clanRanks(e.getGuild());
+					if(e.getGuild().getId().equals("254861442799370240")) clanRanks(e.getGuild());
+					if(e.getGuild().getId().equals("319606739550863360")) clanRanks2(e.getGuild());
 					e.getChannel().addReactionById(e.getMessageId(), "👍").queue();
 					if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
 					break;
