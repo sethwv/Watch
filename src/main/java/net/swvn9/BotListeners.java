@@ -784,6 +784,9 @@ class EventListener extends ListenerAdapter {
 									String nickname = command.next();
 									if(command.hasNext()){
 										nickname = nickname+" "+command.next();
+										if(command.hasNext()){
+											nickname = nickname+" "+command.next();
+										}
 									}
 									if(e.getAuthor().equals(m.getUser())){
 										if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
