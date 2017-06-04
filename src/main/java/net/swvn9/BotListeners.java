@@ -760,6 +760,46 @@ class EventListener extends ListenerAdapter {
 			}
 		}
 
+		if(e.getGuild().getId().equals("319606739550863360")){
+	    	Scanner message = new Scanner(input);
+	    	if(input.contains("vote")||input.contains("poll")||input.contains("Vote")||input.contains("Poll")){
+				e.getChannel().sendMessage("<@&319607280540712961>, "+e.getMember().getEffectiveName()+" has called a vote! Leave your vote in the form of a reaction on this message!\n\n"+input).queue(msg->{
+					while(message.hasNext()){
+						String z = message.next();
+						switch(z){
+							default:
+								break;
+							case "\uD83C\uDDE6":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDE7":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDE8":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDE9":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDEA":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDEB":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDEC":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+							case "\uD83C\uDDED":
+								e.getChannel().addReactionById(msg.getId(),z).queue();
+								break;
+						}
+					}
+				});
+				if (e.getChannelType().isGuild()) e.getMessage().delete().queue();
+			}
+		}
+
 		if(input.charAt(0)=='<'){
 			if(e.getChannel().getId().equals("320615332840472576")){
 				Scanner command = new Scanner(input);
