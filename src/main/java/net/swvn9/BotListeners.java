@@ -225,8 +225,8 @@ class EventListener extends ListenerAdapter {
 					//if(m.getEffectiveName().equals(a.getName())){
 					if(comapare(a.getName(),m.getEffectiveName())&&!Modified.toString().contains(m.getAsMention())){
 						if(m.getRoles().contains(g.getRoleById("320300565789802497"))){
-							System.out.println(a.getName());
-							System.out.println(a.getRank());
+							//System.out.println(a.getName());
+							//System.out.println(a.getRank());
 							Role addroles[];
 							Role remroles[];
 							Role Owner = g.getRoleById("319607520307970051");
@@ -252,10 +252,10 @@ class EventListener extends ListenerAdapter {
 										}
 									}
 									if(!m.getEffectiveName().equalsIgnoreCase(a.getName()))clanranking.setNickname(m,a.getName()).queue();
+                                    if(m.getRoles().contains(g.getRoleById("319606870606217217"))) clanranking.setNickname(m,m.getEffectiveName()+" \uD83D\uDD28").queue();
 									Modified.append(m.getAsMention());
 									break;
 								case "Deputy Owner":
-									System.out.println("test");
 									remroles = new Role[]{Owner,Overseer,Minister,Admin};
 									addroles = new Role[]{DepOwner};
 									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
@@ -268,7 +268,8 @@ class EventListener extends ListenerAdapter {
 										}
 									}
 									if(!m.getEffectiveName().equalsIgnoreCase(a.getName()))clanranking.setNickname(m,a.getName()).queue();
-									Modified.append(m.getAsMention());
+                                    if(m.getRoles().contains(g.getRoleById("319606870606217217"))) clanranking.setNickname(m,m.getEffectiveName()+" \uD83D\uDD28").queue();
+                                    Modified.append(m.getAsMention());
 									break;
 								case "Overseer":
 									remroles = new Role[]{Owner,DepOwner,Minister,Admin};
@@ -283,7 +284,8 @@ class EventListener extends ListenerAdapter {
 										}
 									}
 									if(!m.getEffectiveName().equalsIgnoreCase(a.getName()))clanranking.setNickname(m,a.getName()).queue();
-									Modified.append(m.getAsMention());
+                                    if(m.getRoles().contains(g.getRoleById("319606870606217217"))) clanranking.setNickname(m,m.getEffectiveName()+" \uD83D\uDD28").queue();
+                                    Modified.append(m.getAsMention());
 									break;
 								case "Coordinator":
 									remroles = new Role[]{Owner,DepOwner,Overseer,Admin};
@@ -299,7 +301,8 @@ class EventListener extends ListenerAdapter {
 									}
 									//clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
 									if(!m.getEffectiveName().equalsIgnoreCase(a.getName()))clanranking.setNickname(m,a.getName()).queue();
-									Modified.append(m.getAsMention());
+                                    if(m.getRoles().contains(g.getRoleById("319606870606217217"))) clanranking.setNickname(m,m.getEffectiveName()+" \uD83D\uDD28").queue();
+                                    Modified.append(m.getAsMention());
 									break;
 								case "Admin":
 									remroles = new Role[]{Owner,DepOwner,Overseer,Minister};
@@ -314,7 +317,8 @@ class EventListener extends ListenerAdapter {
 										}
 									}
 									if(!m.getEffectiveName().equalsIgnoreCase(a.getName()))clanranking.setNickname(m,a.getName()).queue();
-									Modified.append(m.getAsMention());
+                                    if(m.getRoles().contains(g.getRoleById("319606870606217217"))) clanranking.setNickname(m,m.getEffectiveName()+" \uD83D\uDD28").queue();
+                                    Modified.append(m.getAsMention());
 									break;
 							}
 
@@ -831,11 +835,13 @@ class EventListener extends ListenerAdapter {
 					Role maintain[] = new Role[]{e.getGuild().getRoleById("319606870606217217")};
 					if(author.isIsadmin()||author.hasPermission("command.m")){
 						if(e.getGuild().getMember(e.getAuthor()).getRoles().contains(e.getGuild().getRoleById("319606870606217217"))){
-							e.getGuild().getController().removeRolesFromMember(e.getMember(),Arrays.asList(maintain)).queue();
+                            e.getGuild().getController().setNickname(e.getMember(),e.getMember().getEffectiveName().replace(" \uD83D\uDD28","")).queue();
+                            e.getGuild().getController().removeRolesFromMember(e.getMember(),Arrays.asList(maintain)).queue();
 							e.getChannel().addReactionById(e.getMessageId(), "👍").queue();
 							if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
 						} else {
-							e.getGuild().getController().addRolesToMember(e.getMember(),Arrays.asList(maintain)).queue();
+                            e.getGuild().getController().setNickname(e.getMember(),e.getMember().getEffectiveName()+" \uD83D\uDD28").queue();
+                            e.getGuild().getController().addRolesToMember(e.getMember(),Arrays.asList(maintain)).queue();
 							e.getChannel().addReactionById(e.getMessageId(), "👍").queue();
 							if (e.getChannelType().isGuild()) e.getMessage().delete().queueAfter(10,TimeUnit.SECONDS);
 						}
