@@ -224,100 +224,189 @@ class EventListener extends ListenerAdapter {
 				for(Member m:g.getMembers()){
 					//if(m.getEffectiveName().equals(a.getName())){
 					if(comapare(a.getName(),m.getEffectiveName())&&!Modified.toString().contains(m.getAsMention())){
+                        Role addroles[];
+                        Role remroles[];
+                        Role Owner = g.getRoleById("319607520307970051");
+                        Role DepOwner = g.getRoleById("320617625300369408");
+                        Role Overseer = g.getRoleById("320616748833439744");
+                        Role Minister = g.getRoleById("319607280540712961");
+                        Role Admin = g.getRoleById("319607318595502091");
+                        Role General = g.getRoleById("323324854650798082");
+                        boolean check=false;
 						if(m.getRoles().contains(g.getRoleById("320300565789802497"))){
 							//System.out.println(a.getName());
 							//System.out.println(a.getRank());
-							Role addroles[];
-							Role remroles[];
-							Role Owner = g.getRoleById("319607520307970051");
-							Role DepOwner = g.getRoleById("320617625300369408");
-							Role Overseer = g.getRoleById("320616748833439744");
-							Role Minister = g.getRoleById("319607280540712961");
-							Role Admin = g.getRoleById("319607318595502091");
 							switch(a.getRank()){
 								default:
-									remroles = new Role[]{Owner,DepOwner,Overseer,Minister,Admin};
-									clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                    if(!Modified.toString().contains(m.getAsMention())){
+                                        remroles = new Role[]{Owner,DepOwner,Overseer,Minister,Admin};
+                                        clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                    }
 									break;
 								case "Owner":
-									remroles = new Role[]{DepOwner,Overseer,Minister,Admin};
+									remroles = new Role[]{DepOwner,Overseer,Minister,Admin,General};
 									addroles = new Role[]{Owner};
-									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
-										if(m.getRoles().contains(Owner)){
-											clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
-											break;
-										}else{
-											clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-											break;
-										}
-									}
+									for(Role r:remroles){
+									    if(m.getRoles().contains(r)){
+									        if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
+                                    //clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
 									if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
 									Modified.append(m.getAsMention());
 									break;
 								case "Deputy Owner":
-									remroles = new Role[]{Owner,Overseer,Minister,Admin};
+									remroles = new Role[]{Owner,Overseer,Minister,Admin,General};
 									addroles = new Role[]{DepOwner};
-									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
-										if(m.getRoles().contains(DepOwner)){
-											clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
-											break;
-										}else{
-											clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-											break;
-										}
-									}
+                                    for(Role r:remroles){
+                                        if(m.getRoles().contains(r)){
+                                            if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
                                     Modified.append(m.getAsMention());
 									break;
 								case "Overseer":
-									remroles = new Role[]{Owner,DepOwner,Minister,Admin};
+									remroles = new Role[]{Owner,DepOwner,Minister,Admin,General};
 									addroles = new Role[]{Overseer};
-									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
-										if(m.getRoles().contains(Overseer)){
-											clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
-											break;
-										}else{
-											clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-											break;
-										}
-									}
+                                    for(Role r:remroles){
+                                        if(m.getRoles().contains(r)){
+                                            if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
                                     Modified.append(m.getAsMention());
 									break;
 								case "Coordinator":
-									remroles = new Role[]{Owner,DepOwner,Overseer,Admin};
+									remroles = new Role[]{Owner,DepOwner,Overseer,Admin,General};
 									addroles = new Role[]{Minister};
-									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
-										if(m.getRoles().contains(Minister)){
-											clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
-											break;
-										}else{
-											clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-											break;
-										}
-									}
-									//clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                    for(Role r:remroles){
+                                        if(m.getRoles().contains(r)){
+                                            if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
                                     Modified.append(m.getAsMention());
 									break;
 								case "Admin":
-									remroles = new Role[]{Owner,DepOwner,Overseer,Minister};
+									remroles = new Role[]{Owner,DepOwner,Overseer,Minister,General};
 									addroles = new Role[]{Admin};
-									for(Role r:m.getRoles()) if(Arrays.asList(remroles).contains(r)){
-										if(m.getRoles().contains(Admin)){
-											clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
-											break;
-										}else{
-											clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-											break;
-										}
-									}
+                                    for(Role r:remroles){
+                                        if(m.getRoles().contains(r)){
+                                            if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
                                     Modified.append(m.getAsMention());
 									break;
+                                case "General":
+                                    remroles = new Role[]{Owner,DepOwner,Overseer,Minister,Admin};
+                                    addroles = new Role[]{General};
+                                    for(Role r:remroles){
+                                        if(m.getRoles().contains(r)){
+                                            if(m.getRoles().contains(addroles[0])){
+                                                clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                                                check = true;
+                                                break;
+                                            } else {
+                                                clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                check = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(!check){
+                                        if(!m.getRoles().contains(addroles[0])){
+                                            clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
+                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                        }
+                                    }
+                                    if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
+                                    Modified.append(m.getAsMention());
+                                    break;
 							}
 
-						}
+
+						} else if(!Modified.toString().contains(m.getAsMention())&&!m.getRoles().contains(g.getRoleById("320300565789802497"))){
+                            remroles = new Role[]{Owner,DepOwner,Overseer,Minister,Admin};
+                            clanranking.removeRolesFromMember(m,Arrays.asList(remroles)).queue();
+                        }
 					}
 				}
 			}
@@ -555,13 +644,15 @@ class EventListener extends ListenerAdapter {
     @Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e){
 		if(e.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
+		    //System.out.println("doing things");
 			administerRanks(e.getGuild());
 		}
 	}
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e){
 		if(e.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
-			administerRanks(e.getGuild());
+            //System.out.println("doing things");
+            administerRanks(e.getGuild());
 		}
 	}
 
@@ -578,6 +669,42 @@ class EventListener extends ListenerAdapter {
 		String input = e.getMessage().getRawContent();
         if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2)+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
 	    if(e.isFromType(ChannelType.PRIVATE)) logger(logPrefix(2)+"(Private Message) "+e.getAuthor().getName()+": "+input);
+
+	    if(e.getChannel().getId().equals("320615332840472576")&&!e.getAuthor().isBot()){
+            if(input.charAt(0)=='<'){
+                if(author.hasPermission("command.v")){
+                    GuildController cont = e.getGuild().getController();
+                    Scanner watch = new Scanner(input);
+                    String mention = watch.next();
+                    for(Member m:e.getGuild().getMembers()){
+                        if(mention.equals(m.getAsMention())){
+                            if(m.equals(e.getMember())||m.isOwner()||m.getUser().isBot()){
+                                break;
+                            }
+                            if(m.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
+                                cont.removeRolesFromMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
+                                cont.setNickname(m,"").queue();
+                                e.getChannel().sendMessage("`"+m.getUser().getName()+" has been un-verified by "+e.getMember().getEffectiveName()+".`").queue();
+                            } else {
+                                String name = m.getEffectiveName();
+                                if(watch.hasNext()){
+                                    name = watch.next();
+                                    while(watch.hasNext()){
+                                        name = name+" "+watch.next();
+                                    }
+                                }
+                                cont.setNickname(m,name).queue();
+                                cont.addRolesToMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
+                                e.getChannel().sendMessage("`"+m.getEffectiveName()+" has been verified by "+e.getMember().getEffectiveName()+" as "+name+".`").queue();
+                            }
+                            e.getMessage().delete().queue();
+
+                        }
+                    }
+                }
+            }
+        }
+
 	    if(isCommand(e.getMessage())){
 			input=input.replaceFirst(LITERAL,"");
 			Scanner command = new Scanner(input);
@@ -763,63 +890,7 @@ class EventListener extends ListenerAdapter {
 			}
 		}
 
-		if(input.charAt(0)=='<'){
-			if(e.getChannel().getId().equals("320615332840472576")){
-				Scanner command = new Scanner(input);
-				if(!author.hasPermission("command.v")){
-					author = null;
-					command.close();
-					return;
-				}
-				if(command.hasNext()){
-					String user = command.next();
-					for(Member m:e.getGuild().getMembers()){
-						if(!m.equals(e.getGuild().getMemberById("320611242366730241"))&&!m.isOwner()){
-							if(m.getRoles().contains(e.getGuild().getRoleById("320300565789802497"))){
-								if(e.getAuthor().equals(m.getUser())){
-									if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
-									author = null;
-									command.close();
-									return;
-								}
-								e.getChannel().sendMessage(user+", you have been un-verified by "+e.getAuthor().getName()+".\n**You have lost all access to rank-based channels,** and may once again speak in <#320615332840472576>.").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
-								e.getGuild().getController().setNickname(m,"").queue();
-								e.getGuild().getController().removeRolesFromMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
 
-							} else {
-								if(command.hasNext()){
-									String nickname = command.next();
-									if(command.hasNext()){
-										nickname = nickname+" "+command.next();
-										if(command.hasNext()){
-											nickname = nickname+" "+command.next();
-										}
-									}
-									if(e.getAuthor().equals(m.getUser())){
-										if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
-										author = null;
-										command.close();
-										return;
-									}
-									e.getChannel().sendMessage(user+", you have been verified by "+e.getAuthor().getName()+", who has set your nickname to "+nickname+". \nAny ranks you have in-game will be applied here, either now or within two hours.\n**You can no longer send messages in <#320615332840472576>**,\nbut **you may now speak in <#320638866103074816> if you are at least Minister or above in-game.**\n*(This message will stay for ten minutes and delete itself. Please make sure you read it.)").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
-									e.getGuild().getController().setNickname(m,nickname).queue();
-								} else {
-									if(e.getAuthor().equals(m.getUser())){
-										if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
-										author = null;
-										command.close();
-										return;
-									}
-									e.getChannel().sendMessage(user+", you have been verified by "+e.getAuthor().getName()+". \nAny ranks you have in-game will be applied here, either now or within two hours.\n**You can no longer send messages in <#320615332840472576>**,\nbut **you may now speak in <#320638866103074816> if you are at least Minister or above in-game.**\n*(This message will stay for ten minutes and delete itself. Please make sure you read it.)").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
-								}
-								e.getGuild().getController().addRolesToMember(m,e.getGuild().getRoleById("320300565789802497")).queue();
-							}
-						}
-					}
-				}
-				if(e.getChannelType().isGuild()) e.getMessage().delete().queue();
-			}
-		}
 
 		if((isDevCommand(e.getMessage()))){
 	    	if(e.getChannelType().equals(ChannelType.PRIVATE)||author.isIsadmin()||isSeth(e.getAuthor())){
