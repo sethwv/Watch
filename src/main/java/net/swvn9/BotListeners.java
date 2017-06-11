@@ -62,6 +62,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 					case "319606739550863360":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
+						event.getJDA().getPresence().setGame(Game.of("0.38a"));
 						MyBackgroudMethod thread2 = new MyBackgroudMethod();
 						thread2.setDaemon(true);
 						thread2.start();
@@ -254,7 +255,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -263,7 +264,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     //clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
@@ -281,7 +282,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+												g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -290,7 +291,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
@@ -307,7 +308,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+												g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -316,7 +317,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
@@ -333,7 +334,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+												g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -342,7 +343,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
@@ -359,7 +360,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+												g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -368,7 +369,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
@@ -385,7 +386,7 @@ class EventListener extends ListenerAdapter {
                                                 break;
                                             } else {
                                                 clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                                g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+												g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                                 check = true;
                                                 break;
                                             }
@@ -394,7 +395,7 @@ class EventListener extends ListenerAdapter {
                                     if(!check){
                                         if(!m.getRoles().contains(addroles[0])){
                                             clanranking.modifyMemberRoles(m,Arrays.asList(addroles),Arrays.asList(remroles)).queue();
-                                            g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+											g.getTextChannelById("320615332840472576").sendMessage("`"+m.getEffectiveName()+" has been added to the "+addroles[0].getName()+" role.`").queue();
                                         }
                                     }
                                     if(!m.getEffectiveName().contains(a.getName()))clanranking.setNickname(m,a.getName()).queue();
