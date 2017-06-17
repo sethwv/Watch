@@ -1,5 +1,6 @@
 package net.swvn9;
 
+import com.google.common.collect.Lists;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 
@@ -36,8 +37,9 @@ class BotUser {
         if(this.permissions==null) this.permissions= Arrays.asList(noperms);
         Set<String> hs = new LinkedHashSet<>();
         hs.addAll(permissions);
-        this.permissions.clear();
-        this.permissions.addAll(hs);
+        this.permissions = null;
+        this.permissions = new ArrayList<>(hs);
+        //this.permissions.addAll(hs);
     }
 
     private String id;

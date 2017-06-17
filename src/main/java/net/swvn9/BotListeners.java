@@ -4,7 +4,6 @@ import com.mikebull94.rsapi.hiscores.ClanMate;
 import com.mikebull94.rsapi.hiscores.Hiscores;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
@@ -12,9 +11,8 @@ import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.events.role.GenericRoleEvent;
 import net.dv8tion.jda.core.events.guild.member.GenericGuildMemberEvent;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
+
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 
 import com.mikebull94.rsapi.*;
@@ -665,6 +663,21 @@ class EventListener extends ListenerAdapter {
 			}
 		}
 		author = null;
+	}
+
+	@Override
+	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e){
+		TextChannel send = null;
+		for(TextChannel c:e.getGuild().getTextChannels()){
+			if(c.getName().contains("bot-log")){
+				send = c;
+			}
+		}
+		if(send!=null){
+			//StringBuilder test = new StringBuilder();
+			//e.getRoles().forEach(msg->test.append(msg.getName()).append(" "));
+			//send.sendMessage("**Role Removed**`"+e.getMember().getEffectiveName()+" removed from "+test.toString()+"`").queue();
+		}
 	}
 
 }
