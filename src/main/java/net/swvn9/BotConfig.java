@@ -71,13 +71,13 @@ class Config {
 }
 class configUser {
 	public String id;
-	public boolean isadmin;
+	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
 class configGroup {
 	public List<String> id;
-	public boolean isadmin;
+	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }

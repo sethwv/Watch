@@ -1,6 +1,5 @@
 package net.swvn9;
 
-import com.google.common.collect.Lists;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 
@@ -13,7 +12,7 @@ class BotUser {
         for(String key:Config.config.getUsers().keySet()){
             if(u.getId().equals(Config.config.getUsers().get(key).id)){
                 this.id = u.getId();
-                this.isadmin = Config.config.getUsers().get(key).isadmin;
+                this.isadmin = Config.config.getUsers().get(key).admin;
                 if(power<Config.config.getUsers().get(key).power) this.power = Config.config.getUsers().get(key).power;
                 if(!Config.config.getUsers().get(key).permissions.isEmpty()) this.permissions = Config.config.getUsers().get(key).permissions;
             }
@@ -21,7 +20,7 @@ class BotUser {
         for(String key:Config.config.getGroups().keySet()) {
             for (String gid : Config.config.getGroups().get(key).id) {
                 if (g.getMember(u).getRoles().toString().contains(gid)) {
-                    if (!isadmin) this.isadmin = Config.config.getGroups().get(key).isadmin;
+                    if (!isadmin) this.isadmin = Config.config.getGroups().get(key).admin;
                     if(this.permissions==null){
                         this.permissions = Config.config.getGroups().get(key).permissions;
                     } else {
@@ -50,7 +49,7 @@ class BotUser {
     String getid(){
         return id;
     }
-    boolean isIsadmin(){
+    boolean isadmin(){
         return isadmin;
     }
     int getPower(){
