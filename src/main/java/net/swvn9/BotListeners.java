@@ -1,32 +1,16 @@
 package net.swvn9;
 
-import com.google.common.collect.Lists;
-import com.mikebull94.rsapi.hiscores.ClanMate;
-import com.mikebull94.rsapi.hiscores.Hiscores;
-import info.debatty.java.stringsimilarity.JaroWinkler;
-import info.debatty.java.stringsimilarity.Levenshtein;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import com.mikebull94.rsapi.*;
-import net.dv8tion.jda.core.managers.GuildController;
-import org.apache.commons.lang3.StringUtils;
-
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
@@ -190,10 +174,10 @@ class EventListener extends ListenerAdapter {
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()) switch (command.next().toLowerCase()) {
-				case "test":
+				case "id":
 					BotCommands.id.run(e.getMessage());
 					break;
-				case "zc":
+				case "clan":
 					BotCommands.clan.run(e.getMessage());
 					break;
 				case "m":
@@ -213,6 +197,9 @@ class EventListener extends ListenerAdapter {
 					break;
 				case "restart":
 					BotCommands.restart.run(e.getMessage());
+					break;
+				case "alog":
+					BotCommands.alog.run(e.getMessage());
 					break;
 			}
 			command.close();

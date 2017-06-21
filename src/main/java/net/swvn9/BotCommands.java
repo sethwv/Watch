@@ -3,6 +3,12 @@ package net.swvn9;
 import com.mikebull94.rsapi.RuneScapeAPI;
 import com.mikebull94.rsapi.hiscores.ClanMate;
 import com.mikebull94.rsapi.hiscores.Hiscores;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -12,18 +18,32 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.swvn9.EventListener.WHITELIST;
 
 class BotCommand{
+    //BotCommand(String node,Long ratelimit){
+    //    this.node = node;
+    //    this.ratelimit = ratelimit;
+    //}
     BotCommand(String node){
         this.node = node;
+        this.ratelimit = 10L;
     }
 
     private final String node;
+    private final Long ratelimit;
+
+    long getratelimit(){
+        return this.ratelimit;
+    }
 
     protected Message message;
     protected Guild guild;
@@ -32,13 +52,27 @@ class BotCommand{
     protected String commandargs;
     protected BotUser botUser;
 
+    protected LocalDateTime Lastrun = LocalDateTime.now().minusYears(10L);
+
     void run(Message m){
         this.message = m;
         this.guild = m.getGuild();
         this.channel = m.getChannel();
         this.user = m.getAuthor();
         this.botUser = new BotUser(user,guild);
-        if(botUser.hasPermission(node)||botUser.isadmin()){
+        if (node.contains("#all")) {
+            this.commandargs = message.getContent().replaceFirst("(?i)::"+(node.replace("command.","")).replace("#all",""),"");
+        } else {
+            this.commandargs = message.getContent().replaceFirst("(?i)::"+(node.replace("command.","")),"");
+        }
+        if(botUser.hasPermission(node)||botUser.isadmin()||node.contains("#all")){
+            if(LocalDateTime.now().isBefore(Lastrun)&&!botUser.isadmin()){
+                long Seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), Lastrun);
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `You can run this command again in "+Seconds+" seconds.` `"+message.getContent()+"`").queue(msg->msg.delete().queueAfter((int)Seconds, TimeUnit.SECONDS));
+                this.cleanup(true);
+                return;
+            }
+            this.Lastrun = LocalDateTime.now().plusSeconds(ratelimit);
             this.command();
             this.cleanup(true);
         } else {
@@ -290,7 +324,41 @@ class BotCommands {
             Bot.restart();
         }
     };
-
+    public static BotCommand alog = new BotCommand("command.alog#all"){
+        @Override
+        void command() {
+            StringBuilder name= new StringBuilder();
+            try {
+                Scanner rsn = new Scanner(commandargs);
+                if(rsn.hasNext()){
+                    name = new StringBuilder(rsn.next());
+                    while(rsn.hasNext()){
+                        name.append("+").append(rsn.next());
+                    }
+                } else {
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to enter a name! ::alog NAME`").queue(msg->msg.delete().queueAfter(1, TimeUnit.SECONDS));
+                    return;
+                }
+                URL url = new URL("http://services.runescape.com/m=adventurers-log/c=tB0ermS1flc/rssfeed?searchName="+name);
+                SyndFeedInput input = new SyndFeedInput();
+                SyndFeed feed = input.build(new XmlReader(url));
+                StringBuilder test = new StringBuilder();
+                List entries = feed.getEntries();
+                Iterator it = entries.iterator();
+                test.append("Adventurer's Log for ").append(name.toString().replace("+", " ")).append("\n```\n");
+                while (it.hasNext()) {
+                    SyndEntry entry = (SyndEntry)it.next();
+                    SyndContent description = entry.getDescription();
+                    test.append(description.getValue().trim().replace("my  ","my ").replace("   called:  "," called: ").replace("   in Daemonheim."," in Daemonheim.").replace("  in Daemonheim"," in Daemonheim").replace(" , ",", ")).append("\n");
+                }
+                test.append("```");
+                channel.sendMessage(test.toString()).queue(msg->msg.delete().queueAfter(10,TimeUnit.MINUTES));
+            } catch (IOException | FeedException e) {
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", the name you've entered is invalid! ("+ name.toString().replace("+"," ")+")`").queue(msg->msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                this.Lastrun = LocalDateTime.now().minusSeconds(getratelimit());
+            }
+        }
+    };
 
     // SPECIAL COMMANDS
 
@@ -311,14 +379,14 @@ class BotCommands {
                             cont.setNickname(m,"").queue();
                             channel.sendMessage("`"+m.getUser().getName()+" has been un-verified by "+guild.getMember(user).getEffectiveName()+".`").queue(msg->msg.delete().queueAfter(10,TimeUnit.SECONDS));
                         } else {
-                            String name = m.getEffectiveName();
+                            StringBuilder name = new StringBuilder(m.getEffectiveName());
                             if(watch.hasNext()){
-                                name = watch.next();
+                                name = new StringBuilder(watch.next());
                                 while(watch.hasNext()){
-                                    name = name+" "+watch.next();
+                                    name.append(" ").append(watch.next());
                                 }
                             }
-                            cont.setNickname(m,name).queue();
+                            cont.setNickname(m, name.toString()).queue();
                             cont.addRolesToMember(m,guild.getRoleById("320300565789802497")).queue();
                             channel.sendMessage("`"+m.getEffectiveName()+" has been verified by "+guild.getMember(user).getEffectiveName()+" as "+name+".`").queue(msg->msg.delete().queueAfter(10,TimeUnit.SECONDS));
                         }
