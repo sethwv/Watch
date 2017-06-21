@@ -336,7 +336,7 @@ class BotCommands {
                         name.append("+").append(rsn.next());
                     }
                 } else {
-                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to enter a name! ::alog NAME`").queue(msg->msg.delete().queueAfter(1, TimeUnit.SECONDS));
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to enter a name! ::alog NAME`").queue(msg->msg.delete().queueAfter(10, TimeUnit.SECONDS));
                     return;
                 }
                 URL url = new URL("http://services.runescape.com/m=adventurers-log/c=tB0ermS1flc/rssfeed?searchName="+name);
