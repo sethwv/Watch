@@ -14,18 +14,15 @@ import java.awt.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.swvn9.EventListener.WHITELIST;
 
 class BotCommand{
     BotCommand(String node){
-        this.literal = "::";
         this.node = node;
     }
 
-    private final String literal;
     private final String node;
 
     protected Message message;
@@ -34,12 +31,6 @@ class BotCommand{
     protected User user;
     protected String commandargs;
     protected BotUser botUser;
-
-    private String doLiteral(String c){
-        if(c.indexOf(literal)==0)
-            return c.replaceFirst(literal,"");
-        return null;
-    }
 
     void run(Message m){
         this.message = m;
@@ -54,7 +45,6 @@ class BotCommand{
             this.cleanup(false);
         }
     }
-
     void cleanup(boolean delete){
         if(message.getChannel().getType().equals(ChannelType.TEXT)&&delete) message.delete().queue();
         this.message = null;
@@ -64,7 +54,6 @@ class BotCommand{
         this.botUser = null;
         this.commandargs = null;
     }
-
     void command(){
         message.getChannel().sendMessage("<:WatchWarn:326815513634406419> `This command has not been configured, node: "+this.node+"`").queue(msg->msg.delete().queueAfter(10, TimeUnit.SECONDS));
     }
@@ -89,7 +78,6 @@ class BotCommands {
             channel.sendMessage(botUser.isadmin()+"").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
         }
     };
-
     public static BotCommand clan = new BotCommand("command.clan"){
         @Override
         void command(){
@@ -199,7 +187,6 @@ class BotCommands {
 
         }
     };
-
     public static BotCommand maintain = new BotCommand("command.m"){
         @Override
         void command(){
@@ -213,7 +200,6 @@ class BotCommands {
             }
         }
     };
-
     public static BotCommand roles = new BotCommand("command.roles"){
         @Override
         void command(){
@@ -236,7 +222,6 @@ class BotCommands {
             channel.sendMessage(roles.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
         }
     };
-
     public static BotCommand showconfig = new BotCommand("NOPERM"){
         @Override
         void command(){
@@ -285,7 +270,6 @@ class BotCommands {
             channel.sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
         }
     };
-
     public static BotCommand pullconfig = new BotCommand("NOPERM"){
         @Override
         void command(){
@@ -294,7 +278,6 @@ class BotCommands {
             channel.addReactionById(message.getId(), "👍").queue();
         }
     };
-
     public static BotCommand kill = new BotCommand("NOPERM"){
         @Override
         void command(){
