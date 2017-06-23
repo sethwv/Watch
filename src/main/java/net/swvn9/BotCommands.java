@@ -35,9 +35,11 @@ class BotCommand{
     BotCommand(String node){
         this.node = node;
         this.ratelimit = 10L;
+        this.help();
+        BotCommands.commandList.add(this);
     }
 
-    private final String node;
+    protected final String node;
     private final Long ratelimit;
 
     long getratelimit(){
@@ -54,8 +56,21 @@ class BotCommand{
     protected LocalDateTime Lastrun = LocalDateTime.now().minusYears(10L);
     protected MessageChannel lastchannel;
 
+    protected String helpname = "Undefined";
+    protected String delpusage = "Undefined";
+    protected String helpdesc = "Undefined";
+    protected Boolean skip = false;
+
+
     boolean getWaiting(){
         return waiting;
+    }
+
+    void help(){
+        this.helpname = "Undefined";
+        this.delpusage = "Undefined";
+        this.helpdesc = "Undefined";
+        this.skip = true;
     }
 
     void setWaiting(boolean waiting){
@@ -103,6 +118,7 @@ class BotCommand{
 }
 
 class BotCommands {
+    public static HashSet<BotCommand> commandList = new HashSet<>();
 
     private static boolean comapare(String a,String b) {
         Levenshtein l = new Levenshtein();
@@ -112,7 +128,47 @@ class BotCommands {
 
     // LITERAL COMMANDS
 
+    public static BotCommand help = new BotCommand("command.help#all"){
+        @Override
+        void help(){
+            this.helpname = "Help (This command)";
+            this.delpusage = "::help <-a>";
+            this.helpdesc = "See all of the commands associated with the bot that you can use. Add the -a flag to see all commands.";
+            this.skip = false;
+        }
+        @Override
+        void command(){
+            EmbedBuilder showCommands = new EmbedBuilder();
+            showCommands.setColor(new Color(148,168,249));
+            showCommands.setFooter("List of commands.",Bot.jda.getSelfUser().getAvatarUrl());
+            boolean specific = false;
+            if(new Scanner(commandargs).hasNext()) {
+                String next = new Scanner(commandargs).next();
+                for (BotCommand bc : commandList) {
+                    if ((bc.helpname.toLowerCase()).contains(next.toLowerCase())) {
+                        specific = true;
+                        showCommands.addField(bc.helpname, "```YAML\nNode: " + bc.node.replace("#all", "") + "\nUsage: " + bc.delpusage + "\nDescription: " + bc.helpdesc + "```", true);
+                    }
+                }
+            }
+            for(BotCommand bc:commandList){
+                if(bc.skip||specific) continue;
+                if(botUser.hasPermission(bc.node)||bc.node.contains("#all")||commandargs.contains("-a")||botUser.isadmin()){
+                    showCommands.addField(bc.helpname,"```YAML\nNode: "+bc.node.replace("#all","")+"\nUsage: "+bc.delpusage+"\nDescription: "+bc.helpdesc+"```",true);
+                }
+            }
+            channel.sendMessage(showCommands.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
+        }
+    };
+
     public static BotCommand id = new BotCommand("command.id"){
+        @Override
+        void help(){
+            this.helpname = "ID";
+            this.delpusage = "::id";
+            this.helpdesc = "Grab the ID and any permissions associated with your user ID.";
+            this.skip = false;
+        }
         @Override
         void command(){
             channel.sendMessage(user.getAsMention()+", Your ID is "+user+".").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
@@ -121,6 +177,13 @@ class BotCommands {
         }
     };
     public static BotCommand roles = new BotCommand("command.roles"){
+        @Override
+        void help(){
+            this.helpname = "Roles";
+            this.delpusage = "::roles";
+            this.helpdesc = "Get all of the role-names and IDs associated with the current discord guild.";
+            this.skip = false;
+        }
         @Override
         void command(){
             EmbedBuilder roles = new EmbedBuilder();
@@ -143,6 +206,13 @@ class BotCommands {
         }
     };
     public static BotCommand showconfig = new BotCommand("command.showconfig"){
+        @Override
+        void help(){
+            this.helpname = "Show Config";
+            this.delpusage = "::showconfig";
+            this.helpdesc = "Spit out the contents of the Config.yml file to a rich embed.";
+            this.skip = false;
+        }
         @Override
         void command(){
             EmbedBuilder other = new EmbedBuilder();
@@ -192,6 +262,13 @@ class BotCommands {
     };
     public static BotCommand pullconfig = new BotCommand("command.pullconfig"){
         @Override
+        void help(){
+            this.helpname = "Pull Config";
+            this.delpusage = "::pullconfig";
+            this.helpdesc = "Pull the latest configuration from the Config.yml file.";
+            this.skip = false;
+        }
+        @Override
         void command(){
             Config.loadConfig();
             WHITELIST = Config.getWhitelist();
@@ -199,6 +276,13 @@ class BotCommands {
         }
     };
     public static BotCommand kill = new BotCommand("command.kill"){
+        @Override
+        void help(){
+            this.helpname = "Kill";
+            this.delpusage = "::kill";
+            this.helpdesc = "Kill the bot and return the host machine to the command line/desktop.";
+            this.skip = false;
+        }
         @Override
         void command(){
             channel.addReactionById(message.getId(), "👍").queue();
@@ -208,14 +292,27 @@ class BotCommands {
     };
     public static BotCommand restart = new BotCommand("command.restart"){
         @Override
+        void help(){
+            this.helpname = "Restart";
+            this.delpusage = "::restart";
+            this.helpdesc = "Restart the bot, re-initialise everything.";
+            this.skip = false;
+        }
+        @Override
         void command(){
             channel.addReactionById(message.getId(), "👍").queue();
             if(channel.getType().equals(ChannelType.TEXT)) message.delete().queue();
             Bot.restart();
         }
     };
-
     public static BotCommand c = new BotCommand("command.c"){
+        @Override
+        void help(){
+            this.helpname = "Clan Bot Command";
+            this.delpusage = "::c (command)";
+            this.helpdesc = "Send a command to the RuneScape clan-sync bot and return the result.";
+            this.skip = false;
+        }
         @Override
         void command() {
             lastchannel = channel;
@@ -225,6 +322,13 @@ class BotCommands {
     };
 
     public static BotCommand clan = new BotCommand("command.clan"){
+        @Override
+        void help(){
+            this.helpname = "RuneScape Clan Ranks";
+            this.delpusage = "::clan";
+            this.helpdesc = "(for now) Pull the upper ranks of the RuneScape clan Zamorak Cult, and match any names with those on the current discord guild.";
+            this.skip = false;
+        }
         @Override
         void command(){
             RuneScapeAPI api = RuneScapeAPI.createHttp();
@@ -334,6 +438,13 @@ class BotCommands {
         }
     };
     public static BotCommand alog = new BotCommand("command.alog#all"){
+        @Override
+        void help(){
+            this.helpname = "RuneScape Adventurer's Log";
+            this.delpusage = "::alog (Runescape Name)";
+            this.helpdesc = "Fetch the RuneScape adventurer's log for the specified player name.";
+            this.skip = false;
+        }
         @Override
         void command() {
             StringBuilder name= new StringBuilder();

@@ -18,7 +18,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	public void onEvent(net.dv8tion.jda.core.events.Event event)
 	{
 		if(event instanceof ReadyEvent){
-			for(Guild a : event.getJDA().getGuilds())
+			for(Guild a : event.getJDA().getGuilds()){
 				switch (a.getId()) {
 					default:
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in " + a.getName() + "! ID:" + a.getId());
@@ -40,7 +40,8 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
 						break;
 				}
-
+			}
+			event.getJDA().getPresence().setGame(Game.of("::help | 1.9a"));
 		}
 	}
 }
@@ -120,7 +121,7 @@ class EventListener extends ListenerAdapter {
 		}
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
-		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("pullconfig")&&!e.getMessage().getContent().contains("clean")||e.getChannelType().equals(ChannelType.PRIVATE)))){
+		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("::pullconfig")&&!e.getMessage().getContent().contains("::clean")&&e.getMessage().getContent().contains("::help")||e.getChannelType().equals(ChannelType.PRIVATE)))){
             return;
         }
 		if(Home==null) EventListener.Home= e.getGuild();
@@ -208,6 +209,9 @@ class EventListener extends ListenerAdapter {
 					break;
 				case "c":
 					BotCommands.c.run(e.getMessage());
+					break;
+				case "help":
+					BotCommands.help.run(e.getMessage());
 					break;
 			}
 			command.close();
