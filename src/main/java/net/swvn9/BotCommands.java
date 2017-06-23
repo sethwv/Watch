@@ -1,8 +1,7 @@
 package net.swvn9;
 
 import com.mikebull94.rsapi.RuneScapeAPI;
-import com.mikebull94.rsapi.hiscores.ClanMate;
-import com.mikebull94.rsapi.hiscores.Hiscores;
+import com.mikebull94.rsapi.hiscores.*;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -51,8 +50,17 @@ class BotCommand{
     protected User user;
     protected String commandargs;
     protected BotUser botUser;
-
+    protected boolean waiting=false;
     protected LocalDateTime Lastrun = LocalDateTime.now().minusYears(10L);
+    protected MessageChannel lastchannel;
+
+    boolean getWaiting(){
+        return waiting;
+    }
+
+    void setWaiting(boolean waiting){
+        this.waiting = waiting;
+    }
 
     void run(Message m){
         this.message = m;
@@ -112,6 +120,110 @@ class BotCommands {
             channel.sendMessage(botUser.isadmin()+"").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
         }
     };
+    public static BotCommand roles = new BotCommand("command.roles"){
+        @Override
+        void command(){
+            EmbedBuilder roles = new EmbedBuilder();
+            roles.setFooter("Roles for " + guild.getName(), Bot.jda.getSelfUser().getAvatarUrl());
+            roles.setThumbnail(guild.getIconUrl());
+            for (Object s : guild.getRoles().toArray()) {
+                String trimmed = s.toString().replace("R:", "");
+                StringBuilder sid = new StringBuilder();
+                for (int i = trimmed.length() - 19; i < trimmed.length() - 1; i++) {
+                    sid.append(trimmed.charAt(i));
+                }
+                StringBuilder sname = new StringBuilder();
+                for (int i = 0; i < trimmed.length() - 20; i++) {
+                    sname.append(trimmed.charAt(i));
+                }
+                roles.addField(sname.toString(), "`" + sid.toString() + "`", true);
+            }
+            roles.setColor(new Color(148,168,249));
+            channel.sendMessage(roles.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
+        }
+    };
+    public static BotCommand showconfig = new BotCommand("command.showconfig"){
+        @Override
+        void command(){
+            EmbedBuilder other = new EmbedBuilder();
+            StringBuilder whitelisted = new StringBuilder();
+            other.setColor(new Color(148,168,249));
+            for (String a : WHITELIST)
+                whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
+            other.addField("Whitelist", whitelisted.toString(), false);
+            other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+            other.addBlankField(false);
+            for (String key : Config.config.getGroups().keySet()) {
+                StringBuilder ids = new StringBuilder();
+                ids.append("Group IDs").append(System.lineSeparator());
+                for (String zz : Config.config.getGroups().get(key).id)
+                    ids.append("- `").append(zz).append("`").append(System.lineSeparator());
+                other.addField(key,ids.toString(), true);
+                StringBuilder perms = new StringBuilder();
+                perms.append("Permissions").append(System.lineSeparator());
+                for (String zz : Config.config.getGroups().get(key).permissions)
+                    perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+                if (Config.config.getGroups().get(key).admin) {
+                    other.addField("Type: SuperUser Group", perms.toString(), true);
+                } else {
+                    other.addField("Type: User Group", perms.toString(), true);
+                }
+                other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
+            }
+            other.addBlankField(false);
+            for (String key : Config.config.getUsers().keySet()) {
+                other.addField(key, "User ID" + System.lineSeparator() + "`" + Config.config.getUsers().get(key).id + "`", true);
+                StringBuilder perms = new StringBuilder();
+                perms.append("Permissions").append(System.lineSeparator());
+                HashSet<String> thing = new HashSet<>();
+                thing.addAll(Config.config.getUsers().get(key).permissions);
+                for (String zz : thing)
+                    perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+                if (Config.config.getUsers().get(key).admin) {
+                    other.addField("Type: SuperUser", perms.toString(), true);
+                } else {
+                    other.addField("Type: User", perms.toString(), true);
+                }
+                other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
+            }
+            other.setFooter("Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+            channel.sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+        }
+    };
+    public static BotCommand pullconfig = new BotCommand("command.pullconfig"){
+        @Override
+        void command(){
+            Config.loadConfig();
+            WHITELIST = Config.getWhitelist();
+            channel.addReactionById(message.getId(), "👍").queue();
+        }
+    };
+    public static BotCommand kill = new BotCommand("command.kill"){
+        @Override
+        void command(){
+            channel.addReactionById(message.getId(), "👍").queue();
+            if(channel.getType().equals(ChannelType.TEXT)) message.delete().queue();
+            System.exit(1);
+        }
+    };
+    public static BotCommand restart = new BotCommand("command.restart"){
+        @Override
+        void command(){
+            channel.addReactionById(message.getId(), "👍").queue();
+            if(channel.getType().equals(ChannelType.TEXT)) message.delete().queue();
+            Bot.restart();
+        }
+    };
+
+    public static BotCommand c = new BotCommand("command.c"){
+        @Override
+        void command() {
+            lastchannel = channel;
+            waiting = true;
+            Bot.jda.getUserById("320611242366730241").openPrivateChannel().complete().sendMessage(commandargs).queue();
+        }
+    };
+
     public static BotCommand clan = new BotCommand("command.clan"){
         @Override
         void command(){
@@ -221,109 +333,6 @@ class BotCommands {
 
         }
     };
-    public static BotCommand maintain = new BotCommand("command.m"){
-        @Override
-        void command(){
-            if(guild.getId().equals("319606739550863360")){
-                Role maintain[] = new Role[]{guild.getRoleById("319606870606217217")};
-                if(guild.getMemberById(user.getId()).getRoles().contains(guild.getRoleById("319606870606217217"))){
-                    guild.getController().removeRolesFromMember(guild.getMemberById(user.getId()), Arrays.asList(maintain)).queue();
-                } else {
-                    guild.getController().addRolesToMember(guild.getMemberById(user.getId()),Arrays.asList(maintain)).queue();
-                }
-            }
-        }
-    };
-    public static BotCommand roles = new BotCommand("command.roles"){
-        @Override
-        void command(){
-            EmbedBuilder roles = new EmbedBuilder();
-            roles.setFooter("Roles for " + guild.getName(), Bot.jda.getSelfUser().getAvatarUrl());
-            roles.setThumbnail(guild.getIconUrl());
-            for (Object s : guild.getRoles().toArray()) {
-                String trimmed = s.toString().replace("R:", "");
-                StringBuilder sid = new StringBuilder();
-                for (int i = trimmed.length() - 19; i < trimmed.length() - 1; i++) {
-                    sid.append(trimmed.charAt(i));
-                }
-                StringBuilder sname = new StringBuilder();
-                for (int i = 0; i < trimmed.length() - 20; i++) {
-                    sname.append(trimmed.charAt(i));
-                }
-                roles.addField(sname.toString(), "`" + sid.toString() + "`", true);
-            }
-            roles.setColor(new Color(148,168,249));
-            channel.sendMessage(roles.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
-        }
-    };
-    public static BotCommand showconfig = new BotCommand("NOPERM"){
-        @Override
-        void command(){
-            EmbedBuilder other = new EmbedBuilder();
-            StringBuilder whitelisted = new StringBuilder();
-            other.setColor(new Color(148,168,249));
-            for (String a : WHITELIST)
-                whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
-            other.addField("Whitelist", whitelisted.toString(), false);
-            other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
-            other.addBlankField(false);
-            for (String key : Config.config.getGroups().keySet()) {
-                StringBuilder ids = new StringBuilder();
-                ids.append("Group IDs").append(System.lineSeparator());
-                for (String zz : Config.config.getGroups().get(key).id)
-                    ids.append("- `").append(zz).append("`").append(System.lineSeparator());
-                other.addField(key,ids.toString(), true);
-                StringBuilder perms = new StringBuilder();
-                perms.append("Permissions").append(System.lineSeparator());
-                for (String zz : Config.config.getGroups().get(key).permissions)
-                    perms.append("- `").append(zz).append("`").append(System.lineSeparator());
-                if (Config.config.getGroups().get(key).admin) {
-                    other.addField("Type: SuperUser Group", perms.toString(), true);
-                } else {
-                    other.addField("Type: User Group", perms.toString(), true);
-                }
-                other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
-            }
-            other.addBlankField(false);
-            for (String key : Config.config.getUsers().keySet()) {
-                other.addField(key, "User ID" + System.lineSeparator() + "`" + Config.config.getUsers().get(key).id + "`", true);
-                StringBuilder perms = new StringBuilder();
-                perms.append("Permissions").append(System.lineSeparator());
-                HashSet<String> thing = new HashSet<>();
-                thing.addAll(Config.config.getUsers().get(key).permissions);
-                for (String zz : thing)
-                    perms.append("- `").append(zz).append("`").append(System.lineSeparator());
-                if (Config.config.getUsers().get(key).admin) {
-                    other.addField("Type: SuperUser", perms.toString(), true);
-                } else {
-                    other.addField("Type: User", perms.toString(), true);
-                }
-                other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
-            }
-            other.setFooter("Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
-            channel.sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
-        }
-    };
-    public static BotCommand pullconfig = new BotCommand("NOPERM"){
-        @Override
-        void command(){
-            Config.loadConfig();
-            WHITELIST = Config.getWhitelist();
-            channel.addReactionById(message.getId(), "👍").queue();
-        }
-    };
-    public static BotCommand kill = new BotCommand("NOPERM"){
-        @Override
-        void command(){
-            System.exit(1);
-        }
-    };
-    public static BotCommand restart = new BotCommand("NOPERM"){
-        @Override
-        void command(){
-            Bot.restart();
-        }
-    };
     public static BotCommand alog = new BotCommand("command.alog#all"){
         @Override
         void command() {
@@ -360,8 +369,19 @@ class BotCommands {
         }
     };
 
-    // SPECIAL COMMANDS
-
+    public static BotCommand maintain = new BotCommand("command.m"){
+        @Override
+        void command(){
+            if(guild.getId().equals("319606739550863360")){
+                Role maintain[] = new Role[]{guild.getRoleById("319606870606217217")};
+                if(guild.getMemberById(user.getId()).getRoles().contains(guild.getRoleById("319606870606217217"))){
+                    guild.getController().removeRolesFromMember(guild.getMemberById(user.getId()), Arrays.asList(maintain)).queue();
+                } else {
+                    guild.getController().addRolesToMember(guild.getMemberById(user.getId()),Arrays.asList(maintain)).queue();
+                }
+            }
+        }
+    };
     public static BotCommand verify = new BotCommand("command.v"){
         @Override
         void command(){
@@ -395,5 +415,7 @@ class BotCommands {
             }
         }
     };
+
+    // SPECIAL COMMANDS
 
 }

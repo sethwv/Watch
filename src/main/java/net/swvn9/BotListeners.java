@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
@@ -113,6 +114,10 @@ class EventListener extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
+		if(BotCommands.c.getWaiting()&&e.getChannelType().equals(ChannelType.PRIVATE)&&e.getAuthor().getId().equals("320611242366730241")){
+			BotCommands.c.lastchannel.sendMessage(e.getMessage().getRawContent()).queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+			BotCommands.c.setWaiting(false);
+		}
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
 		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("pullconfig")&&!e.getMessage().getContent().contains("clean")||e.getChannelType().equals(ChannelType.PRIVATE)))){
@@ -200,6 +205,9 @@ class EventListener extends ListenerAdapter {
 					break;
 				case "alog":
 					BotCommands.alog.run(e.getMessage());
+					break;
+				case "c":
+					BotCommands.c.run(e.getMessage());
 					break;
 			}
 			command.close();
