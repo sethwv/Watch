@@ -121,7 +121,7 @@ class EventListener extends ListenerAdapter {
 		}
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
-		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("::pullconfig")&&!e.getMessage().getContent().contains("::clean")&&e.getMessage().getContent().contains("::help")||e.getChannelType().equals(ChannelType.PRIVATE)))){
+		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("::pullconfig")&&!e.getMessage().getContent().contains("::say")&&!e.getMessage().getContent().contains("::help")&&!e.getMessage().getContent().contains("::kill")||e.getChannelType().equals(ChannelType.PRIVATE)))){
             return;
         }
 		if(Home==null) EventListener.Home= e.getGuild();
