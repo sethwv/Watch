@@ -176,43 +176,17 @@ class EventListener extends ListenerAdapter {
 			}
 		}
 
+
+
 		if((isDevCommand(e.getMessage()))){
 			input=input.replaceFirst(DEVLITERAL,"");
 			Scanner command = new Scanner(input);
-			if(command.hasNext()) switch (command.next().toLowerCase()) {
-				case "id":
-					BotCommands.id.run(e.getMessage());
-					break;
-				case "clan":
-					BotCommands.clan.run(e.getMessage());
-					break;
-				case "m":
-					BotCommands.maintain.run(e.getMessage());
-					break;
-				case "roles":
-					BotCommands.roles.run(e.getMessage());
-					break;
-				case "config":
-					BotCommands.showconfig.run(e.getMessage());
-					break;
-				case "pullconfig":
-					BotCommands.pullconfig.run(e.getMessage());
-					break;
-				case "kill":
-					BotCommands.kill.run(e.getMessage());
-					break;
-				case "restart":
-					BotCommands.restart.run(e.getMessage());
-					break;
-				case "alog":
-					BotCommands.alog.run(e.getMessage());
-					break;
-				case "c":
-					BotCommands.c.run(e.getMessage());
-					break;
-				case "help":
-					BotCommands.help.run(e.getMessage());
-					break;
+			if(command.hasNext()){
+				for(BotCommand b:BotCommands.commandList){
+					if(input.indexOf(b.node.replace("command.","").replace("#all",""))==0){
+						b.run(e.getMessage());
+					}
+				}
 			}
 			command.close();
 		}

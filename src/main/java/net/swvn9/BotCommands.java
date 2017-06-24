@@ -132,7 +132,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Help (This command)";
-            this.delpusage = "::help <-a>";
+            this.delpusage = "::help <keyword> <-a>";
             this.helpdesc = "See all of the commands associated with the bot that you can use. Add the -a flag to see all commands.";
             this.skip = false;
         }
@@ -158,6 +158,22 @@ class BotCommands {
                 }
             }
             channel.sendMessage(showCommands.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
+        }
+    };
+
+    public static BotCommand say = new BotCommand("command.say"){
+        @Override
+        void help(){
+            this.helpname = "Say";
+            this.delpusage = "::say (Message)";
+            this.helpdesc = "Send a message as the bot";
+            this.skip = false;
+        }
+        @Override
+        void command(){
+            if(!commandargs.equals("")){
+                channel.sendMessage(commandargs).queue();
+            }
         }
     };
 
