@@ -41,7 +41,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 						break;
 				}
 			}
-			event.getJDA().getPresence().setGame(Game.of("::help | 1.9a"));
+			//event.getJDA().getPresence().setGame(Game.of("::help | 1.9a"));
 		}
 	}
 }
