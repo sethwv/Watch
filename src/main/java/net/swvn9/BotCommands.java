@@ -233,7 +233,7 @@ class BotCommands {
                     this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
                 }
                 for(User u:message.getMentionedUsers()){
-                    guild.getController().ban(u,6).queue();
+                    guild.getController().ban(u,6,commandargs).queue();
                     message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" banned "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue();
                 }
 
