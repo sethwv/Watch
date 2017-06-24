@@ -176,7 +176,30 @@ class BotCommands {
             }
         }
     };
+    public static BotCommand ban = new BotCommand("command.ban"){
+        @Override
+        void help(){
+            this.helpname = "Ban";
+            this.delpusage = "::ban [user mention(s)] <reason>";
+            this.helpdesc = "Ban user(s) with an optional message";
+            this.skip = false;
+        }
+        @Override
+        void command(){
+            if(!commandargs.equals("")){
+                for(User u:message.getMentionedUsers()){
+                    this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
+                }
+                for(User u:message.getMentionedUsers()){
+                    guild.getController().ban(u,6).queue();
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" banned "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue();
+                }
 
+            } else {
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to mention at least one user ::ban @mention(s)`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
+        }
+    };
     public static BotCommand id = new BotCommand("command.id"){
         @Override
         void help(){
@@ -236,7 +259,7 @@ class BotCommands {
             other.setColor(new Color(148,168,249));
             for (String a : WHITELIST)
                 whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
-            other.addField("Whitelist", whitelisted.toString(), false);
+            //other.addField("Whitelist", whitelisted.toString(), false);
             other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
             other.addBlankField(false);
             for (String key : Config.config.getGroups().keySet()) {
