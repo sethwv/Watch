@@ -48,7 +48,7 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 
 class EventListener extends ListenerAdapter {
 
-	private static final String DEVLITERAL = "::";
+	private static final String LITERAL = "::";
 	static String WHITELIST[] = Config.getWhitelist();
 	private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
     private static FileWriter log;
@@ -104,9 +104,9 @@ class EventListener extends ListenerAdapter {
 		}
 	}
 
-	private static boolean isDevCommand(Message m){
-		for(int i = 0;i<DEVLITERAL.length();i++){
-			if(m.getContent().indexOf(DEVLITERAL)!=0){
+	private static boolean isCommand(Message m){
+		for(int i = 0; i< LITERAL.length(); i++){
+			if(m.getContent().indexOf(LITERAL)!=0){
 				return false;
 			}
 		}
@@ -177,13 +177,12 @@ class EventListener extends ListenerAdapter {
 		}
 
 
-
-		if((isDevCommand(e.getMessage()))){
-			input=input.replaceFirst(DEVLITERAL,"");
+		if((isCommand(e.getMessage()))){
+			input=input.replaceFirst(LITERAL,"");
 			Scanner command = new Scanner(input);
 			if(command.hasNext()){
 				for(BotCommand b:BotCommands.commandList){
-					if(input.indexOf(b.node.replace("command.","").replace("#all",""))==0){
+					if(input.indexOf(b.node.replace("command.","").replace("#all",""))==0&&!input.contains("verify")){
 						b.run(e.getMessage());
 					}
 				}
