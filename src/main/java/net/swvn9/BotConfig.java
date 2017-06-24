@@ -8,6 +8,7 @@ import java.util.*;
 
 class Config {
 	private static final File Ldir = new File("Logs");
+	private static final File Cdir = new File("Commands");
 	private static final File Config = new File("Config.yml");
 	private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 	private static final List<String> Whitetemp = new ArrayList<>();
@@ -20,6 +21,8 @@ class Config {
 
 	static void loadConfig(){
 		try{
+			if(!Cdir.exists()) //noinspection ResultOfMethodCallIgnored
+				Cdir.mkdir();
 			if(!Ldir.exists()) //noinspection ResultOfMethodCallIgnored
 				Ldir.mkdir();
 			/*if(!Config.exists()){

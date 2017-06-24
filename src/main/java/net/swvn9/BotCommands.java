@@ -14,8 +14,12 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -35,17 +39,38 @@ class BotCommand{
     BotCommand(String node){
         this.node = node;
         this.ratelimit = 10L;
+        this.watchfile = new File("Commands"+File.separator+(node.replace("command.","").replace("#all",""))+".watch");
         this.help();
         BotCommands.commandList.add(this);
+        if(savemem){
+            try{
+                if(!watchfile.exists()){
+                    FileWriter newFile = new FileWriter(watchfile,false);
+                    newFile.close();
+                } else {
+                    FileReader openfile = new FileReader(watchfile);
+                    Scanner readfile = new Scanner(openfile);
+                    while(readfile.hasNext()){
+                        memory.add(readfile.next());
+                    }
+                    readfile.close();
+                    openfile.close();
+                }
+            }catch(IOException eee){
+
+            }
+        }
     }
 
     protected final String node;
     private final Long ratelimit;
+    private final File watchfile;
 
     long getratelimit(){
         return this.ratelimit;
     }
 
+    protected HashSet<String> memory = new HashSet<>();
     protected Message message;
     protected Guild guild;
     protected MessageChannel channel;
@@ -55,6 +80,7 @@ class BotCommand{
     protected boolean waiting=false;
     protected LocalDateTime Lastrun = LocalDateTime.now().minusYears(10L);
     protected MessageChannel lastchannel;
+    protected boolean savemem = false;
 
     protected String helpname = "Undefined";
     protected String delpusage = "Undefined";
@@ -71,6 +97,21 @@ class BotCommand{
         this.delpusage = "Undefined";
         this.helpdesc = "Undefined";
         this.skip = true;
+    }
+
+    void saveMemory(){
+            if(savemem) {
+                try {
+                    StringBuilder memstring = new StringBuilder();
+                    for (String s : memory) {
+                        memstring.append(s).append(" ");
+                    }
+                    FileWriter writefile = new FileWriter(watchfile, false);
+                    writefile.append(memstring);
+                    writefile.close();
+                } catch (IOException eee) {
+                }
+            }
     }
 
     void setWaiting(boolean waiting){
@@ -110,6 +151,7 @@ class BotCommand{
         this.user = null;
         this.botUser = null;
         this.commandargs = null;
+        saveMemory();
     }
     void command(){
         message.getChannel().sendMessage("<:WatchWarn:326815513634406419> `This command has not been configured, node: "+this.node+"`").queue(msg->msg.delete().queueAfter(10, TimeUnit.SECONDS));
@@ -324,12 +366,19 @@ class BotCommands {
         }
         @Override
         void command(){
-            channel.addReactionById(message.getId(), "👍").queue();
             if(channel.getType().equals(ChannelType.TEXT)) message.delete().queue();
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            }catch (InterruptedException eeee){
+                eeee.getMessage();
+            }
             System.exit(1);
         }
     };
     public static BotCommand restart = new BotCommand("command.restart"){
+        @Override
+        void cleanup(boolean delete){
+        }
         @Override
         void help(){
             this.helpname = "Restart";
@@ -339,8 +388,12 @@ class BotCommands {
         }
         @Override
         void command(){
-            channel.addReactionById(message.getId(), "👍").queue();
             if(channel.getType().equals(ChannelType.TEXT)) message.delete().queue();
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            }catch (InterruptedException eeee){
+                eeee.getMessage();
+            }
             Bot.restart();
         }
     };
@@ -357,6 +410,66 @@ class BotCommands {
             lastchannel = channel;
             waiting = true;
             Bot.jda.getUserById("320611242366730241").openPrivateChannel().complete().sendMessage(commandargs).queue();
+        }
+    };
+
+    public static BotCommand watch = new BotCommand("command.watch"){
+        @Override
+        void help(){
+            this.helpname = "Watch";
+            this.delpusage = "::watch (add/del/list) <keyword>";
+            this.helpdesc = "Have the bot \"watch\" for certain keywords in chat, and log any occurrences to a channel called #logs\nKeywords are not case-sensitive";
+            this.skip = false;
+            this.savemem = true;
+        }
+        @Override
+        void command(){
+            if(!commandargs.equals("")) {
+                Scanner read = new Scanner(commandargs);
+                if(read.hasNext()){
+                    switch(read.next()){
+                        default:
+                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Invalid Syntax` `"+commandargs+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            break;
+                        case"add":
+                            if(read.hasNext()){
+                                String keyword = read.next().toLowerCase();
+                                if(!memory.contains(keyword)){
+                                    memory.add(keyword);
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been added to the watch filter. type ::watch del "+keyword+" to remove it.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                } else {
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am already watching for "+keyword+".`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                }
+                            } else {
+                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            }
+                            break;
+                        case"del":
+                            if(read.hasNext()){
+                                String keyword = read.next().toLowerCase();
+                                if(memory.contains(keyword)){
+                                    memory.remove(keyword);
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been removed from the watch filter.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                } else {
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am not currently watching for "+keyword+". Do ::watch add "+keyword+" to add it to the list.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                }
+                            } else {
+                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            }
+                            break;
+                        case"list":
+                            StringBuilder keywords = new StringBuilder();
+                            for(String s:memory){
+                                keywords.append(s).append(", ");
+                            }
+                            keywords.deleteCharAt(keywords.length()-1).deleteCharAt(keywords.length()-1);
+                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Right now I'm watching for "+keywords+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            break;
+                    }
+                }
+            } else {
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify an action and a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
         }
     };
 

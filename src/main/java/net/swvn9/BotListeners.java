@@ -1,11 +1,14 @@
 package net.swvn9;
 
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
+import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -120,15 +123,45 @@ class EventListener extends ListenerAdapter {
 			BotCommands.c.setWaiting(false);
 		}
 	    if((e.getAuthor().isBot()||
+		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||e.getChannelType().equals(ChannelType.PRIVATE))){
+            return;
+        }
+        /*
+        	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
 		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("::pullconfig")&&!e.getMessage().getContent().contains("::say")&&!e.getMessage().getContent().contains("::help")&&!e.getMessage().getContent().contains("::kill")||e.getChannelType().equals(ChannelType.PRIVATE)))){
             return;
         }
+         */
 		if(Home==null) EventListener.Home= e.getGuild();
 
 		String input = e.getMessage().getRawContent();
         if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2)+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
 	    if(e.isFromType(ChannelType.PRIVATE)) logger(logPrefix(2)+"(Private Message) "+e.getAuthor().getName()+": "+input);
+
+
+	    for(String s:BotCommands.watch.memory){
+	    	if(input.toLowerCase().contains(s)&&!input.contains("::watch")){
+				TextChannel send = null;
+				for(TextChannel c:e.getGuild().getTextChannels()) {
+					if (c.getName().contains("logs")) {
+						send = c;
+					}
+				}
+				if(send!=null){
+					EmbedBuilder log = new EmbedBuilder();
+					log.addField("A watched keyword has been said",s,false);
+					log.addField("Name",e.getAuthor().getAsMention(),true);
+					log.addField("Message",input,true);
+					log.addField("Channel",e.getTextChannel().getAsMention(),true);
+					log.setColor(new Color(148,168,249));
+					send.sendMessage(log.build()).queue();
+					send.sendMessage("@here").complete().delete().queueAfter(1,TimeUnit.SECONDS);
+				}
+			}
+		}
+
+
 
 	    if(e.getChannel().getId().equals("320615332840472576")&&!e.getAuthor().isBot()){
             if(input.charAt(0)=='<'){
@@ -184,6 +217,7 @@ class EventListener extends ListenerAdapter {
 				for(BotCommand b:BotCommands.commandList){
 					if(input.indexOf(b.node.replace("command.","").replace("#all",""))==0&&!input.contains("verify")){
 						b.run(e.getMessage());
+						break;
 					}
 				}
 			}
