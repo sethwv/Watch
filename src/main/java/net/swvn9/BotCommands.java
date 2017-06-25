@@ -207,7 +207,7 @@ class BotCommands {
         @Override
         void command() {
             String invcode;
-            invcode = guild.getPublicChannel().createInvite().setMaxUses(1).setMaxAge(24L,TimeUnit.HOURS).complete().getCode();
+            invcode = guild.getPublicChannel().createInvite().setMaxUses(1).setMaxAge(24L,TimeUnit.HOURS).setUnique(true).complete().getCode();
             channel.sendMessage("<:Watch:326815513550389249> `An invite has been created and sent to you `").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
             user.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/"+invcode).queue();
         }
