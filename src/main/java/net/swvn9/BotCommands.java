@@ -14,7 +14,6 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.awt.*;
 import java.io.File;
@@ -83,18 +82,13 @@ class BotCommand{
     protected boolean savemem = false;
 
     protected String helpname = "Undefined";
-    protected String delpusage = "Undefined";
+    protected String helpusage = "Undefined";
     protected String helpdesc = "Undefined";
     protected Boolean skip = false;
 
-
-    boolean getWaiting(){
-        return waiting;
-    }
-
     void help(){
         this.helpname = "Undefined";
-        this.delpusage = "Undefined";
+        this.helpusage = "Undefined";
         this.helpdesc = "Undefined";
         this.skip = true;
     }
@@ -162,19 +156,19 @@ class BotCommand{
 class BotCommands {
     public static HashSet<BotCommand> commandList = new HashSet<>();
 
+    // Command utility methods
     private static boolean comapare(String a,String b) {
         Levenshtein l = new Levenshtein();
         JaroWinkler jw = new JaroWinkler();
         return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
     }
 
-    // LITERAL COMMANDS
-
+    // General commands
     public static BotCommand help = new BotCommand("command.help#all"){
         @Override
         void help(){
             this.helpname = "Help (This command)";
-            this.delpusage = "::help <keyword> <-a>";
+            this.helpusage = "::help <keyword> <-a>";
             this.helpdesc = "See all of the commands associated with the bot that you can use. Add the -a flag to see all commands.";
             this.skip = false;
         }
@@ -189,25 +183,42 @@ class BotCommands {
                 for (BotCommand bc : commandList) {
                     if ((bc.helpname.toLowerCase()).contains(next.toLowerCase())) {
                         specific = true;
-                        showCommands.addField(bc.helpname, "```YAML\nNode: " + bc.node.replace("#all", "") + "\nUsage: " + bc.delpusage + "\nDescription: " + bc.helpdesc + "```", true);
+                        showCommands.addField(bc.helpname, "```YAML\nNode: " + bc.node.replace("#all", "") + "\nUsage: " + bc.helpusage + "\nDescription: " + bc.helpdesc + "```", true);
                     }
                 }
             }
             for(BotCommand bc:commandList){
                 if(bc.skip||specific) continue;
                 if(botUser.hasPermission(bc.node)||bc.node.contains("#all")||commandargs.contains("-a")||botUser.isadmin()){
-                    showCommands.addField(bc.helpname,"```YAML\nNode: "+bc.node.replace("#all","")+"\nUsage: "+bc.delpusage+"\nDescription: "+bc.helpdesc+"```",true);
+                    showCommands.addField(bc.helpname,"```YAML\nNode: "+bc.node.replace("#all","")+"\nUsage: "+bc.helpusage +"\nDescription: "+bc.helpdesc+"```",true);
                 }
             }
             channel.sendMessage(showCommands.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
         }
     };
+    public static BotCommand inv = new BotCommand("command.inv"){
+        @Override
+        void help(){
+            this.helpname = "Invite";
+            this.helpusage = "::inv";
+            this.helpdesc = "Generate a one-time-use invite that is valid for 24 hours";
+            this.skip = false;
+        }
+        @Override
+        void command() {
+            String invcode;
+            invcode = guild.getPublicChannel().createInvite().setMaxUses(1).setMaxAge(24L,TimeUnit.HOURS).complete().getCode();
+            channel.sendMessage("<:Watch:326815513550389249> `An invite has been created and sent to you `").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+            user.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/"+invcode).queue();
+        }
+    };
 
+    // Mod/Admin commands
     public static BotCommand say = new BotCommand("command.say"){
         @Override
         void help(){
             this.helpname = "Say";
-            this.delpusage = "::say (Message)";
+            this.helpusage = "::say (Message)";
             this.helpdesc = "Send a message as the bot";
             this.skip = false;
         }
@@ -222,7 +233,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Ban";
-            this.delpusage = "::ban [user mention(s)] <reason>";
+            this.helpusage = "::ban [user mention(s)] <reason>";
             this.helpdesc = "Ban user(s) with an optional message";
             this.skip = false;
         }
@@ -231,6 +242,7 @@ class BotCommands {
             if(!commandargs.equals("")){
                 for(User u:message.getMentionedUsers()){
                     this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
+                    if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
                 }
                 for(User u:message.getMentionedUsers()){
                     guild.getController().ban(u,6,commandargs).queue();
@@ -242,11 +254,97 @@ class BotCommands {
             }
         }
     };
+    public static BotCommand kick = new BotCommand("command.kick"){
+        @Override
+        void help(){
+            this.helpname = "Kick";
+            this.helpusage = "::kick [user mention(s)] <reason>";
+            this.helpdesc = "Kick user(s) with an optional message";
+            this.skip = false;
+        }
+        @Override
+        void command(){
+            if(!commandargs.equals("")){
+                for(User u:message.getMentionedUsers()){
+                    this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
+                    if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
+                }
+                for(User u:message.getMentionedUsers()){
+                    guild.getController().kick(u.getId(),commandargs).queue();
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" kicked "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue();
+                }
+
+            } else {
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to mention at least one user ::ban @mention(s)`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
+        }
+    };
+    public static BotCommand watch = new BotCommand("command.watch"){
+        @Override
+        void help(){
+            this.helpname = "Watch";
+            this.helpusage = "::watch (add/del/list) <keyword>";
+            this.helpdesc = "Have the bot \"watch\" for certain keywords in chat, and log any occurrences to a channel called #logs\nKeywords are not case-sensitive";
+            this.skip = false;
+            this.savemem = true;
+        }
+        @Override
+        void command(){
+            if(!commandargs.equals("")) {
+                Scanner read = new Scanner(commandargs);
+                if(read.hasNext()){
+                    switch(read.next()){
+                        default:
+                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Invalid Syntax` `"+commandargs+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            break;
+                        case"add":
+                            if(read.hasNext()){
+                                String keyword = read.next().toLowerCase();
+                                if(!memory.contains(keyword)){
+                                    memory.add(keyword);
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been added to the watch filter. type ::watch del "+keyword+" to remove it.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                } else {
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am already watching for "+keyword+".`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                }
+                            } else {
+                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+ helpusage +"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            }
+                            break;
+                        case"del":
+                            if(read.hasNext()){
+                                String keyword = read.next().toLowerCase();
+                                if(memory.contains(keyword)){
+                                    memory.remove(keyword);
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been removed from the watch filter.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                } else {
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am not currently watching for "+keyword+". Do ::watch add "+keyword+" to add it to the list.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                }
+                            } else {
+                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+ helpusage +"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            }
+                            break;
+                        case"list":
+                            StringBuilder keywords = new StringBuilder();
+                            for(String s:memory){
+                                keywords.append(s).append(", ");
+                            }
+                            keywords.deleteCharAt(keywords.length()-1).deleteCharAt(keywords.length()-1);
+                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Right now I'm watching for "+keywords+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                            break;
+                    }
+                }
+            } else {
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify an action and a keyword!` `"+ helpusage +"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
+        }
+    };
+
+    // Configuration commands
     public static BotCommand id = new BotCommand("command.id"){
         @Override
         void help(){
             this.helpname = "ID";
-            this.delpusage = "::id";
+            this.helpusage = "::id";
             this.helpdesc = "Grab the ID and any permissions associated with your user ID.";
             this.skip = false;
         }
@@ -261,7 +359,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Roles";
-            this.delpusage = "::roles";
+            this.helpusage = "::roles";
             this.helpdesc = "Get all of the role-names and IDs associated with the current discord guild.";
             this.skip = false;
         }
@@ -290,7 +388,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Show Config";
-            this.delpusage = "::showconfig";
+            this.helpusage = "::showconfig";
             this.helpdesc = "Spit out the contents of the Config.yml file to a rich embed.";
             this.skip = false;
         }
@@ -345,7 +443,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Pull Config";
-            this.delpusage = "::pullconfig";
+            this.helpusage = "::pullconfig";
             this.helpdesc = "Pull the latest configuration from the Config.yml file.";
             this.skip = false;
         }
@@ -356,11 +454,13 @@ class BotCommands {
             channel.addReactionById(message.getId(), "👍").queue();
         }
     };
+
+    // Owner commands
     public static BotCommand kill = new BotCommand("command.kill"){
         @Override
         void help(){
             this.helpname = "Kill";
-            this.delpusage = "::kill";
+            this.helpusage = "::kill";
             this.helpdesc = "Kill the bot and return the host machine to the command line/desktop.";
             this.skip = false;
         }
@@ -382,7 +482,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Restart";
-            this.delpusage = "::restart";
+            this.helpusage = "::restart";
             this.helpdesc = "Restart the bot, re-initialise everything.";
             this.skip = false;
         }
@@ -397,87 +497,13 @@ class BotCommands {
             Bot.restart();
         }
     };
-    public static BotCommand c = new BotCommand("command.c"){
-        @Override
-        void help(){
-            this.helpname = "Clan Bot Command";
-            this.delpusage = "::c (command)";
-            this.helpdesc = "Send a command to the RuneScape clan-sync bot and return the result.";
-            this.skip = false;
-        }
-        @Override
-        void command() {
-            lastchannel = channel;
-            waiting = true;
-            Bot.jda.getUserById("320611242366730241").openPrivateChannel().complete().sendMessage(commandargs).queue();
-        }
-    };
 
-    public static BotCommand watch = new BotCommand("command.watch"){
-        @Override
-        void help(){
-            this.helpname = "Watch";
-            this.delpusage = "::watch (add/del/list) <keyword>";
-            this.helpdesc = "Have the bot \"watch\" for certain keywords in chat, and log any occurrences to a channel called #logs\nKeywords are not case-sensitive";
-            this.skip = false;
-            this.savemem = true;
-        }
-        @Override
-        void command(){
-            if(!commandargs.equals("")) {
-                Scanner read = new Scanner(commandargs);
-                if(read.hasNext()){
-                    switch(read.next()){
-                        default:
-                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Invalid Syntax` `"+commandargs+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                            break;
-                        case"add":
-                            if(read.hasNext()){
-                                String keyword = read.next().toLowerCase();
-                                if(!memory.contains(keyword)){
-                                    memory.add(keyword);
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been added to the watch filter. type ::watch del "+keyword+" to remove it.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                                } else {
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am already watching for "+keyword+".`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                                }
-                            } else {
-                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                            }
-                            break;
-                        case"del":
-                            if(read.hasNext()){
-                                String keyword = read.next().toLowerCase();
-                                if(memory.contains(keyword)){
-                                    memory.remove(keyword);
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+keyword+" has been removed from the watch filter.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                                } else {
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am not currently watching for "+keyword+". Do ::watch add "+keyword+" to add it to the list.`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                                }
-                            } else {
-                                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                            }
-                            break;
-                        case"list":
-                            StringBuilder keywords = new StringBuilder();
-                            for(String s:memory){
-                                keywords.append(s).append(", ");
-                            }
-                            keywords.deleteCharAt(keywords.length()-1).deleteCharAt(keywords.length()-1);
-                            message.getChannel().sendMessage("<:Watch:326815513550389249> `Right now I'm watching for "+keywords+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                            break;
-                    }
-                }
-            } else {
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify an action and a keyword!` `"+delpusage+"`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-            }
-        }
-    };
-
+    // RuneScape commands
     public static BotCommand clan = new BotCommand("command.clan"){
         @Override
         void help(){
             this.helpname = "RuneScape Clan Ranks";
-            this.delpusage = "::clan";
+            this.helpusage = "::clan";
             this.helpdesc = "(for now) Pull the upper ranks of the RuneScape clan Zamorak Cult, and match any names with those on the current discord guild.";
             this.skip = false;
         }
@@ -593,7 +619,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "RuneScape Adventurer's Log";
-            this.delpusage = "::alog (Runescape Name)";
+            this.helpusage = "::alog (Runescape Name)";
             this.helpdesc = "Fetch the RuneScape adventurer's log for the specified player name.";
             this.skip = false;
         }
@@ -632,7 +658,8 @@ class BotCommands {
         }
     };
 
-    public static BotCommand maintain = new BotCommand("command.m"){
+    // Administer commands (won't work anywhere else)
+    public static BotCommand m = new BotCommand("command.m"){
         @Override
         void command(){
             if(guild.getId().equals("319606739550863360")){
@@ -645,7 +672,7 @@ class BotCommands {
             }
         }
     };
-    public static BotCommand verify = new BotCommand("command.v"){
+    public static BotCommand v = new BotCommand("command.v"){
         @Override
         void command(){
             if(guild.getId().equals("319606739550863360")){
@@ -678,7 +705,4 @@ class BotCommands {
             }
         }
     };
-
-    // SPECIAL COMMANDS
-
 }

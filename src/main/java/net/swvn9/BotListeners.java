@@ -4,7 +4,6 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -118,10 +117,6 @@ class EventListener extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
-		if(BotCommands.c.getWaiting()&&e.getChannelType().equals(ChannelType.PRIVATE)&&e.getAuthor().getId().equals("320611242366730241")){
-			BotCommands.c.lastchannel.sendMessage(e.getMessage().getRawContent()).queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-			BotCommands.c.setWaiting(false);
-		}
 	    if((e.getAuthor().isBot()||
 		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||e.getChannelType().equals(ChannelType.PRIVATE))){
             return;
@@ -165,7 +160,7 @@ class EventListener extends ListenerAdapter {
 
 	    if(e.getChannel().getId().equals("320615332840472576")&&!e.getAuthor().isBot()){
             if(input.charAt(0)=='<'){
-				BotCommands.verify.run(e.getMessage());
+				BotCommands.v.run(e.getMessage());
             }
         }
 
