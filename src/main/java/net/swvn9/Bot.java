@@ -18,7 +18,7 @@ class Bot{
     public static void main(String[] args) {
             try{
                 Config.loadConfig();
-                jda = new JDABuilder(AccountType.BOT).addEventListener(new EventListener()).addEventListener(new ReadyListener()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
+                jda = new JDABuilder(AccountType.BOT).addEventListener(new BotEvent()).addEventListener(new BotReady()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
             } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
                 System.out.println(e.getMessage());
             }
@@ -30,7 +30,7 @@ class Bot{
             jda.shutdown(false);
             jda=null;
             Config.loadConfig();
-            jda = new JDABuilder(AccountType.BOT).addEventListener(new EventListener()).addEventListener(new ReadyListener()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
+            jda = new JDABuilder(AccountType.BOT).addEventListener(new BotEvent()).addEventListener(new BotReady()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             System.out.println(e.getMessage());
         }

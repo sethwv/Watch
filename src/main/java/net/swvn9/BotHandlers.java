@@ -7,14 +7,16 @@ import java.util.*;
 
 class BotUser {
     BotUser(User u, Guild g){
+        String noperms[] ={"none"};
         this.isadmin = false;
         this.id = u.getId();
         for(String key:Config.config.getUsers().keySet()){
             if(u.getId().equals(Config.config.getUsers().get(key).id)){
+                if(Config.config.getUsers().get(key).permissions==null) this.permissions= Arrays.asList(noperms);
                 this.id = u.getId();
                 this.isadmin = Config.config.getUsers().get(key).admin;
                 if(power<Config.config.getUsers().get(key).power) this.power = Config.config.getUsers().get(key).power;
-                if(!Config.config.getUsers().get(key).permissions.isEmpty()) this.permissions = Config.config.getUsers().get(key).permissions;
+                if(Config.config.getUsers().get(key).permissions!=null) this.permissions = Config.config.getUsers().get(key).permissions;
             }
         }
         for(String key:Config.config.getGroups().keySet()) {
@@ -32,7 +34,6 @@ class BotUser {
                 }
             }
         }
-        String noperms[] ={"noperms"};
         if(this.permissions==null) this.permissions= Arrays.asList(noperms);
         Set<String> hs = new LinkedHashSet<>();
         hs.addAll(permissions);

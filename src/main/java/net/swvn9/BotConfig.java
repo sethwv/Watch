@@ -43,17 +43,24 @@ class Config {
 			Whitetemp.add(a.next());
 		}
 		net.swvn9.Config.Whitelist = Whitetemp.toArray(new String[0]);
+		/*
 		Scanner b = new Scanner(config.getAdminrole());
 		while(b.hasNext()){
 			AdminTemp.add(b.next());
 		}
 		net.swvn9.Config.AdminRoles = AdminTemp.toArray(new String[0]);
+		*/
 	}
 
 	static String getToken(){
 		return config.getToken();
 	}
-
+	static String getrebrandlyToken(){
+		return config.getRebrandlyToken();
+	}
+	static String getrebrandlyURL(){
+		return config.getRebrandlyURL();
+	}
 	static String[] getWhitelist(){
 		return Whitelist;
 	}
@@ -87,7 +94,9 @@ class configGroup {
 class Yaml { //this is my yaml bean thingamahooza
 
 	private String Token;
-	private String Adminrole;
+	//private String Adminrole;
+	private String rebrandlyToken;
+	private String rebrandlyURL;
 	private String Whitelist;
 	private Map<String,configUser> Users;
 	private Map<String,configGroup> Groups;
@@ -98,14 +107,14 @@ class Yaml { //this is my yaml bean thingamahooza
 	void setToken(String Token) {
 		this.Token = Token;
 	}
-
+/*
 	String getAdminrole() {
 		return Adminrole;
 	}
 	void setAdminrole(String AdminRole) {
 		this.Adminrole = AdminRole;
 	}
-
+*/
 	String getWhitelist() {
 		return Whitelist;
 	}
@@ -125,5 +134,21 @@ class Yaml { //this is my yaml bean thingamahooza
 	}
 	void setUsers(Map<String,configUser> Users){
 		this.Users = Users;
+	}
+
+	public String getRebrandlyToken() {
+		return rebrandlyToken;
+	}
+
+	public void setRebrandlyToken(String rebrandlyToken) {
+		this.rebrandlyToken = rebrandlyToken;
+	}
+
+	public String getRebrandlyURL() {
+		return rebrandlyURL;
+	}
+
+	public void setRebrandlyURL(String rebrandlyURL) {
+		this.rebrandlyURL = rebrandlyURL;
 	}
 }

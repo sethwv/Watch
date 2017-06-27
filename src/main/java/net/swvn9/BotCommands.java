@@ -10,25 +10,30 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.awt.*;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static net.swvn9.EventListener.WHITELIST;
+import static net.swvn9.BotEvent.WHITELIST;
 
 class BotCommand{
     //BotCommand(String node,Long ratelimit){
@@ -131,7 +136,11 @@ class BotCommand{
                 return;
             }
             this.Lastrun = LocalDateTime.now().plusSeconds(ratelimit);
-            this.command();
+            try{
+                this.command();
+            }catch(Exception eeeeee){
+                eeeeee.getStackTrace();
+            }
             this.cleanup(true);
         } else {
             this.cleanup(false);
@@ -147,7 +156,7 @@ class BotCommand{
         this.commandargs = null;
         saveMemory();
     }
-    void command(){
+    void command() throws Exception {
         message.getChannel().sendMessage("<:WatchWarn:326815513634406419> `This command has not been configured, node: "+this.node+"`").queue(msg->msg.delete().queueAfter(10, TimeUnit.SECONDS));
     }
 
@@ -155,6 +164,7 @@ class BotCommand{
 
 class BotCommands {
     public static HashSet<BotCommand> commandList = new HashSet<>();
+    public static ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
     // Command utility methods
     private static boolean comapare(String a,String b) {
@@ -168,8 +178,8 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Help (This command)";
-            this.helpusage = "::help <keyword> <-a>";
-            this.helpdesc = "See all of the commands associated with the bot that you can use. Add the -a flag to see all commands.";
+            this.helpusage = "::help <keyword> <-a,c>";
+            this.helpdesc = "See all of the commands associated with the bot that you can use, sent to you in a dm unless specified otherwise.\n#Flags:\n<-a> All commands\n<-c> In current channel";
             this.skip = false;
         }
         @Override
@@ -178,23 +188,28 @@ class BotCommands {
             showCommands.setColor(new Color(148,168,249));
             showCommands.setFooter("List of commands.",Bot.jda.getSelfUser().getAvatarUrl());
             boolean specific = false;
-            if(new Scanner(commandargs).hasNext()) {
-                String next = new Scanner(commandargs).next();
+            String noargs = commandargs.replace("-a","").replace("-c","").trim();
+            if(new Scanner(noargs).hasNext()) {
+                String next = new Scanner(noargs).next();
                 for (BotCommand bc : commandList) {
                     if ((bc.helpname.toLowerCase()).contains(next.toLowerCase())) {
                         specific = true;
-                        showCommands.addField(bc.helpname, "```YAML\nNode: " + bc.node.replace("#all", "") + "\nUsage: " + bc.helpusage + "\nDescription: " + bc.helpdesc + "```", true);
+                        showCommands.addField(bc.helpname, "```Markdown\n#Node: \n" + bc.node.replace("#all", "") + "\n#Usage: \n" + bc.helpusage + "\n#Description: \n" + bc.helpdesc + "```", true);
                     }
                 }
             }
             for(BotCommand bc:commandList){
                 if(bc.skip||specific) continue;
                 if(botUser.hasPermission(bc.node)||bc.node.contains("#all")||commandargs.contains("-a")||botUser.isadmin()){
-                    showCommands.addField(bc.helpname,"```YAML\nNode: "+bc.node.replace("#all","")+"\nUsage: "+bc.helpusage +"\nDescription: "+bc.helpdesc+"```",true);
+                    showCommands.addField(bc.helpname, "```Markdown\n#Node: \n" + bc.node.replace("#all", "") + "\n#Usage: \n" + bc.helpusage + "\n#Description: \n" + bc.helpdesc + "```", true);
                 }
             }
-            channel.sendMessage(showCommands.build()).queue(msg->msg.delete().queueAfter(1,TimeUnit.MINUTES));
-        }
+            if(commandargs.contains("-c")&&botUser.isadmin()){
+                channel.sendMessage(showCommands.build()).queue();
+            } else {
+                user.openPrivateChannel().complete().sendMessage(showCommands.build()).queue();
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", check your DMs!`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));            }
+            }
     };
     public static BotCommand inv = new BotCommand("command.inv"){
         @Override
@@ -212,20 +227,61 @@ class BotCommands {
             user.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/"+invcode).queue();
         }
     };
+    public static BotCommand info = new BotCommand("command.info#all"){
+        @Override
+        void command() {
+            EmbedBuilder stuff = new EmbedBuilder();
+            stuff.setTitle(user.getName()+"#"+user.getDiscriminator());
+            stuff.setThumbnail(user.getAvatarUrl());
+            stuff.setColor(new Color(148,168,249));
+            DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("dd MMM yyyy");
+            stuff.addField("ID", "`"+user.getId()+"`",true);
+            stuff.addField("Effective Name","`"+guild.getMember(user).getEffectiveName()+"`",true);
+            stuff.addField("Discord Join Date","`"+user.getCreationTime().format(dateformat)+"`",true);
+            stuff.addField("Status","`"+guild.getMember(user).getOnlineStatus().name()+"`",false);
+            StringBuilder userroles = new StringBuilder();
+            for(Role e:guild.getMember(user).getRoles()){
+                userroles.append("- ").append(e.getAsMention()).append("\n");
+            }
+            if(guild.getMember(user).getRoles().isEmpty()) userroles.append("`(none)`");
+            stuff.addField("User Roles",userroles.toString(),false);
+            channel.sendMessage(stuff.build()).queue();
+
+            EmbedBuilder rolecases = new EmbedBuilder();
+            rolecases.setTitle("Role Interaction Cases");
+            rolecases.setColor(new Color(255,255,255));
+            if(!message.getMentionedRoles().isEmpty()){
+                for(Role r:message.getMentionedRoles()){
+                    rolecases.addField(r.getName(),r.getAsMention()+"\t"+guild.getMember(user).canInteract(r),false);
+                }
+                channel.sendMessage(rolecases.build()).queue();
+            }
+
+            EmbedBuilder usercases = new EmbedBuilder();
+            usercases.setTitle("User Interaction Cases");
+            usercases.setColor(new Color(255,255,255));
+            if(!message.getMentionedUsers().isEmpty()){
+                for(User u:message.getMentionedUsers()){
+                    usercases.addField(guild.getMember(u).getEffectiveName(),u.getAsMention()+"\t"+guild.getMember(user).canInteract(guild.getMember(u)),false);
+                }
+                channel.sendMessage(usercases.build()).queue();
+            }
+        }
+    };
 
     // Mod/Admin commands
     public static BotCommand say = new BotCommand("command.say"){
         @Override
         void help(){
             this.helpname = "Say";
-            this.helpusage = "::say (Message)";
+            this.helpusage = "::say <message>";
             this.helpdesc = "Send a message as the bot";
             this.skip = false;
         }
         @Override
         void command(){
             if(!commandargs.equals("")){
-                channel.sendMessage(commandargs).queue();
+                channel.sendMessage(message.getRawContent().replaceFirst("(?i)::say","")).queue();
             }
         }
     };
@@ -233,22 +289,46 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Ban";
-            this.helpusage = "::ban [user mention(s)] <reason>";
+            this.helpusage = "::ban <mention(s)> <reason>";
             this.helpdesc = "Ban user(s) with an optional message";
             this.skip = false;
         }
         @Override
         void command(){
             if(!commandargs.equals("")){
+                TextChannel send = null;
+                for(TextChannel c:guild.getTextChannels()){
+                    if(c.getName().equalsIgnoreCase("logs")){
+                        send = c;
+                    }
+                }
                 for(User u:message.getMentionedUsers()){
                     this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
-                    if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
+                    if(guild.getMember(user).canInteract(guild.getMember(u))) if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
                 }
+                commandargs = commandargs.substring(0, Math.min(commandargs.length(), 512));
                 for(User u:message.getMentionedUsers()){
-                    guild.getController().ban(u,6,commandargs).queue();
-                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" banned "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue();
+                    if(guild.getMember(user).canInteract(guild.getMember(u))){
+                        if(send!=null){
+                            EmbedBuilder log = new EmbedBuilder();
+                            StringBuilder roles = new StringBuilder();
+                            guild.getRoles().forEach(msg->roles.append("`- ").append(msg.getName()).append("`\n"));
+                            log.setColor(new Color(255, 0, 0));
+                            log.addField("Action","Ban",false);
+                            log.addField("User",u.getName()+"#"+u.getDiscriminator()+" ("+u.getId()+")",false);
+                            log.addField("Moderator:",user.getName()+"#"+user.getDiscriminator(),false);
+                            log.addField("Reason",commandargs,false);
+                            log.setFooter(Bot.jda.getSelfUser().getName()+"#"+Bot.jda.getSelfUser().getDiscriminator(),Bot.jda.getSelfUser().getAvatarUrl());
+                            log.setTimestamp(LocalDateTime.now());
+                            send.sendMessage(log.build()).queue();
+                        }
+                        if(!u.equals(user)) guild.getController().ban(u,6,commandargs).queue();
+                        message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" banned "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    } else {
+                        message.getChannel().sendMessage("<:WatchError:326815514129072131> `Unable to ban "+u.getName()+"#"+u.getDiscriminator()+"`").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    }
                 }
-
+                if(send!=null) message.getChannel().sendMessage("<:Watch:326815513550389249> `Bans have been logged in the `"+send.getAsMention()+"` channel.`").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
             } else {
                 message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+", you need to mention at least one user ::ban @mention(s)`").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
@@ -258,20 +338,44 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Kick";
-            this.helpusage = "::kick [user mention(s)] <reason>";
+            this.helpusage = "::kick <mention(s)> <reason>";
             this.helpdesc = "Kick user(s) with an optional message";
             this.skip = false;
         }
         @Override
         void command(){
+            TextChannel send = null;
+            for(TextChannel c:guild.getTextChannels()){
+                if(c.getName().equalsIgnoreCase("logs")){
+                    send = c;
+                }
+            }
             if(!commandargs.equals("")){
                 for(User u:message.getMentionedUsers()){
                     this.commandargs = commandargs.replace("@"+u.getName(),"").trim();
-                    if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
+                    if(guild.getMember(user).canInteract(guild.getMember(u))) if(!u.isBot()) u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from "+guild.getName()+" by "+user.getAsMention()+" with the message `"+commandargs+"`.").queue();
                 }
+                commandargs = commandargs.substring(0, Math.min(commandargs.length(), 512));
                 for(User u:message.getMentionedUsers()){
-                    guild.getController().kick(u.getId(),commandargs).queue();
-                    message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" kicked "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue();
+                    if(guild.getMember(user).canInteract(guild.getMember(u))){
+                        if(send!=null){
+                            EmbedBuilder log = new EmbedBuilder();
+                            StringBuilder roles = new StringBuilder();
+                            guild.getRoles().forEach(msg->roles.append("`- ").append(msg.getName()).append("`\n"));
+                            log.setColor(new Color(0, 0, 255));
+                            log.addField("Action","Kick",false);
+                            log.addField("User",u.getName()+"#"+u.getDiscriminator()+" ("+u.getId()+")",false);
+                            log.addField("Moderator:",user.getName()+"#"+user.getDiscriminator(),false);
+                            log.addField("Reason",commandargs,false);
+                            log.setFooter(Bot.jda.getSelfUser().getName()+"#"+Bot.jda.getSelfUser().getDiscriminator(),Bot.jda.getSelfUser().getAvatarUrl());
+                            log.setTimestamp(LocalDateTime.now());
+                            send.sendMessage(log.build()).queue();
+                        }
+                        if(!u.equals(user)) guild.getController().kick(u.getId(),commandargs).queue();
+                        message.getChannel().sendMessage("<:Watch:326815513550389249> `"+user.getName()+" kicked "+u.getName()+"#"+u.getDiscriminator()+" ("+commandargs+")`").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    } else {
+                        message.getChannel().sendMessage("<:WatchError:326815514129072131> `Unable to kick "+u.getName()+"#"+u.getDiscriminator()+"`").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    }
                 }
 
             } else {
@@ -283,7 +387,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "Watch";
-            this.helpusage = "::watch (add/del/list) <keyword>";
+            this.helpusage = "::watch <list/del/add> <keyword>";
             this.helpdesc = "Have the bot \"watch\" for certain keywords in chat, and log any occurrences to a channel called #logs\nKeywords are not case-sensitive";
             this.skip = false;
             this.savemem = true;
@@ -400,8 +504,6 @@ class BotCommands {
             for (String a : WHITELIST)
                 whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
             //other.addField("Whitelist", whitelisted.toString(), false);
-            other.setFooter("Settings + Whitelist from Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
-            other.addBlankField(false);
             for (String key : Config.config.getGroups().keySet()) {
                 StringBuilder ids = new StringBuilder();
                 ids.append("Group IDs").append(System.lineSeparator());
@@ -410,14 +512,19 @@ class BotCommands {
                 other.addField(key,ids.toString(), true);
                 StringBuilder perms = new StringBuilder();
                 perms.append("Permissions").append(System.lineSeparator());
-                for (String zz : Config.config.getGroups().get(key).permissions)
-                    perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+                if(Config.config.getGroups().get(key).permissions!=null){
+                    for (String zz : Config.config.getGroups().get(key).permissions)
+                        perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+                } else {
+                    perms.append("`none`");
+                }
                 if (Config.config.getGroups().get(key).admin) {
                     other.addField("Type: SuperUser Group", perms.toString(), true);
                 } else {
                     other.addField("Type: User Group", perms.toString(), true);
                 }
-                other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
+                //other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
+                other.addBlankField(true);
             }
             other.addBlankField(false);
             for (String key : Config.config.getUsers().keySet()) {
@@ -425,7 +532,11 @@ class BotCommands {
                 StringBuilder perms = new StringBuilder();
                 perms.append("Permissions").append(System.lineSeparator());
                 HashSet<String> thing = new HashSet<>();
-                thing.addAll(Config.config.getUsers().get(key).permissions);
+                if(Config.config.getUsers().get(key).permissions!=null){
+                    thing.addAll(Config.config.getUsers().get(key).permissions);
+                } else {
+                    perms.append("`none`");
+                }
                 for (String zz : thing)
                     perms.append("- `").append(zz).append("`").append(System.lineSeparator());
                 if (Config.config.getUsers().get(key).admin) {
@@ -433,9 +544,11 @@ class BotCommands {
                 } else {
                     other.addField("Type: User", perms.toString(), true);
                 }
-                other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
+                //other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
+                other.addBlankField(true);
             }
-            other.setFooter("Config.yml", Bot.jda.getSelfUser().getAvatarUrl());
+            other.setFooter("Config.yml (May not show all entries)", Bot.jda.getSelfUser().getAvatarUrl());
+            other.setTimestamp(LocalDateTime.now());
             channel.sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
         }
     };
@@ -451,7 +564,7 @@ class BotCommands {
         void command(){
             Config.loadConfig();
             WHITELIST = Config.getWhitelist();
-            channel.addReactionById(message.getId(), "👍").queue();
+            //channel.addReactionById(message.getId(), "👍").queue();
         }
     };
 
@@ -497,8 +610,154 @@ class BotCommands {
             Bot.restart();
         }
     };
+    public static BotCommand input = new BotCommand("command.input"){
+        @Override
+        void help(){
+            this.helpname = "Enable/Disable Input";
+            this.helpusage = "::input";
+            this.helpdesc = "Enable or disable input for the bot so that the bot can stay running while testing.";
+            this.skip = false;
+        }
+        @Override
+        void command(){
+            if(!waiting){
+                this.waiting=true;
+                Bot.jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+            } else{
+                this.waiting=false;
+                Bot.jda.getPresence().setStatus(OnlineStatus.ONLINE);
+            }
+        }
+    };
+    public static BotCommand bot = new BotCommand("command.bot"){
+        @Override
+        void help(){
+            this.helpname = "Bot Utility";
+            this.helpusage = "::bot <-s/-a/-k> <?listener>";
+            this.helpdesc = "You should probably stay away from everything this command does except for ::bot -s";
+            this.skip = false;
+        }
+        @Override
+        void command() {
+            if(commandargs.contains("-s")){
+                EmbedBuilder stats = new EmbedBuilder();
+                stats.setTimestamp(LocalDateTime.now());
+                stats.setColor(new Color(114, 137, 218));
+                stats.addField("Status",Bot.jda.getStatus().name(),false);
+                stats.addField("Heartbeat",Bot.jda.getPing()+"ms",true);
+                stats.addField("API Responses",Bot.jda.getResponseTotal()+"",true);
+                StringBuilder cfr = new StringBuilder();
+                int number = 1;
+                for(String s:Bot.jda.getCloudflareRays()){
+                    cfr.append("<").append(number++).append("/").append(s).append(">\n");
+                }
+                stats.addField("CF Rays","```Markdown\n"+cfr.toString()+"```",false);
+                StringBuilder lst = new StringBuilder();
+                int number2 = 0;
+                for(Object obj:Bot.jda.getRegisteredListeners()){
+                    lst.append("<").append(number2++).append("/").append(obj.toString()).append(">\n");
+                }
+                stats.addField("Listeners","```Markdown\n"+lst.toString()+"```",false);
+                channel.sendMessage(stats.build()).queue();
+            } else if(commandargs.contains("-k")){
+                commandargs = commandargs.replace("-k","");
+                Scanner ln = new Scanner(commandargs);
+                if(ln.hasNextInt()){
+                    int chosen = ln.nextInt();
+                    channel.sendMessage("```Markdown\nYou have removed listener <"+chosen+"/"+Bot.jda.getRegisteredListeners().get(chosen).toString()+">```").queue();
+                    Bot.jda.removeEventListener(Bot.jda.getRegisteredListeners().get(chosen));
+                }
+            } else if(commandargs.contains("-a")){
+                commandargs = commandargs.replace("-a","");
+                Scanner ln = new Scanner(commandargs);
+                if(ln.hasNext()){
+                    String chosenL = ln.next();
+                    switch (chosenL.toLowerCase()){
+                        case"botevent":
+                            channel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotEvent>```").queue();
+                            Bot.jda.addEventListener(new BotEvent());
+                            break;
+                        case"botready":
+                            channel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotReady>```").queue();
+                            Bot.jda.addEventListener(new BotReady());
+                            break;
+                        case"botlogging":
+                            channel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotLogging>```").queue();
+                            Bot.jda.addEventListener(new BotLogging());
+                            break;
+                    }
+                }
+            }
+        }
+    };
+    public static BotCommand js = new BotCommand("command.js"){
+        @Override
+        void help(){
+            this.helpname = "Javascript Eval";
+            this.helpusage = "::js <line>";
+            this.helpdesc = "Evaluate a line of JS";
+            this.skip = false;
+        }
+        @Override
+        void command() {
+            try{
+                engine.eval(commandargs);
+            }catch(ScriptException se){
+                channel.sendMessage("```"+se+"```").queue();
+            }
+        }
+    };
+    public static BotCommand link = new BotCommand("command.link"){
+        @Override
+        void help(){
+            this.helpname = "Rebrandly Link";
+            this.helpusage = "::link <url> <redirect>";
+            this.helpdesc = "Using the rebrandly api token defined in the config file, create redirect links.";
+            this.skip = false;
+        }
+        @Override
+        void command() throws Exception {
+            boolean info = false;
+            if(commandargs.contains("-j")){
+                info = true;
+                commandargs=commandargs.replace("-j","").trim();
+            }
+            Scanner args = new Scanner(commandargs);
+            String shortl = "";
+            String ouath = "";
+            if(args.hasNext()) ouath = args.next();
+            if(args.hasNext()) shortl = args.next();
+            if(!ouath.contains("http://")&&!ouath.contains("https://")) ouath = "http://"+ouath;
+            URL url = new URL("https://api.rebrandly.com/v1/links");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);//5 secs
+            connection.setReadTimeout(5000);//5 secs
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("apikey", Config.getrebrandlyToken());
+            OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+            out.write("{\"destination\": \"" + ouath + "\", \"slashtag\":\"" + shortl + "\", \"domain\": { \"fullName\": \""+Config.getrebrandlyURL()+"\" }}");
+            out.flush();
+            out.close();
+            int res = connection.getResponseCode();
+            InputStream is = connection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String line = null;
+            while((line = br.readLine() ) != null) {
+                if(res==200){
+                    if(info) channel.sendMessage("<:Watch:326815513550389249> **http://"+Config.getrebrandlyURL()+"/"+shortl+"** now links to **"+ouath+"**.\n```json\n"+line+"```").queue();
+                    if(!info) channel.sendMessage("<:Watch:326815513550389249> **http://"+Config.getrebrandlyURL()+"/"+shortl+"** now links to **"+ouath+"**.").queue();
+                } else {
+                    channel.sendMessage("<:WatchError:326815514129072131> "+res+" Something went wrong\n```JSON"+line+"```").queue();
+                }
+            }
+            connection.disconnect();
+        }
+    };
 
-    // RuneScape commands
+
+        // RuneScape commands
     public static BotCommand clan = new BotCommand("command.clan"){
         @Override
         void help(){
@@ -619,7 +878,7 @@ class BotCommands {
         @Override
         void help(){
             this.helpname = "RuneScape Adventurer's Log";
-            this.helpusage = "::alog (Runescape Name)";
+            this.helpusage = "::alog <RunescapeName>";
             this.helpdesc = "Fetch the RuneScape adventurer's log for the specified player name.";
             this.skip = false;
         }

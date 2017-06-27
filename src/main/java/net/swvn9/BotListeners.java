@@ -15,7 +15,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
-class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
+class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
 	@Override
 	public void onEvent(net.dv8tion.jda.core.events.Event event)
 	{
@@ -23,32 +23,31 @@ class ReadyListener implements net.dv8tion.jda.core.hooks.EventListener {
 			for(Guild a : event.getJDA().getGuilds()){
 				switch (a.getId()) {
 					default:
-						EventListener.logger(EventListener.logPrefix(0) + "I'm in " + a.getName() + "! ID:" + a.getId());
+						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in " + a.getName() + "! ID:" + a.getId());
 						break;
 					case "123527831664852992":
 						event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-						EventListener.logger(EventListener.logPrefix(0) + "I'm in seb's server!");
+						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in seb's server!");
 						break;
 					case "243112682142695446":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						EventListener.logger(EventListener.logPrefix(0) + "I'm in the test server!");
+						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the test server!");
 						break;
 					case "254861442799370240":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult public server");
+						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the Zamorak Cult public server");
 						break;
 					case "319606739550863360":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						EventListener.logger(EventListener.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
+						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
 						break;
 				}
 			}
-			//event.getJDA().getPresence().setGame(Game.of("::help | 1.9a"));
 		}
 	}
 }
 
-class EventListener extends ListenerAdapter {
+class BotEvent extends ListenerAdapter {
 
 	private static final String LITERAL = "::";
 	static String WHITELIST[] = Config.getWhitelist();
@@ -97,7 +96,7 @@ class EventListener extends ListenerAdapter {
 	@SuppressWarnings("unused")
 	static void logger(String input){
 		try {
-			EventListener.log =new FileWriter("Logs"+File.separator+"LOG_"+LOGTIME+".txt",true);
+			BotEvent.log =new FileWriter("Logs"+File.separator+"LOG_"+LOGTIME+".txt",true);
 			log.write(input+System.lineSeparator());
 			log.close();
 			System.out.println(input);
@@ -117,8 +116,7 @@ class EventListener extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
-	    if((e.getAuthor().isBot()||
-		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||e.getChannelType().equals(ChannelType.PRIVATE))){
+	    if((e.getAuthor().isBot()||e.getChannelType().equals(ChannelType.PRIVATE))){
             return;
         }
         /*
@@ -128,7 +126,12 @@ class EventListener extends ListenerAdapter {
             return;
         }
          */
-		if(Home==null) EventListener.Home= e.getGuild();
+
+        if(BotCommands.input.waiting&&!e.getMessage().getContent().contains("::input")){
+        	return;
+		}
+
+		if(Home==null) BotEvent.Home= e.getGuild();
 
 		String input = e.getMessage().getRawContent();
         if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2)+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
