@@ -383,7 +383,7 @@ class BotCommands {
             }
         }
     };
-    public static final BotCommand watch = new BotCommand("command.watch"){
+    public static BotCommand watch = new BotCommand("command.watch"){
         @Override
         void help(){
             this.helpname = "Watch";
@@ -658,7 +658,7 @@ class BotCommands {
             Bot.restart();
         }
     };
-    public static final BotCommand input = new BotCommand("command.input"){
+    public static BotCommand input = new BotCommand("command.input"){
         @Override
         void help(){
             this.helpname = "Enable/Disable Input";
@@ -677,7 +677,7 @@ class BotCommands {
             }
         }
     };
-    public static final BotCommand bot = new BotCommand("command.bot"){
+    public static BotCommand bot = new BotCommand("command.bot"){
         @Override
         void help(){
             this.helpname = "Bot Utility";
@@ -996,7 +996,7 @@ class BotCommands {
             }
         }
     };
-    public static final BotCommand v = new BotCommand("command.v"){
+    public static BotCommand v = new BotCommand("command.v"){
         @Override
         void command(){
             if(guild.getId().equals("319606739550863360")){
