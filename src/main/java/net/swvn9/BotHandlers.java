@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.User;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 class BotUser {
     BotUser(User u, Guild g){
         String noperms[] ={"none"};

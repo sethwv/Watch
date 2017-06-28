@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.*;
 import java.util.*;
 
+@SuppressWarnings("unused")
 class Config {
 	private static final File Ldir = new File("Logs");
 	private static final File Cdir = new File("Commands");
@@ -79,18 +80,21 @@ class Config {
 		return keys;
 	}
 }
+@SuppressWarnings("unused")
 class configUser {
 	public String id;
 	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
+@SuppressWarnings("unused")
 class configGroup {
 	public List<String> id;
 	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
+@SuppressWarnings("unused")
 class Yaml { //this is my yaml bean thingamahooza
 
 	private String Token;

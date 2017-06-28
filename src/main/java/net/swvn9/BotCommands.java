@@ -15,7 +15,6 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,7 +24,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static net.swvn9.BotEvent.WHITELIST;
 
+@SuppressWarnings("unused")
 class BotCommand{
     //BotCommand(String node,Long ratelimit){
     //    this.node = node;
@@ -62,7 +61,7 @@ class BotCommand{
                     readfile.close();
                     openfile.close();
                 }
-            }catch(IOException eee){
+            }catch(IOException ignored){
 
             }
         }
@@ -76,7 +75,7 @@ class BotCommand{
         return this.ratelimit;
     }
 
-    protected HashSet<String> memory = new HashSet<>();
+    protected final HashSet<String> memory = new HashSet<>();
     protected Message message;
     protected Guild guild;
     protected MessageChannel channel;
@@ -112,7 +111,7 @@ class BotCommand{
                     FileWriter writefile = new FileWriter(watchfile, false);
                     writefile.append(memstring);
                     writefile.close();
-                } catch (IOException eee) {
+                } catch (IOException ignored) {
                 }
             }
     }
@@ -166,9 +165,10 @@ class BotCommand{
 
 }
 
+@SuppressWarnings("unused")
 class BotCommands {
-    public static HashSet<BotCommand> commandList = new HashSet<>();
-    public static ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+    public static final HashSet<BotCommand> commandList = new HashSet<>();
+    public static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
     // Command utility methods
     private static boolean comapare(String a,String b) {
@@ -315,8 +315,6 @@ class BotCommands {
                     if(guild.getMember(user).canInteract(guild.getMember(u))){
                         if(send!=null){
                             EmbedBuilder log = new EmbedBuilder();
-                            StringBuilder roles = new StringBuilder();
-                            guild.getRoles().forEach(msg->roles.append("`- ").append(msg.getName()).append("`\n"));
                             log.setColor(new Color(255, 0, 0));
                             log.addField("Action","Ban",false);
                             log.addField("User",u.getName()+"#"+u.getDiscriminator()+" ("+u.getId()+")",false);
@@ -364,8 +362,6 @@ class BotCommands {
                     if(guild.getMember(user).canInteract(guild.getMember(u))){
                         if(send!=null){
                             EmbedBuilder log = new EmbedBuilder();
-                            StringBuilder roles = new StringBuilder();
-                            guild.getRoles().forEach(msg->roles.append("`- ").append(msg.getName()).append("`\n"));
                             log.setColor(new Color(0, 0, 255));
                             log.addField("Action","Kick",false);
                             log.addField("User",u.getName()+"#"+u.getDiscriminator()+" ("+u.getId()+")",false);
@@ -387,7 +383,7 @@ class BotCommands {
             }
         }
     };
-    public static BotCommand watch = new BotCommand("command.watch"){
+    public static final BotCommand watch = new BotCommand("command.watch"){
         @Override
         void help(){
             this.helpname = "Watch";
@@ -551,10 +547,10 @@ class BotCommands {
         @Override
         void command(){
             EmbedBuilder other = new EmbedBuilder();
-            StringBuilder whitelisted = new StringBuilder();
+            //StringBuilder whitelisted = new StringBuilder();
             other.setColor(new Color(148,168,249));
             for (String a : WHITELIST)
-                whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
+                //whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
             //other.addField("Whitelist", whitelisted.toString(), false);
             for (String key : Config.config.getGroups().keySet()) {
                 StringBuilder ids = new StringBuilder();
@@ -662,7 +658,7 @@ class BotCommands {
             Bot.restart();
         }
     };
-    public static BotCommand input = new BotCommand("command.input"){
+    public static final BotCommand input = new BotCommand("command.input"){
         @Override
         void help(){
             this.helpname = "Enable/Disable Input";
@@ -681,7 +677,7 @@ class BotCommands {
             }
         }
     };
-    public static BotCommand bot = new BotCommand("command.bot"){
+    public static final BotCommand bot = new BotCommand("command.bot"){
         @Override
         void help(){
             this.helpname = "Bot Utility";
@@ -812,7 +808,7 @@ class BotCommands {
             int res = connection.getResponseCode();
             InputStream is = connection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
+            String line;
             while((line = br.readLine() ) != null) {
                 if(res==200){
                     if(info) channel.sendMessage("<:Watch:326815513550389249> **http://"+Config.getrebrandlyURL()+"/"+shortl+"** now links to **"+ouath+"**.\n```json\n"+line+"```").queue();
@@ -1000,7 +996,7 @@ class BotCommands {
             }
         }
     };
-    public static BotCommand v = new BotCommand("command.v"){
+    public static final BotCommand v = new BotCommand("command.v"){
         @Override
         void command(){
             if(guild.getId().equals("319606739550863360")){

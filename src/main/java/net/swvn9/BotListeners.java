@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +48,7 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
 	}
 }
 
+@SuppressWarnings("unused")
 class BotEvent extends ListenerAdapter {
 
 	private static final String LITERAL = "::";
