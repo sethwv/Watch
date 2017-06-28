@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +44,7 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
 						break;
 				}
 			}
+			BotCommands.bot.start = System.nanoTime();
 		}
 	}
 }
@@ -213,7 +215,7 @@ class BotEvent extends ListenerAdapter {
 			Scanner command = new Scanner(input);
 			if(command.hasNext()){
 				for(BotCommand b:BotCommands.commandList){
-					if(input.indexOf(b.node.replace("command.","").replace("#all",""))==0&&!input.contains("verify")){
+					if(input.toLowerCase().indexOf(b.node.replace("command.","").replace("#all","").toLowerCase())==0&&!input.contains("verify")){
 						b.run(e.getMessage());
 						break;
 					}

@@ -10,12 +10,12 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -24,14 +24,16 @@ import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static net.swvn9.BotEvent.WHITELIST;
 
@@ -85,6 +87,8 @@ class BotCommand{
     protected LocalDateTime Lastrun = LocalDateTime.now().minusYears(10L);
     protected MessageChannel lastchannel;
     protected boolean savemem = false;
+
+    protected long start;
 
     protected String helpname = "Undefined";
     protected String helpusage = "Undefined";
@@ -442,6 +446,54 @@ class BotCommands {
             }
         }
     };
+    public static BotCommand purge = new BotCommand("command.purge"){
+        @Override
+        void help(){
+            this.helpname = "Purge Messages";
+            this.helpusage = "::purge <mentions> <number>";
+            this.helpdesc = "Mentions are optional, if a number of messages to purge is not specified, it will be 10. Pinned messages will not be deleted.";
+            this.skip = false;
+        }
+        @Override
+        void command() throws Exception {
+            this.commandargs=message.getRawContent().replaceFirst("(?i)::purge","");
+            this.commandargs=commandargs.replaceAll("<[@#]([!&])?\\d{18}>","").trim();
+            List<String> remove = new ArrayList<>();
+            Scanner args = new Scanner(commandargs);
+            int limit;
+            System.out.println(commandargs);
+            int arg;
+            if(args.hasNextInt()){
+                arg = args.nextInt();
+                limit = arg;
+            } else {
+                limit = 10;
+            }
+            int total = 0;
+            Message msg = channel.sendMessage("<:Watch:326815513550389249> `Attempting to purge "+limit+" messages.`").complete();
+            for(int i=0;limit>0;i++){
+                int todelete;
+                if(limit>100){
+                    todelete = 100;
+                }else{
+                    todelete = limit;
+                }
+                List<Message> toPurge = guild.getTextChannelById(channel.getId()).getIterableHistory().stream()
+                        .limit(todelete)
+                        .filter(m -> m.getCreationTime().isAfter(OffsetDateTime.now().minusDays(13)))
+                        .filter(m -> !m.isPinned())
+                        .filter(m -> !message.equals(m))
+                        .filter(m -> !msg.equals(m))
+                        .collect(Collectors.toList());
+                limit-=100;
+                if(!message.getMentionedUsers().isEmpty())toPurge=toPurge.stream().filter(m->message.getMentionedUsers().contains(m.getAuthor())).collect(Collectors.toList());
+                total+=toPurge.size();
+                guild.getTextChannelById(channel.getId()).deleteMessages(toPurge).queue();
+            }
+            msg.editMessage("<:Watch:326815513550389249> `Purged "+total+" messages.`").complete().delete().queueAfter(30,TimeUnit.SECONDS);
+            //channel.editMessageById(id,"<:Watch:326815513550389249> `Purged "+total+" messages.`").queue();
+        }
+    };
 
     // Configuration commands
     public static BotCommand id = new BotCommand("command.id"){
@@ -644,8 +696,25 @@ class BotCommands {
                 stats.setTimestamp(LocalDateTime.now());
                 stats.setColor(new Color(114, 137, 218));
                 stats.addField("Status",Bot.jda.getStatus().name(),false);
-                stats.addField("Heartbeat",Bot.jda.getPing()+"ms",true);
-                stats.addField("API Responses",Bot.jda.getResponseTotal()+"",true);
+                stats.addField("Heartbeat",""+Bot.jda.getPing()+"ms",true);
+                stats.addField("API Responses",""+Bot.jda.getResponseTotal()+"",true);
+
+                stats.setFooter("Watch#6969 ",Bot.jda.getSelfUser().getAvatarUrl());
+
+                long uptime = System.nanoTime()-start;
+                long Days = TimeUnit.NANOSECONDS.toDays(uptime);
+                long Hours = TimeUnit.NANOSECONDS.toHours(uptime-TimeUnit.DAYS.toNanos(Days));
+                long Minutes = TimeUnit.NANOSECONDS.toMinutes(uptime-TimeUnit.HOURS.toNanos(Hours));
+                long Seconds = TimeUnit.NANOSECONDS.toSeconds(uptime-TimeUnit.MINUTES.toNanos(Minutes));
+
+                StringBuilder uptimeString = new StringBuilder();
+
+                if(Days!=0) uptimeString.append(Days).append("d ");
+                if(Hours!=0) uptimeString.append(Hours).append("h ");
+                if(Minutes!=0) uptimeString.append(Minutes).append("m ");
+                if(Seconds!=0) uptimeString.append(Seconds).append("s");
+
+                stats.addField("Uptime",""+uptimeString.toString()+"",true);
                 StringBuilder cfr = new StringBuilder();
                 int number = 1;
                 for(String s:Bot.jda.getCloudflareRays()){
@@ -757,7 +826,7 @@ class BotCommands {
     };
 
 
-        // RuneScape commands
+    // RuneScape commands
     public static BotCommand clan = new BotCommand("command.clan"){
         @Override
         void help(){

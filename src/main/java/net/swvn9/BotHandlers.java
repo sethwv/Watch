@@ -12,7 +12,7 @@ class BotUser {
         this.id = u.getId();
         for(String key:Config.config.getUsers().keySet()){
             if(u.getId().equals(Config.config.getUsers().get(key).id)){
-                if(Config.config.getUsers().get(key).permissions==null) this.permissions= Arrays.asList(noperms);
+                if(Config.config.getUsers().get(key).permissions==null) this.permissions= new ArrayList<>(Arrays.asList(noperms));
                 this.id = u.getId();
                 this.isadmin = Config.config.getUsers().get(key).admin;
                 if(power<Config.config.getUsers().get(key).power) this.power = Config.config.getUsers().get(key).power;
@@ -34,7 +34,7 @@ class BotUser {
                 }
             }
         }
-        if(this.permissions==null) this.permissions= Arrays.asList(noperms);
+        if(this.permissions==null) this.permissions= new ArrayList<>(Arrays.asList(noperms));
         Set<String> hs = new LinkedHashSet<>();
         hs.addAll(permissions);
         this.permissions = null;
@@ -45,7 +45,7 @@ class BotUser {
     private String id;
     private boolean isadmin;
     private int power;
-    private List<String> permissions;
+    private List<String> permissions = new ArrayList<>();
 
     String getid(){
         return id;
