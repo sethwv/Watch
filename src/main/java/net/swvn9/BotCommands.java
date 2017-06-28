@@ -471,16 +471,15 @@ class BotCommands {
             List<String> remove = new ArrayList<>();
             Scanner args = new Scanner(commandargs);
             int limit;
-            System.out.println(commandargs);
             int arg;
             if (args.hasNextInt()) {
                 arg = args.nextInt();
-                limit = arg;
+                limit = arg+2;
             } else {
                 limit = 10;
             }
             int total = 0;
-            Message msg = channel.sendMessage("<:Watch:326815513550389249> `Attempting to purge " + limit + " messages.`").complete();
+            Message msg = channel.sendMessage("<:Watch:326815513550389249> `Attempting to purge " + (limit-2) + " messages.`").complete();
             for (int i = 0; limit > 0; i++) {
                 int todelete;
                 if (limit > 100) {
@@ -502,7 +501,6 @@ class BotCommands {
                 guild.getTextChannelById(channel.getId()).deleteMessages(toPurge).queue();
             }
             msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
-            //channel.editMessageById(id,"<:Watch:326815513550389249> `Purged "+total+" messages.`").queue();
         }
     };
 
@@ -724,8 +722,8 @@ class BotCommands {
                 long uptime = System.nanoTime() - start;
                 long Days = TimeUnit.NANOSECONDS.toDays(uptime);
                 long Hours = TimeUnit.NANOSECONDS.toHours(uptime - TimeUnit.DAYS.toNanos(Days));
-                long Minutes = TimeUnit.NANOSECONDS.toMinutes(uptime - TimeUnit.HOURS.toNanos(Hours));
-                long Seconds = TimeUnit.NANOSECONDS.toSeconds(uptime - TimeUnit.MINUTES.toNanos(Minutes));
+                long Minutes = TimeUnit.NANOSECONDS.toMinutes(uptime - TimeUnit.HOURS.toNanos(Hours)-TimeUnit.DAYS.toNanos(Days));
+                long Seconds = TimeUnit.NANOSECONDS.toSeconds(uptime - TimeUnit.MINUTES.toNanos(Minutes)-TimeUnit.HOURS.toNanos(Hours)-TimeUnit.DAYS.toNanos(Days));
 
                 StringBuilder uptimeString = new StringBuilder();
 
