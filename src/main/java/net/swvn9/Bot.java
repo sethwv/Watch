@@ -16,12 +16,12 @@ class Bot{
 
 
     public static void main(String[] args) {
-            try{
-                Config.loadConfig();
-                jda = new JDABuilder(AccountType.BOT).addEventListener(new BotEvent()).addEventListener(new BotReady()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
-            } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
-                System.out.println(e.getMessage());
-            }
+        try{
+            Config.loadConfig();
+            jda = new JDABuilder(AccountType.BOT).addEventListener(new BotEvent()).addEventListener(new BotReady()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(Config.getToken()).buildBlocking();
+        } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     static void restart(){
