@@ -16,6 +16,13 @@ import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
+	public static boolean isDevelopmentEnvironment() {
+		boolean isDev = true;
+		if (System.getenv("deven") == null) {
+			isDev = false;
+		}
+		return isDev;
+	}
 	@Override
 	public void onEvent(net.dv8tion.jda.core.events.Event event)
 	{
@@ -23,27 +30,34 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
 			for(Guild a : event.getJDA().getGuilds()){
 				switch (a.getId()) {
 					default:
-						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in " + a.getName() + "! ID:" + a.getId());
+						BotEvent.logger(BotEvent.logPrefix(0,event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
 						break;
-					case "123527831664852992":
-						event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in seb's server!");
+					case "aa123527831664852992":
+						//event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
+						BotEvent.logger(BotEvent.logPrefix(0,event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
 						break;
-					case "243112682142695446":
+					case "aa243112682142695446":
 						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the test server!");
+						BotEvent.logger(BotEvent.logPrefix(0,event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
 						break;
-					case "254861442799370240":
-						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the Zamorak Cult public server");
+					case "aa254861442799370240":
+						//event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+						BotEvent.logger(BotEvent.logPrefix(0,event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
 						break;
-					case "319606739550863360":
-						event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-						BotEvent.logger(BotEvent.logPrefix(0) + "I'm in the Zamorak Cult Administer Server");
+					case "aa319606739550863360":
+						//event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+						BotEvent.logger(BotEvent.logPrefix(0,event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
 						break;
 				}
 			}
 			BotCommands.bot.start = System.nanoTime();
+			if(isDevelopmentEnvironment()){
+				event.getJDA().getPresence().setStatus(OnlineStatus.IDLE);
+				event.getJDA().getPresence().setGame(Game.of("☕in Dev Mode"));
+			} else {
+				event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+				event.getJDA().getPresence().setGame(Game.of("☕"));
+			}
 		}
 	}
 }
@@ -91,10 +105,40 @@ class BotEvent extends ListenerAdapter {
 			case 6:
 				logType = "Perm";
 				break;
+			case 8:
+				logType = "SHRD";
+				break;
 		}
 		return "["+timeStamp+"] ["+logType+"] [Log]: "; //create and return the log prefix
 	}
-
+	static String logPrefix(int type,int shard){
+		String timeStamp = new SimpleDateFormat("HH:mm:ss").format(new Date()); //ge tthe current timestamp
+		String logType; //prepare the log type string
+		switch(type) {
+			default:
+				logType = "Info"; //Mark the type as Info
+				break;
+			case 1:
+				logType = "Error"; //mark the type as Error
+				break;
+			case 2:
+				logType = "Chat"; //mark the type as Chat
+				break;
+			case 3:
+				logType = "Moji"; //mark the type as Emoji/Reaction
+				break;
+			case 4:
+				logType = "CACH";
+				break;
+			case 5:
+				logType = "DBUG";
+				break;
+			case 6:
+				logType = "Perm";
+				break;
+		}
+		return "["+timeStamp+"] ["+logType+"] ["+(shard+1)+"] [Log]: "; //create and return the log prefix
+	}
 	@SuppressWarnings("unused")
 	static void logger(String input){
 		try {
@@ -136,8 +180,8 @@ class BotEvent extends ListenerAdapter {
 		if(Home==null) BotEvent.Home= e.getGuild();
 
 		String input = e.getMessage().getRawContent();
-        if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2)+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
-	    if(e.isFromType(ChannelType.PRIVATE)) logger(logPrefix(2)+"(Private Message) "+e.getAuthor().getName()+": "+input);
+        if(e.isFromType(ChannelType.TEXT)) logger(logPrefix(2,e.getJDA().getShardInfo().getShardId())+"("+e.getGuild().getName()+", #"+e.getTextChannel().getName()+") "+e.getAuthor().getName()+": "+input);
+	    if(e.isFromType(ChannelType.PRIVATE)) logger(logPrefix(2,e.getJDA().getShardInfo().getShardId())+"(Private Message) "+e.getAuthor().getName()+": "+input);
 
 
 	    for(String s:BotCommands.watch.memory){
@@ -157,6 +201,7 @@ class BotEvent extends ListenerAdapter {
 					log.setColor(new Color(148,168,249));
 					send.sendMessage(log.build()).queue();
 					send.sendMessage("@here").complete().delete().queueAfter(1,TimeUnit.SECONDS);
+					//e.getMessage().delete().queue();
 				}
 			}
 		}
