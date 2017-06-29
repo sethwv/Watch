@@ -1,13 +1,4 @@
 # this is a java project using maven
 language: java
-  sudo: false
-  language:
-    - java
-  script: "travis_wait mvn -T4 -pl quickfixj-codegenerator install"
-  jdk:
-    - oraclejdk8
-  env:
-    - MAVEN_OPTS="-Xms2048m -Xmx=2048m"
-  branches:
-    only:
-      - travis-ci-build
+# install
+install: mvn install
