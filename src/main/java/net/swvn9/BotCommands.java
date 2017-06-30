@@ -859,9 +859,10 @@ class BotCommands {
         void command() {
             try {
                 engine.put("jda",Bot.jdas.get(jdaShard));
-                engine.put("commandChannel", commandChannel);
-                engine.put("commandMessage", commandMessage);
-                engine.put("commandGuild", commandGuild);
+                engine.put("channel", commandChannel);
+                engine.put("message", commandMessage);
+                engine.put("guild", commandGuild);
+                engine.put("user",commandUser);
                 engine.put("moji",EmojiManager.getAllTags());
                 commandChannel.sendMessage("```java\n//Evaluating\n" + commandArgs.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(commandArgs).toString();
@@ -926,7 +927,7 @@ class BotCommands {
         @Override
         void command() throws Exception {
             BotReady.newIcons();
-            commandChannel.sendMessage("<:WatchDone:327873359025143818>").queue(m->m.delete().queueAfter(10,TimeUnit.SECONDS));
+            commandChannel.sendMessage("<:Watch:326815513550389249>` Changed shard emojis.`").queue(m->m.delete().queueAfter(10,TimeUnit.SECONDS));
         }
     };
 
