@@ -17,7 +17,7 @@ class Bot{
 
     static JDA jda;
     static List<JDA> jdas = new ArrayList<>();
-    static int toShard = 2;
+    static int toShard = 4;
 
     public static void main(String[] args) {
         try{

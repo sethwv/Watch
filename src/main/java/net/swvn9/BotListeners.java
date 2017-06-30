@@ -7,11 +7,11 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
+import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.awt.Event;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -76,7 +76,7 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
     }
 
     @Override
-    public void onEvent(net.dv8tion.jda.core.events.Event event) {
+    public void onEvent(Event event) {
         if (event instanceof ReadyEvent) {
             for (Guild a : event.getJDA().getGuilds()) {
                 switch (a.getId()) {

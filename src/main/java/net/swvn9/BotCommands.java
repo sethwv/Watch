@@ -652,7 +652,7 @@ class BotCommands {
     };
 
     // Owner commands
-    public static BotCommand shard = new BotCommand("command.jdaShard"){
+    public static BotCommand shard = new BotCommand("command.shard"){
         @Override
         void command() throws Exception {
             EmbedBuilder sharding = new EmbedBuilder();
@@ -949,7 +949,7 @@ class BotCommands {
 
             String Clan = "Zamorak Cult";
             try {
-                java.util.List<ClanMate> clanMates = hiscores.clanInformation(Clan);
+                List<ClanMate> clanMates = hiscores.clanInformation(Clan);
                 EmbedBuilder Ranks = new EmbedBuilder();
                 StringBuilder One = new StringBuilder();
                 if (commandGuild.getId().equals("254861442799370240") && Clan.equals("Zamorak Cult"))
