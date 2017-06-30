@@ -37,7 +37,7 @@ class Config {
 		} catch(IOException | NullPointerException ee){
 			System.out.println("There was an error with the configuration file."+System.lineSeparator()+"Please ensure that you copy the \"example_Config.yml\""+System.lineSeparator()+"fill it with your configuration choices"+System.lineSeparator()+"and rename it to \"Config.yml\"");
 			System.out.println("Below is the error commandMessage.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
-			System.exit(0);
+			Runtime.getRuntime().exit(0);
 		}
 		Scanner a = new Scanner(config.getWhitelist());
 		while(a.hasNext()){
@@ -81,14 +81,14 @@ class Config {
 	}
 }
 @SuppressWarnings("unused")
-class configUser {
+class ConfigUser {
 	public String id;
 	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
 @SuppressWarnings("unused")
-class configGroup {
+class ConfigGroup {
 	public List<String> id;
 	public boolean admin;
 	public int power;
@@ -102,8 +102,8 @@ class Yaml { //this is my yaml bean thingamahooza
 	private String rebrandlyToken;
 	private String rebrandlyURL;
 	private String Whitelist;
-	private Map<String,configUser> Users;
-	private Map<String,configGroup> Groups;
+	private Map<String,ConfigUser> Users;
+	private Map<String,ConfigGroup> Groups;
 
 	String getToken() {
 		return Token;
@@ -126,17 +126,17 @@ class Yaml { //this is my yaml bean thingamahooza
 		this.Whitelist = Whitelist;
 	}
 
-	Map<String,configGroup> getGroups(){
+	Map<String,ConfigGroup> getGroups(){
 		return Groups;
 	}
-	void setGroups(Map<String,configGroup> Groups){
+	void setGroups(Map<String,ConfigGroup> Groups){
 		this.Groups = Groups;
 	}
 
-	Map<String,configUser> getUsers(){
+	Map<String,ConfigUser> getUsers(){
 		return Users;
 	}
-	void setUsers(Map<String,configUser> Users){
+	void setUsers(Map<String,ConfigUser> Users){
 		this.Users = Users;
 	}
 

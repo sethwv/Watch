@@ -16,7 +16,7 @@ import static net.swvn9.BotEvent.logPrefix;
 class Bot{
 
     static List<JDA> jdas = new ArrayList<>();
-    static int toShard = 4;
+    static int toShard = 2;
 
     public static void main(String[] args) {
         try{

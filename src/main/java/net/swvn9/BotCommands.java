@@ -683,7 +683,7 @@ class BotCommands {
             } catch (InterruptedException eeee) {
                 eeee.getMessage();
             }
-            System.exit(1);
+            Runtime.getRuntime().exit(0);
         }
     };
     public static BotCommand stop = new BotCommand("command.stop") {
