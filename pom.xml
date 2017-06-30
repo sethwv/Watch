@@ -58,6 +58,13 @@
         </plugins>
     </build>
     <dependencies>
+            <dependency>
+                <groupId>com.mikebull94.rsapi</groupId>
+                <artifactId>rs-api</artifactId>
+                <version>2.3</version>
+                <scope>system</scope>
+                <systemPath>C:/Users/swvn1/IdeaProjects/rs-api-2.3.jar</systemPath>
+            </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
             <artifactId>emoji-java</artifactId>
