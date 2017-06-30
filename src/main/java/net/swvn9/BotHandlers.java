@@ -1,7 +1,9 @@
 package net.swvn9;
 
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.managers.Presence;
 
 import java.util.*;
 

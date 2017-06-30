@@ -9,6 +9,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import com.vdurmont.emoji.EmojiManager;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static net.swvn9.BotEvent.WHITELIST;
+import static net.swvn9.BotEvent.icon;
 
 @SuppressWarnings("unused")
 class BotCommand {
@@ -750,19 +752,18 @@ class BotCommands {
                 this.waiting = true;
                 for(JDA jda:Bot.jdas){
                     jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-                    jda.getPresence().setGame(Game.of("❌no input"));
                 }
             } else {
                 this.waiting = false;
                 if(BotReady.isDevelopmentEnvironment()){
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.IDLE);
-                        jda.getPresence().setGame(Game.of("☕in Dev Mode"));
+                        jda.getPresence().setGame(Game.of(icon.get(shard)+"in Dev Mode"));
                     }
                 } else {
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.ONLINE);
-                        jda.getPresence().setGame(Game.of("☕"));
+                        jda.getPresence().setGame(Game.of(icon.get(shard)));
                     }
                 }
             }
@@ -864,6 +865,7 @@ class BotCommands {
                 engine.put("channel",channel);
                 engine.put("message",message);
                 engine.put("guild",guild);
+                engine.put("moji",EmojiManager.getAllTags());
                 channel.sendMessage("```java\n//Evaluating\n" + commandargs.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(commandargs).toString();
                 if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
