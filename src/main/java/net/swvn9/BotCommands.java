@@ -293,8 +293,8 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Say";
-            this.helpUsage = "::say <commandMessage>";
-            this.helpDesc = "Send a commandMessage as the bot";
+            this.helpUsage = "::say <Message>";
+            this.helpDesc = "Send a Message as the bot";
             this.helpSkip = false;
         }
 
@@ -310,7 +310,7 @@ class BotCommands {
         void help() {
             this.helpName = "Ban";
             this.helpUsage = "::ban <mention(s)> <reason>";
-            this.helpDesc = "Ban commandUser(s) with an optional commandMessage";
+            this.helpDesc = "Ban commandUser(s) with an optional Message";
             this.helpSkip = false;
         }
 
@@ -326,7 +326,7 @@ class BotCommands {
                 for (User u : commandMessage.getMentionedUsers()) {
                     this.commandArgs = commandArgs.replace("@" + u.getName(), "").trim();
                     if (commandGuild.getMember(commandUser).canInteract(commandGuild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from " + commandGuild.getName() + " by " + commandUser.getAsMention() + " with the commandMessage `" + commandArgs + "`.").queue();
+                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from " + commandGuild.getName() + " by " + commandUser.getAsMention() + " with the message `" + commandArgs + "`.").queue();
                 }
                 commandArgs = commandArgs.substring(0, Math.min(commandArgs.length(), 512));
                 for (User u : commandMessage.getMentionedUsers()) {
@@ -360,7 +360,7 @@ class BotCommands {
         void help() {
             this.helpName = "Kick";
             this.helpUsage = "::kick <mention(s)> <reason>";
-            this.helpDesc = "Kick commandUser(s) with an optional commandMessage";
+            this.helpDesc = "Kick commandUser(s) with an optional Message";
             this.helpSkip = false;
         }
 
@@ -376,7 +376,7 @@ class BotCommands {
                 for (User u : commandMessage.getMentionedUsers()) {
                     this.commandArgs = commandArgs.replace("@" + u.getName(), "").trim();
                     if (commandGuild.getMember(commandUser).canInteract(commandGuild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from " + commandGuild.getName() + " by " + commandUser.getAsMention() + " with the commandMessage `" + commandArgs + "`.").queue();
+                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from " + commandGuild.getName() + " by " + commandUser.getAsMention() + " with the message `" + commandArgs + "`.").queue();
                 }
                 commandArgs = commandArgs.substring(0, Math.min(commandArgs.length(), 512));
                 for (User u : commandMessage.getMentionedUsers()) {
@@ -511,12 +511,12 @@ class BotCommands {
                     commandGuild.getTextChannelById(commandChannel.getId()).deleteMessages(toPurge).queue();
 
                 }catch(Exception exc){
-                    if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " commandMessage.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+                    if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     if(total!=1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     break;
                 }
             }
-            if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " commandMessage.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             if(total!=1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
         }
     };
@@ -859,9 +859,10 @@ class BotCommands {
         void command() {
             try {
                 engine.put("jda",Bot.jdas.get(jdaShard));
-                engine.put("commandChannel", commandChannel);
-                engine.put("commandMessage", commandMessage);
-                engine.put("commandGuild", commandGuild);
+                engine.put("channel", commandChannel);
+                engine.put("message", commandMessage);
+                engine.put("guild", commandGuild);
+                engine.put("user",commandUser);
                 engine.put("moji",EmojiManager.getAllTags());
                 commandChannel.sendMessage("```java\n//Evaluating\n" + commandArgs.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(commandArgs).toString();
@@ -926,7 +927,7 @@ class BotCommands {
         @Override
         void command() throws Exception {
             BotReady.newIcons();
-            commandChannel.sendMessage("<:WatchDone:327873359025143818>").queue(m->m.delete().queueAfter(10,TimeUnit.SECONDS));
+            commandChannel.sendMessage("<:Watch:326815513550389249>` Changed shard emojis.`").queue(m->m.delete().queueAfter(10,TimeUnit.SECONDS));
         }
     };
 

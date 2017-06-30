@@ -11,6 +11,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
+import java.awt.Event;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +32,7 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
             isDev = false;
         }
         return isDev;
+        //return false;
     }
 
     public static void newIcons() {
@@ -39,16 +41,15 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
             icon = new ArrayList<>();
         }
         collection.add(EmojiManager.getByUnicode("☕"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF88"));
-        collection.add(EmojiManager.getByUnicode("\uD83D\uDEE1"));
-        collection.add(EmojiManager.getByUnicode("⚖"));
-        collection.add(EmojiManager.getByUnicode("\uD83E\uDD50"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF2E"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6D"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6A"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF5D"));
-        collection.add(EmojiManager.getByUnicode("\uD83D\uDD25"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF88"));
+        //collection.add(EmojiManager.getByUnicode("\uD83D\uDEE1"));
+        //collection.add(EmojiManager.getByUnicode("\uD83E\uDD50"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF2E"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF6D"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF6A"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF5D"));
+        //collection.add(EmojiManager.getByUnicode("\uD83D\uDD25"));
+        //collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
         if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
             collection = new ArrayList<>();
             collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
@@ -58,47 +59,20 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
                 if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
                     icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
                 } else {
-                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
+                    if(isDevelopmentEnvironment())icon.add("☕in Dev mode, "+(j.getShardInfo().getShardId()+1));
+                    if(!isDevelopmentEnvironment())icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode()+"Shard "+(j.getShardInfo().getShardId()+1));
                 }
             } else {
                 if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
                     icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
                 } else {
-                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
+                    if(isDevelopmentEnvironment())icon.add("☕in Dev mode, "+(j.getShardInfo().getShardId()+1));
+                    if(!isDevelopmentEnvironment())icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode()+"Shard "+(j.getShardInfo().getShardId()+1));
                 }
             }
             BotEvent.logger(BotEvent.logPrefix(0, j.getShardInfo().getShardId()) + "Shard Icon: " + icon.get(j.getShardInfo().getShardId()));
             j.getPresence().setGame(Game.of(icon.get(j.getShardInfo().getShardId())));
         }
-    }
-
-    public static void newIcons(JDA j) {
-        if (icon.size() >= Bot.jdas.size()) {
-            icon = null;
-            icon = new ArrayList<>();
-        }
-        collection.add(EmojiManager.getByUnicode("☕"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF88"));
-        collection.add(EmojiManager.getByUnicode("\uD83D\uDEE1"));
-        collection.add(EmojiManager.getByUnicode("⚖"));
-        collection.add(EmojiManager.getByUnicode("\uD83E\uDD50"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF2E"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6D"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6A"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF5D"));
-        collection.add(EmojiManager.getByUnicode("\uD83D\uDD25"));
-        collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
-        if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
-            collection = new ArrayList<>();
-            collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
-        }
-        if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
-            icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
-        } else {
-            icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
-        }
-        BotEvent.logger(BotEvent.logPrefix(0, j.getShardInfo().getShardId()) + "Shard Icon: " + icon.get(j.getShardInfo().getShardId()));
-        j.getPresence().setGame(Game.of(icon.get(j.getShardInfo().getShardId())));
     }
 
     @Override
@@ -133,14 +107,22 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
             } else {
                 event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
             }
-            Timer timer = new Timer();
-            TimerTask hourlyTask = new TimerTask() {
-                @Override
-                public void run() {
-                    newIcons(event.getJDA());
-                }
-            };
-            timer.schedule(hourlyTask, 0L, 1000 * 60 * 240);
+            if(event.getJDA().getShardInfo().getShardId()==event.getJDA().getShardInfo().getShardTotal()-1){
+                try{
+                    while(Bot.jdas.contains(null))
+                    {
+                        Thread.sleep(1000);
+                    }
+                }catch(Exception ignored){}
+                Timer timer = new Timer();
+                TimerTask hourlyTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        newIcons();
+                    }
+                };
+                timer.schedule(hourlyTask, 0L, 1000 * 60 * 240);
+            }
         }
     }
 }
