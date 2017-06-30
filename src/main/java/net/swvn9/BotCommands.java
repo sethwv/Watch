@@ -43,7 +43,31 @@ class BotCommand {
     //    this.commandNode = commandNode;
     //    this.rateLimit = rateLimit;
     //}
-    BotCommand(String commandNode) {
+    protected final String commandNode;
+    private final Long rateLimit;
+    private final File watchFile;
+
+    protected int jdaShard =0;
+    protected final HashSet<String> commandMemory = new HashSet<>();
+    protected Message commandMessage;
+    protected Guild commandGuild;
+    protected MessageChannel commandChannel;
+    protected User commandUser;
+    protected String commandArgs;
+    protected BotUser botUser;
+    protected boolean commandWaiting = false;
+    protected LocalDateTime lastRun = LocalDateTime.now().minusYears(10L);
+    protected MessageChannel lastChannel;
+    protected boolean saveMemory = false;
+
+    protected long start;
+
+    protected String helpName = "Undefined";
+    protected String helpUsage = "Undefined";
+    protected String helpDesc = "Undefined";
+    protected Boolean helpSkip = false;
+
+    protected BotCommand(String commandNode) {
         this.commandNode = commandNode;
         this.rateLimit = 10L;
         this.watchFile = new File("Commands" + File.separator + (commandNode.replace("command.", "").replace("#all", "")) + ".watch");
@@ -69,34 +93,9 @@ class BotCommand {
         }
     }
 
-    protected final String commandNode;
-    private final Long rateLimit;
-    private final File watchFile;
-
-
-    long getratelimit() {
+    protected long getratelimit() {
         return this.rateLimit;
     }
-
-    protected int jdaShard =0;
-    protected final HashSet<String> commandMemory = new HashSet<>();
-    protected Message commandMessage;
-    protected Guild commandGuild;
-    protected MessageChannel commandChannel;
-    protected User commandUser;
-    protected String commandArgs;
-    protected BotUser botUser;
-    protected boolean commandWaiting = false;
-    protected LocalDateTime lastRun = LocalDateTime.now().minusYears(10L);
-    protected MessageChannel lastChannel;
-    protected boolean saveMemory = false;
-
-    protected long start;
-
-    protected String helpName = "Undefined";
-    protected String helpUsage = "Undefined";
-    protected String helpDesc = "Undefined";
-    protected Boolean helpSkip = false;
 
     void help() {
         this.helpName = "Undefined";
@@ -338,7 +337,7 @@ class BotCommands {
                             log.addField("User", u.getName() + "#" + u.getDiscriminator() + " (" + u.getId() + ")", false);
                             log.addField("Moderator:", commandUser.getName() + "#" + commandUser.getDiscriminator(), false);
                             log.addField("Reason", commandArgs, false);
-                            log.setFooter(Bot.jdas.get(jdaShard).getSelfUser().getName() + "#" + Bot.jdas.get(jdaShard).getSelfUser().getDiscriminator(), Bot.jda.getSelfUser().getAvatarUrl());
+                            log.setFooter(Bot.jdas.get(jdaShard).getSelfUser().getName() + "#" + Bot.jdas.get(jdaShard).getSelfUser().getDiscriminator(), Bot.jdas.get(1).getSelfUser().getAvatarUrl());
                             log.setTimestamp(LocalDateTime.now());
                             send.sendMessage(log.build()).queue();
                         }
@@ -388,7 +387,7 @@ class BotCommands {
                             log.addField("User", u.getName() + "#" + u.getDiscriminator() + " (" + u.getId() + ")", false);
                             log.addField("Moderator:", commandUser.getName() + "#" + commandUser.getDiscriminator(), false);
                             log.addField("Reason", commandArgs, false);
-                            log.setFooter(Bot.jdas.get(jdaShard).getSelfUser().getName() + "#" + Bot.jdas.get(jdaShard).getSelfUser().getDiscriminator(), Bot.jda.getSelfUser().getAvatarUrl());
+                            log.setFooter(Bot.jdas.get(jdaShard).getSelfUser().getName() + "#" + Bot.jdas.get(jdaShard).getSelfUser().getDiscriminator(), Bot.jdas.get(1).getSelfUser().getAvatarUrl());
                             log.setTimestamp(LocalDateTime.now());
                             send.sendMessage(log.build()).queue();
                         }
