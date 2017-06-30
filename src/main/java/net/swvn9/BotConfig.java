@@ -36,7 +36,7 @@ class Config {
 			net.swvn9.Config.config = mapper.readValue(new File("Config.yml"), Yaml.class);
 		} catch(IOException | NullPointerException ee){
 			System.out.println("There was an error with the configuration file."+System.lineSeparator()+"Please ensure that you copy the \"example_Config.yml\""+System.lineSeparator()+"fill it with your configuration choices"+System.lineSeparator()+"and rename it to \"Config.yml\"");
-			System.out.println("Below is the error message.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
+			System.out.println("Below is the error commandMessage.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
 			System.exit(0);
 		}
 		Scanner a = new Scanner(config.getWhitelist());

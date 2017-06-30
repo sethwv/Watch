@@ -1,9 +1,7 @@
 package net.swvn9;
 
-import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.managers.Presence;
 
 import java.util.*;
 
@@ -45,6 +43,7 @@ class BotUser {
         //this.permissions.addAll(hs);
     }
 
+    @SuppressWarnings("InstanceVariableNamingConvention")
     private String id;
     private boolean isadmin;
     private int power;

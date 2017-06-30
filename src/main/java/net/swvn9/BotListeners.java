@@ -1,10 +1,9 @@
 package net.swvn9;
 
 import com.vdurmont.emoji.Emoji;
-import com.vdurmont.emoji.EmojiLoader;
 import com.vdurmont.emoji.EmojiManager;
-import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
@@ -15,11 +14,12 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static net.swvn9.BotEvent.collection;
 import static net.swvn9.BotEvent.icon;
@@ -33,21 +33,77 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
         return isDev;
     }
 
+    public static void newIcons() {
+        if (icon.size() >= Bot.jdas.size()) {
+            icon = null;
+            icon = new ArrayList<>();
+        }
+        collection.add(EmojiManager.getByUnicode("☕"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF88"));
+        collection.add(EmojiManager.getByUnicode("\uD83D\uDEE1"));
+        collection.add(EmojiManager.getByUnicode("⚖"));
+        collection.add(EmojiManager.getByUnicode("\uD83E\uDD50"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF2E"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6D"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6A"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF5D"));
+        collection.add(EmojiManager.getByUnicode("\uD83D\uDD25"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
+        if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+            collection = new ArrayList<>();
+            collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
+        }
+        for (JDA j : Bot.jdas) {
+            if (j.getShardInfo().getShardId() == 0) {
+                if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
+                } else {
+                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
+                }
+            } else {
+                if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
+                } else {
+                    icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
+                }
+            }
+            BotEvent.logger(BotEvent.logPrefix(0, j.getShardInfo().getShardId()) + "Shard Icon: " + icon.get(j.getShardInfo().getShardId()));
+            j.getPresence().setGame(Game.of(icon.get(j.getShardInfo().getShardId())));
+        }
+    }
+
+    public static void newIcons(JDA j) {
+        if (icon.size() >= Bot.jdas.size()) {
+            icon = null;
+            icon = new ArrayList<>();
+        }
+        collection.add(EmojiManager.getByUnicode("☕"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF88"));
+        collection.add(EmojiManager.getByUnicode("\uD83D\uDEE1"));
+        collection.add(EmojiManager.getByUnicode("⚖"));
+        collection.add(EmojiManager.getByUnicode("\uD83E\uDD50"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF2E"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6D"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF6A"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF5D"));
+        collection.add(EmojiManager.getByUnicode("\uD83D\uDD25"));
+        collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
+        if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+            collection = new ArrayList<>();
+            collection.add(EmojiManager.getByUnicode("\uD83C\uDF41"));
+        }
+        if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+            icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode() + "Happy 150");
+        } else {
+            icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
+        }
+        BotEvent.logger(BotEvent.logPrefix(0, j.getShardInfo().getShardId()) + "Shard Icon: " + icon.get(j.getShardInfo().getShardId()));
+        j.getPresence().setGame(Game.of(icon.get(j.getShardInfo().getShardId())));
+    }
+
     @Override
     public void onEvent(net.dv8tion.jda.core.events.Event event) {
         if (event instanceof ReadyEvent) {
-            collection.add(EmojiManager.getByUnicode("☕"));
-            //collection.addAll(EmojiManager.getAll());
-            //BotEvent.collection=collection.stream()
-            //        .filter(e -> !e.equals(EmojiManager.getByUnicode("\uD83C\uDDF8\uD83C\uDDF0")))
-            //        .collect(Collectors.toList());
-            if (event.getJDA().getShardInfo().getShardId() == 0) {
-                icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
-            } else {
-                icon.add(collection.get(new Random().nextInt(collection.size())).getUnicode());
-            }
-            BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "Shard Icon: " + icon.get(event.getJDA().getShardInfo().getShardId()));
-            System.out.println("icon:" + icon);
             for (Guild a : event.getJDA().getGuilds()) {
                 switch (a.getId()) {
                     default:
@@ -74,11 +130,17 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
             BotCommands.bot.start = System.nanoTime();
             if (isDevelopmentEnvironment()) {
                 event.getJDA().getPresence().setStatus(OnlineStatus.IDLE);
-                event.getJDA().getPresence().setGame(Game.of(icon.get(event.getJDA().getShardInfo().getShardId()) + "in Dev Mode"));
             } else {
                 event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                event.getJDA().getPresence().setGame(Game.of(icon.get(event.getJDA().getShardInfo().getShardId())));
             }
+            Timer timer = new Timer();
+            TimerTask hourlyTask = new TimerTask() {
+                @Override
+                public void run() {
+                    newIcons(event.getJDA());
+                }
+            };
+            timer.schedule(hourlyTask, 0L, 1000 * 60 * 240);
         }
     }
 }
@@ -95,7 +157,7 @@ class BotEvent extends ListenerAdapter {
     static List<Emoji> collection = new ArrayList<>();
     public static List<String> icon = new ArrayList<>();
 
-    //check if a specific channel ID is on the whitelist
+    //check if a specific commandChannel ID is on the whitelist
     private boolean channelWhitelisted(String channelID) {
         for (String value : WHITELIST) { //for each value in the whitelist array
             if (value.equalsIgnoreCase(channelID)) return true; //if the id is whitelisted, return true.
@@ -186,7 +248,7 @@ class BotEvent extends ListenerAdapter {
         return true;
     }
 
-    @Override //any message sent that the bot can see
+    @Override //any commandMessage sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
         if ((e.getAuthor().isBot() || e.getChannelType().equals(ChannelType.PRIVATE))) {
             return;
@@ -199,7 +261,7 @@ class BotEvent extends ListenerAdapter {
         }
          */
 
-        if (BotCommands.input.waiting && !e.getMessage().getContent().contains("::input")) {
+        if (BotCommands.input.commandWaiting && !e.getMessage().getContent().contains("::input")) {
             return;
         }
 
@@ -212,7 +274,7 @@ class BotEvent extends ListenerAdapter {
             logger(logPrefix(2, e.getJDA().getShardInfo().getShardId()) + "(Private Message) " + e.getAuthor().getName() + ": " + input);
 
 
-        for (String s : BotCommands.watch.memory) {
+        for (String s : BotCommands.watch.commandMemory) {
             if (input.toLowerCase().contains(s) && !input.contains("::watch")) {
                 TextChannel send = null;
                 for (TextChannel c : e.getGuild().getTextChannels()) {
@@ -244,7 +306,7 @@ class BotEvent extends ListenerAdapter {
         if (e.getGuild().getId().equals("319606739550863360")) {
             Scanner message = new Scanner(input);
             if (input.contains("vote") || input.contains("poll") || input.contains("Vote") || input.contains("Poll")) {
-                e.getChannel().sendMessage("<@&319607280540712961>, " + e.getMember().getEffectiveName() + " has called a vote! Leave your vote in the form of a reaction on this message!\n\n" + input).queue(msg -> {
+                e.getChannel().sendMessage("<@&319607280540712961>, " + e.getMember().getEffectiveName() + " has called a vote! Leave your vote in the form of a reaction on this commandMessage!\n\n" + input).queue(msg -> {
                     while (message.hasNext()) {
                         String z = message.next();
                         switch (z) {
@@ -287,7 +349,7 @@ class BotEvent extends ListenerAdapter {
             Scanner command = new Scanner(input);
             if (command.hasNext()) {
                 for (BotCommand b : BotCommands.commandList) {
-                    if (input.toLowerCase().indexOf(b.node.replace("command.", "").replace("#all", "").toLowerCase()) == 0 && !input.contains("verify")) {
+                    if (input.toLowerCase().indexOf(b.commandNode.replace("command.", "").replace("#all", "").toLowerCase()) == 0 && !input.contains("verify")) {
                         b.run(e.getMessage());
                         break;
                     }
