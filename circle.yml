@@ -3,8 +3,7 @@ machine:
       PROJECT_NAME: Watch
 test:
   post:
-    - mkdir $CIRCLE_ARTIFACTS/jar
-    - mv /home/ubuntu/Watch/target/*.jar $CIRCLE_ARTIFACTS/jar
+    - mv /home/ubuntu/Watch/target/*.jar $CIRCLE_ARTIFACTS
 dependencies:
   pre:
     - go get github.com/aktau/github-release
@@ -13,7 +12,7 @@ deployment:
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
     commands:
-      - zip -r $CIRCLE_ARTIFACTS/$PROJECT_NAME-$CIRCLE_TAG.zip dist/*
+      - zip -r $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
       - git config user.name $CIRCLE_PROJECT_USERNAME
       - gren --override --data-source=commits
-      - github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --tag $CIRCLE_TAG --name $CIRCLE_PROJECT_REPONAME"."$CIRCLE_TAG"-build-"$CIRCLE_BUILD_NUM".zip" --file $CIRCLE_ARTIFACTS/$PROJECT_NAME-$CIRCLE_TAG.zip
+      - github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --tag $CIRCLE_TAG --file $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
