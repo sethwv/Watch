@@ -11,26 +11,26 @@ class BotUser {
         String noperms[] ={"none"};
         this.isadmin = false;
         this.id = u.getId();
-        for(String key:Config.config.getUsers().keySet()){
-            if(u.getId().equals(Config.config.getUsers().get(key).id)){
-                if(Config.config.getUsers().get(key).permissions==null) this.permissions= new ArrayList<>(Arrays.asList(noperms));
+        for(String key: BotConfig.config.getUsers().keySet()){
+            if(u.getId().equals(BotConfig.config.getUsers().get(key).userId)){
+                if(BotConfig.config.getUsers().get(key).permissions==null) this.permissions= new ArrayList<>(Arrays.asList(noperms));
                 this.id = u.getId();
-                this.isadmin = Config.config.getUsers().get(key).admin;
-                if(power<Config.config.getUsers().get(key).power) this.power = Config.config.getUsers().get(key).power;
-                if(Config.config.getUsers().get(key).permissions!=null) this.permissions = Config.config.getUsers().get(key).permissions;
+                this.isadmin = BotConfig.config.getUsers().get(key).admin;
+                if(power< BotConfig.config.getUsers().get(key).power) this.power = BotConfig.config.getUsers().get(key).power;
+                if(BotConfig.config.getUsers().get(key).permissions!=null) this.permissions = BotConfig.config.getUsers().get(key).permissions;
             }
         }
-        for(String key:Config.config.getGroups().keySet()) {
-            for (String gid : Config.config.getGroups().get(key).id) {
+        for(String key: BotConfig.config.getGroups().keySet()) {
+            for (String gid : BotConfig.config.getGroups().get(key).groupId) {
                 if (g.getMember(u).getRoles().toString().contains(gid)) {
-                    if (!isadmin) this.isadmin = Config.config.getGroups().get(key).admin;
+                    if (!isadmin) this.isadmin = BotConfig.config.getGroups().get(key).admin;
                     if(this.permissions==null){
-                        this.permissions = Config.config.getGroups().get(key).permissions;
+                        this.permissions = BotConfig.config.getGroups().get(key).permissions;
                     } else {
-                        this.permissions.addAll(Config.config.getGroups().get(key).permissions);
+                        this.permissions.addAll(BotConfig.config.getGroups().get(key).permissions);
                     }
-                    this.permissions.addAll(Config.config.getGroups().get(key).permissions);
-                    if (power < Config.config.getGroups().get(key).power) this.power = Config.config.getGroups().get(key).power;
+                    this.permissions.addAll(BotConfig.config.getGroups().get(key).permissions);
+                    if (power < BotConfig.config.getGroups().get(key).power) this.power = BotConfig.config.getGroups().get(key).power;
                     break;
                 }
             }

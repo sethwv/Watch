@@ -18,7 +18,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
-class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
+class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
     public static boolean isDevelopmentEnvironment() {
         boolean isDev = true;
         if (System.getenv("deven") == null) {
@@ -33,23 +33,23 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
             for (Guild a : event.getJDA().getGuilds()) {
                 switch (a.getId()) {
                     default:
-                        BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
+                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
                         break;
                     case "aa123527831664852992":
                         //event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-                        BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
+                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
                         break;
                     case "aa243112682142695446":
                         event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
+                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
                         break;
                     case "aa254861442799370240":
                         //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
+                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
                         break;
                     case "aa319606739550863360":
                         //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotEvent.logger(BotEvent.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
+                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
                         break;
                 }
             }
@@ -76,10 +76,10 @@ class BotReady implements net.dv8tion.jda.core.hooks.EventListener {
 }
 
 @SuppressWarnings("unused")
-class BotEvent extends ListenerAdapter {
+class BotListeners extends ListenerAdapter {
 
     private static final String LITERAL = "::";
-    static String WHITELIST[] = Config.getWhitelist();
+    static String WHITELIST[] = BotConfig.getWhitelist();
     private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
     private static FileWriter log;
     private static Guild Home;
@@ -158,7 +158,7 @@ class BotEvent extends ListenerAdapter {
     @SuppressWarnings("unused")
     static void logger(String input) {
         try {
-            BotEvent.log = new FileWriter("Logs" + File.separator + "LOG_" + LOGTIME + ".txt", true);
+            BotListeners.log = new FileWriter("Logs" + File.separator + "LOG_" + LOGTIME + ".txt", true);
             log.write(input + System.lineSeparator());
             log.close();
             System.out.println(input);
@@ -193,7 +193,7 @@ class BotEvent extends ListenerAdapter {
             return;
         }
 
-        if (Home == null) BotEvent.Home = e.getGuild();
+        if (Home == null) BotListeners.Home = e.getGuild();
 
         String input = e.getMessage().getRawContent();
         if (e.isFromType(ChannelType.TEXT))

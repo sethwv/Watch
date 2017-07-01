@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static net.swvn9.BotEvent.WHITELIST;
+import static net.swvn9.BotListeners.WHITELIST;
 
 @SuppressWarnings("unused")
 class BotCommand {
@@ -58,7 +58,6 @@ class BotCommand {
     protected LocalDateTime lastRun = LocalDateTime.now().minusYears(10L);
     protected MessageChannel lastChannel;
     protected boolean saveMemory = false;
-
     protected long start;
 
     protected String helpName = "Undefined";
@@ -142,8 +141,8 @@ class BotCommand {
         }
         if (botUser.hasPermission(commandNode) || botUser.isadmin() || commandNode.contains("#all")) {
             if (LocalDateTime.now().isBefore(lastRun) && !botUser.isadmin()) {
-                long Seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), lastRun);
-                commandMessage.getChannel().sendMessage("<:Watch:326815513550389249> `You can run this command again in " + Seconds + " seconds.` `" + commandMessage.getContent() + "`").queue(msg -> msg.delete().queueAfter((int) Seconds, TimeUnit.SECONDS));
+                long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), lastRun);
+                commandMessage.getChannel().sendMessage("<:Watch:326815513550389249> `You can run this command again in " + seconds + " seconds.` `" + commandMessage.getContent() + "`").queue(msg -> msg.delete().queueAfter((int) seconds, TimeUnit.SECONDS));
                 this.cleanup(true);
                 return;
             }
@@ -584,21 +583,21 @@ class BotCommands {
             for (String a : WHITELIST)
                 //whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
                 //other.addField("Whitelist", whitelisted.toString(), false);
-                for (String key : Config.config.getGroups().keySet()) {
+                for (String key : BotConfig.config.getGroups().keySet()) {
                     StringBuilder ids = new StringBuilder();
                     ids.append("Group IDs").append(System.lineSeparator());
-                    for (String zz : Config.config.getGroups().get(key).id)
+                    for (String zz : BotConfig.config.getGroups().get(key).groupId)
                         ids.append("- `").append(zz).append("`").append(System.lineSeparator());
                     other.addField(key, ids.toString(), true);
                     StringBuilder perms = new StringBuilder();
                     perms.append("Permissions").append(System.lineSeparator());
-                    if (Config.config.getGroups().get(key).permissions != null) {
-                        for (String zz : Config.config.getGroups().get(key).permissions)
+                    if (BotConfig.config.getGroups().get(key).permissions != null) {
+                        for (String zz : BotConfig.config.getGroups().get(key).permissions)
                             perms.append("- `").append(zz).append("`").append(System.lineSeparator());
                     } else {
                         perms.append("`none`");
                     }
-                    if (Config.config.getGroups().get(key).admin) {
+                    if (BotConfig.config.getGroups().get(key).admin) {
                         other.addField("Type: SuperUser Group", perms.toString(), true);
                     } else {
                         other.addField("Type: User Group", perms.toString(), true);
@@ -607,19 +606,19 @@ class BotCommands {
                     other.addBlankField(true);
                 }
             other.addBlankField(false);
-            for (String key : Config.config.getUsers().keySet()) {
-                other.addField(key, "User ID" + System.lineSeparator() + "`" + Config.config.getUsers().get(key).id + "`", true);
+            for (String key : BotConfig.config.getUsers().keySet()) {
+                other.addField(key, "User ID" + System.lineSeparator() + "`" + BotConfig.config.getUsers().get(key).userId + "`", true);
                 StringBuilder perms = new StringBuilder();
                 perms.append("Permissions").append(System.lineSeparator());
                 HashSet<String> thing = new HashSet<>();
-                if (Config.config.getUsers().get(key).permissions != null) {
-                    thing.addAll(Config.config.getUsers().get(key).permissions);
+                if (BotConfig.config.getUsers().get(key).permissions != null) {
+                    thing.addAll(BotConfig.config.getUsers().get(key).permissions);
                 } else {
                     perms.append("`none`");
                 }
                 for (String zz : thing)
                     perms.append("- `").append(zz).append("`").append(System.lineSeparator());
-                if (Config.config.getUsers().get(key).admin) {
+                if (BotConfig.config.getUsers().get(key).admin) {
                     other.addField("Type: SuperUser", perms.toString(), true);
                 } else {
                     other.addField("Type: User", perms.toString(), true);
@@ -643,8 +642,8 @@ class BotCommands {
 
         @Override
         void command() {
-            Config.loadConfig();
-            WHITELIST = Config.getWhitelist();
+            BotConfig.loadConfig();
+            WHITELIST = BotConfig.getWhitelist();
             //commandChannel.addReactionById(commandMessage.getId(), "👍").queue();
         }
     };
@@ -750,7 +749,7 @@ class BotCommands {
                 }
             } else {
                 this.commandWaiting = false;
-                if(BotReady.isDevelopmentEnvironment()){
+                if(BotGeneric.isDevelopmentEnvironment()){
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.IDLE);
                     }
@@ -784,17 +783,17 @@ class BotCommands {
                 stats.setFooter("Watch#6969 ", Bot.jdas.get(jdaShard).getSelfUser().getAvatarUrl());
 
                 long uptime = System.nanoTime() - start;
-                long Days = TimeUnit.NANOSECONDS.toDays(uptime);
-                long Hours = TimeUnit.NANOSECONDS.toHours(uptime - TimeUnit.DAYS.toNanos(Days));
-                long Minutes = TimeUnit.NANOSECONDS.toMinutes(uptime - TimeUnit.HOURS.toNanos(Hours)-TimeUnit.DAYS.toNanos(Days));
-                long Seconds = TimeUnit.NANOSECONDS.toSeconds(uptime - TimeUnit.MINUTES.toNanos(Minutes)-TimeUnit.HOURS.toNanos(Hours)-TimeUnit.DAYS.toNanos(Days));
+                long days = TimeUnit.NANOSECONDS.toDays(uptime);
+                long hours = TimeUnit.NANOSECONDS.toHours(uptime - TimeUnit.DAYS.toNanos(days));
+                long minutes = TimeUnit.NANOSECONDS.toMinutes(uptime - TimeUnit.HOURS.toNanos(hours)-TimeUnit.DAYS.toNanos(days));
+                long seconds = TimeUnit.NANOSECONDS.toSeconds(uptime - TimeUnit.MINUTES.toNanos(minutes)-TimeUnit.HOURS.toNanos(hours)-TimeUnit.DAYS.toNanos(days));
 
                 StringBuilder uptimeString = new StringBuilder();
 
-                if (Days != 0) uptimeString.append(Days).append("d ");
-                if (Hours != 0) uptimeString.append(Hours).append("h ");
-                if (Minutes != 0) uptimeString.append(Minutes).append("m ");
-                if (Seconds != 0) uptimeString.append(Seconds).append("s");
+                if (days != 0) uptimeString.append(days).append("d ");
+                if (hours != 0) uptimeString.append(hours).append("h ");
+                if (minutes != 0) uptimeString.append(minutes).append("m ");
+                if (seconds != 0) uptimeString.append(seconds).append("s");
 
                 stats.addField("Uptime", "" + uptimeString.toString() + "", true);
                 StringBuilder cfr = new StringBuilder();
@@ -825,13 +824,13 @@ class BotCommands {
                 if (ln.hasNext()) {
                     String chosenL = ln.next();
                     switch (chosenL.toLowerCase()) {
-                        case "botevent":
-                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotEvent>```").queue();
-                            Bot.jdas.get(jdaShard).addEventListener(new BotEvent());
+                        case "botlisteners":
+                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotListeners>```").queue();
+                            Bot.jdas.get(jdaShard).addEventListener(new BotListeners());
                             break;
-                        case "botready":
-                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotReady>```").queue();
-                            Bot.jdas.get(jdaShard).addEventListener(new BotReady());
+                        case "botgeneric":
+                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotGeneric>```").queue();
+                            Bot.jdas.get(jdaShard).addEventListener(new BotGeneric());
                             break;
                         case "botlogging":
                             commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotLogging>```").queue();
@@ -896,9 +895,9 @@ class BotCommands {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("apikey", Config.getrebrandlyToken());
+            connection.setRequestProperty("apikey", BotConfig.getrebrandlyToken());
             OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-            out.write("{\"destination\": \"" + ouath + "\", \"slashtag\":\"" + shortl + "\", \"domain\": { \"fullName\": \"" + Config.getrebrandlyURL() + "\" }}");
+            out.write("{\"destination\": \"" + ouath + "\", \"slashtag\":\"" + shortl + "\", \"domain\": { \"fullName\": \"" + BotConfig.getrebrandlyURL() + "\" }}");
             out.flush();
             out.close();
             int res = connection.getResponseCode();
@@ -908,9 +907,9 @@ class BotCommands {
             while ((line = br.readLine()) != null) {
                 if (res == 200) {
                     if (info)
-                        commandChannel.sendMessage("<:Watch:326815513550389249> **http://" + Config.getrebrandlyURL() + "/" + shortl + "** now links to **" + ouath + "**.\n```json\n" + line + "```").queue();
+                        commandChannel.sendMessage("<:Watch:326815513550389249> **http://" + BotConfig.getrebrandlyURL() + "/" + shortl + "** now links to **" + ouath + "**.\n```json\n" + line + "```").queue();
                     if (!info)
-                        commandChannel.sendMessage("<:Watch:326815513550389249> **http://" + Config.getrebrandlyURL() + "/" + shortl + "** now links to **" + ouath + "**.").queue();
+                        commandChannel.sendMessage("<:Watch:326815513550389249> **http://" + BotConfig.getrebrandlyURL() + "/" + shortl + "** now links to **" + ouath + "**.").queue();
                 } else {
                     commandChannel.sendMessage("<:WatchError:326815514129072131> " + res + " Something went wrong\n```JSON" + line + "```").queue();
                 }
@@ -934,24 +933,24 @@ class BotCommands {
             RuneScapeAPI api = RuneScapeAPI.createHttp();
             Hiscores hiscores = api.hiscores();
 
-            String Clan = "Zamorak Cult";
+            String clan = "Zamorak Cult";
             try {
-                List<ClanMate> clanMates = hiscores.clanInformation(Clan);
-                EmbedBuilder Ranks = new EmbedBuilder();
-                StringBuilder One = new StringBuilder();
-                if (commandGuild.getId().equals("254861442799370240") && Clan.equals("Zamorak Cult"))
-                    One.append(commandGuild.getRoleById(254883837757227008L).getAsMention()).append(System.lineSeparator());
-                StringBuilder Two = new StringBuilder();
-                if (commandGuild.getId().equals("254861442799370240") && Clan.equals("Zamorak Cult"))
-                    Two.append(commandGuild.getRoleById(268490396617801729L).getAsMention()).append(System.lineSeparator());
-                StringBuilder Three = new StringBuilder();
-                if (commandGuild.getId().equals("254861442799370240") && Clan.equals("Zamorak Cult"))
-                    Three.append(commandGuild.getRoleById(258350529229357057L).getAsMention()).append(System.lineSeparator());
-                StringBuilder Four = new StringBuilder();
-                if (commandGuild.getId().equals("254861442799370240") && Clan.equals("Zamorak Cult"))
-                    Four.append(commandGuild.getRoleById(254881136524656640L).getAsMention()).append(System.lineSeparator());
-                StringBuilder Five = new StringBuilder();
-                StringBuilder Six = new StringBuilder();
+                List<ClanMate> clanMates = hiscores.clanInformation(clan);
+                EmbedBuilder ranks = new EmbedBuilder();
+                StringBuilder one = new StringBuilder();
+                if (commandGuild.getId().equals("254861442799370240") && clan.equals("Zamorak Cult"))
+                    one.append(commandGuild.getRoleById(254883837757227008L).getAsMention()).append(System.lineSeparator());
+                StringBuilder two = new StringBuilder();
+                if (commandGuild.getId().equals("254861442799370240") && clan.equals("Zamorak Cult"))
+                    two.append(commandGuild.getRoleById(268490396617801729L).getAsMention()).append(System.lineSeparator());
+                StringBuilder three = new StringBuilder();
+                if (commandGuild.getId().equals("254861442799370240") && clan.equals("Zamorak Cult"))
+                    three.append(commandGuild.getRoleById(258350529229357057L).getAsMention()).append(System.lineSeparator());
+                StringBuilder four = new StringBuilder();
+                if (commandGuild.getId().equals("254861442799370240") && clan.equals("Zamorak Cult"))
+                    four.append(commandGuild.getRoleById(254881136524656640L).getAsMention()).append(System.lineSeparator());
+                StringBuilder five = new StringBuilder();
+                StringBuilder six = new StringBuilder();
                 int admins = StringUtils.countMatches(clanMates.toString(), "Admin") / 2 + 1;
                 int admincount = 0;
                 for (ClanMate a : clanMates) {
@@ -960,84 +959,84 @@ class BotCommands {
                         case "Owner":
                             for (Member b : commandGuild.getMembers()) {
                                 if (comapare(b.getEffectiveName(), a.getName())) {
-                                    if (!One.toString().contains(b.getAsMention()))
-                                        One.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                    if (!one.toString().contains(b.getAsMention()))
+                                        one.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     found = true;
                                     break;
                                 }
                             }
-                            if (!found) One.append(a.getName());
-                            One.append(System.lineSeparator());
+                            if (!found) one.append(a.getName());
+                            one.append(System.lineSeparator());
                             break;
                         case "Deputy Owner":
                             for (Member b : commandGuild.getMembers()) {
                                 if (comapare(b.getEffectiveName(), a.getName())) {
-                                    if (!Two.toString().contains(b.getAsMention()))
-                                        Two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                    if (!two.toString().contains(b.getAsMention()))
+                                        two.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     found = true;
                                     break;
                                 }
                             }
-                            if (!found) Two.append(a.getName());
-                            Two.append(System.lineSeparator());
+                            if (!found) two.append(a.getName());
+                            two.append(System.lineSeparator());
                             break;
                         case "Overseer":
                             for (Member b : commandGuild.getMembers()) {
                                 if (comapare(b.getEffectiveName(), a.getName())) {
-                                    if (!Three.toString().contains(b.getAsMention()))
-                                        Three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                    if (!three.toString().contains(b.getAsMention()))
+                                        three.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     found = true;
                                     break;
                                 }
                             }
-                            if (!found) Three.append(a.getName());
-                            Three.append(System.lineSeparator());
+                            if (!found) three.append(a.getName());
+                            three.append(System.lineSeparator());
                             break;
                         case "Coordinator":
                             for (Member b : commandGuild.getMembers()) {
                                 if (comapare(b.getEffectiveName(), a.getName())) {
-                                    if (!Four.toString().contains(b.getAsMention()))
-                                        Four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                    if (!four.toString().contains(b.getAsMention()))
+                                        four.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     found = true;
                                     break;
                                 }
                             }
-                            if (!found) Four.append(a.getName());
-                            Four.append(System.lineSeparator());
+                            if (!found) four.append(a.getName());
+                            four.append(System.lineSeparator());
                             break;
                         case "Admin":
                             admincount++;
                             for (Member b : commandGuild.getMembers()) {
                                 if (comapare(b.getEffectiveName(), a.getName())) {
-                                    if (!Five.toString().contains(b.getAsMention()) && !Six.toString().contains(b.getAsMention()))
+                                    if (!five.toString().contains(b.getAsMention()) && !six.toString().contains(b.getAsMention()))
                                         if (admincount <= admins)
-                                            Five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                            five.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     if (admincount > admins)
-                                        Six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
+                                        six.append(b.getAsMention()).append(" *(").append(a.getName()).append(")*");
                                     found = true;
                                     break;
                                 }
                             }
                             if (admincount <= admins)
-                                if (!found) Five.append(a.getName());
-                            Five.append(System.lineSeparator());
+                                if (!found) five.append(a.getName());
+                            five.append(System.lineSeparator());
                             if (admincount > admins)
-                                if (!found) Six.append(a.getName());
-                            Six.append(System.lineSeparator());
+                                if (!found) six.append(a.getName());
+                            six.append(System.lineSeparator());
                             break;
                     }
                 }
-                Ranks.addField("Owner", One.toString(), false);
-                Ranks.addField("Deputy Owner", Two.toString(), true);
-                Ranks.addField("Overseer", Three.toString(), true);
-                Ranks.addField("Coordinator", Four.toString(), false);
-                Ranks.addField("Admin", Five.toString(), true);
-                if (admincount > admins) Ranks.addField("\u200B", Six.toString(), true);
-                Ranks.setColor(new Color(148, 168, 249));
-                Ranks.setDescription("The bot has matched the accounts with it's best guess of what their discord tag might be. There is still a significant margin for error, so let me know if something goes wrong, or something is omitted that should not be. However if you're running the command for a clan other than that which owns the discord server, things will be matched wrong.");
-                String Time = new SimpleDateFormat("MM/dd/YYYY hh:mma zzz").format(new Date());
-                Ranks.setFooter("Generated " + Time + " For " + Clan, Bot.jdas.get(jdaShard).getSelfUser().getAvatarUrl());
-                commandChannel.sendMessage(Ranks.build()).queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+                ranks.addField("Owner", one.toString(), false);
+                ranks.addField("Deputy Owner", two.toString(), true);
+                ranks.addField("Overseer", three.toString(), true);
+                ranks.addField("Coordinator", four.toString(), false);
+                ranks.addField("Admin", five.toString(), true);
+                if (admincount > admins) ranks.addField("\u200B", six.toString(), true);
+                ranks.setColor(new Color(148, 168, 249));
+                ranks.setDescription("The bot has matched the accounts with it's best guess of what their discord tag might be. There is still a significant margin for error, so let me know if something goes wrong, or something is omitted that should not be. However if you're running the command for a clan other than that which owns the discord server, things will be matched wrong.");
+                String time = new SimpleDateFormat("MM/dd/YYYY hh:mma zzz").format(new Date());
+                ranks.setFooter("Generated " + time + " For " + clan, Bot.jdas.get(jdaShard).getSelfUser().getAvatarUrl());
+                commandChannel.sendMessage(ranks.build()).queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
             } catch (java.lang.NoClassDefFoundError | IOException eeeee) {
                 System.out.println(eeeee.getMessage());
                 eeeee.printStackTrace();

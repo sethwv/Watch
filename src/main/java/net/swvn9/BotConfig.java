@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 @SuppressWarnings("unused")
-class Config {
+class BotConfig {
 	private static final File Ldir = new File("Logs");
 	private static final File Cdir = new File("Commands");
 	private static final File Config = new File("Config.yml");
@@ -16,7 +16,7 @@ class Config {
 	private static String Whitelist[];
 	private static final List<String> AdminTemp = new ArrayList<>();
 	private static String AdminRoles[];
-	static Yaml config;
+	static YamlBean config;
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private static Map<String,String[]> Groups;
 
@@ -26,35 +26,21 @@ class Config {
 				Cdir.mkdir();
 			if(!Ldir.exists()) //noinspection ResultOfMethodCallIgnored
 				Ldir.mkdir();
-			/*if(!Config.exists()){
-				FileWriter newFile = new FileWriter(Config);
-				newFile.write("#This file contains all of the configuration options available (for now)"+System.lineSeparator()+"token: Bots Token Here"+System.lineSeparator()+System.lineSeparator()+"adminrole: The admin role ID(s) separated by spaces"+System.lineSeparator()+"whitelist: Channel ID(s) Separated by spaces");
-				newFile.close();
-				System.out.println("The Config.yml file has been created, fill it in with the relevant information.");
-				System.exit(0);
-			}*/
-			net.swvn9.Config.config = mapper.readValue(new File("Config.yml"), Yaml.class);
+			BotConfig.config = mapper.readValue(new File("Config.yml"), YamlBean.class);
 		} catch(IOException | NullPointerException ee){
 			System.out.println("There was an error with the configuration file."+System.lineSeparator()+"Please ensure that you copy the \"example_Config.yml\""+System.lineSeparator()+"fill it with your configuration choices"+System.lineSeparator()+"and rename it to \"Config.yml\"");
 			System.out.println("Below is the error commandMessage.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
 			Runtime.getRuntime().exit(0);
 		}
-		Scanner a = new Scanner(config.getWhitelist());
+		Scanner a = new Scanner(config.getChannelWhitelist());
 		while(a.hasNext()){
 			Whitetemp.add(a.next());
 		}
-		net.swvn9.Config.Whitelist = Whitetemp.toArray(new String[0]);
-		/*
-		Scanner b = new Scanner(config.getAdminrole());
-		while(b.hasNext()){
-			AdminTemp.add(b.next());
-		}
-		net.swvn9.Config.AdminRoles = AdminTemp.toArray(new String[0]);
-		*/
+		BotConfig.Whitelist = Whitetemp.toArray(new String[0]);
 	}
 
 	static String getToken(){
-		return config.getToken();
+		return config.getBotToken();
 	}
 	static String getrebrandlyToken(){
 		return config.getRebrandlyToken();
@@ -69,8 +55,8 @@ class Config {
 	static String[] getAdminRoles(){
 		return AdminRoles;
 	}
-	static String[] getPerms(String Key){
-		return Groups.get(Key);
+	static String[] getPerms(String key){
+		return Groups.get(key);
 	}
 	static String[] getGroups(){
 		String[] keys = new String[Groups.keySet().toArray().length];
@@ -81,63 +67,55 @@ class Config {
 	}
 }
 @SuppressWarnings("unused")
-class ConfigUser {
-	public String id;
+class UserBean {
+	public String userId;
 	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
 @SuppressWarnings("unused")
-class ConfigGroup {
-	public List<String> id;
+class GroupBean {
+	public List<String> groupId;
 	public boolean admin;
 	public int power;
 	public List<String> permissions;
 }
 @SuppressWarnings("unused")
-class Yaml { //this is my yaml bean thingamahooza
+class YamlBean { //this is my yaml bean thingamahooza
 
-	private String Token;
-	//private String Adminrole;
+	private String botToken;
 	private String rebrandlyToken;
 	private String rebrandlyURL;
-	private String Whitelist;
-	private Map<String,ConfigUser> Users;
-	private Map<String,ConfigGroup> Groups;
+	private String channelWhitelist;
+	private Map<String,UserBean> users;
+	private Map<String,GroupBean> groups;
 
-	String getToken() {
-		return Token;
+	String getBotToken() {
+		return botToken;
 	}
-	void setToken(String Token) {
-		this.Token = Token;
-	}
-/*
-	String getAdminrole() {
-		return Adminrole;
-	}
-	void setAdminrole(String AdminRole) {
-		this.Adminrole = AdminRole;
-	}
-*/
-	String getWhitelist() {
-		return Whitelist;
-	}
-	void setWhitelist(String Whitelist) {
-		this.Whitelist = Whitelist;
+	void setBotToken(String botToken) {
+		this.botToken = botToken;
 	}
 
-	Map<String,ConfigGroup> getGroups(){
-		return Groups;
+	String getChannelWhitelist() {
+		return channelWhitelist;
 	}
-	void setGroups(Map<String,ConfigGroup> Groups){
-		this.Groups = Groups;
+	void setChannelWhitelist(String channelWhitelist) {
+		this.channelWhitelist = channelWhitelist;
 	}
 
-	Map<String,ConfigUser> getUsers(){
-		return Users;
+	Map<String,GroupBean> getGroups(){
+		return groups;
 	}
-	void setUsers(Map<String,ConfigUser> Users){
-		this.Users = Users;
+	void setGroups(Map<String,GroupBean> groups){
+		this.groups = groups;
+	}
+
+	Map<String,UserBean> getUsers(){
+		return users;
+	}
+	void setUsers(Map<String,UserBean> users){
+		this.users = users;
 	}
 
 	public String getRebrandlyToken() {
