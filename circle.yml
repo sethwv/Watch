@@ -1,11 +1,6 @@
 machine:
-  java:
-    version: openjdk8
    environment:
       PROJECT_NAME: Watch
-general:
-  artifacts:
-    - "~/Watch/target/*.jar"
 test:
   post:
     - mkdir $CIRCLE_ARTIFACTS/jar
