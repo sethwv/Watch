@@ -17,13 +17,21 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FileUtils;
 
+import javax.imageio.ImageIO;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -838,6 +846,25 @@ class BotCommands {
                             break;
                     }
                 }
+            } else if (commandArgs.contains("-b")){
+                //EmbedBuilder badges = new EmbedBuilder();
+                //badges.addField("CI Build","[![CircleCI](https://circleci.com/gh/swvn9/Watch.png)](https://circleci.com/gh/swvn9/Watch)",true);
+                //commandChannel.sendMessage(badges.build()).queue();
+                try{
+                    File picutreFile = new File("badges/ci.svg");
+                    picutreFile.delete();
+                    URL url=new URL("https://circleci.com/gh/swvn9/Watch.svg?style=shield");
+                    URLConnection conn = url.openConnection();
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
+                    conn.setRequestProperty("Content-Type","image/svg+xml");
+                    conn.connect();
+
+                    FileUtils.copyInputStreamToFile(conn.getInputStream(), picutreFile);
+
+
+                    commandChannel.sendFile(picutreFile,null).queue();
+                }catch(Exception eeeeee){eeeeee.printStackTrace();}
+
             }
         }
     };
