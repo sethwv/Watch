@@ -5,6 +5,10 @@ test:
   post:
     - mkdir $CIRCLE_ARTIFACTS/jar
     - mv /home/ubuntu/Watch/target/*.jar $CIRCLE_ARTIFACTS/jar
+dependencies:
+  pre:
+    - go get github.com/aktau/github-release
+    - npm install github-release-notes -g
 deployment:
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
