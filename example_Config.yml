@@ -1,11 +1,11 @@
 botToken: BOT TOKEN
 rebrandlyToken: REBRANDY API KEY
 rebrandlyURL: REBRANDY URL
-whitelist: NOT USED ANYMORE :(
+channelWhitelist: NIY
 
 groups:
   AdministerMODERATION:
-    id:
+    groupId:
       - 319607520307970051
       - 320617625300369408
       - 320616748833439744
@@ -16,7 +16,7 @@ groups:
       - command.clan
       - command.v
   AdministerUSER:
-    id:
+    groupId:
       - 256137186456371200
     admin: False
     power: 0
@@ -25,11 +25,11 @@ groups:
 users:
 #The Best Guy
   Seth:
-    id: 111592329424470016
+    userId: 111592329424470016
     admin: True
     power: 0
   Dragorak:
-    id: 323258668445597696
+    userId: 323258668445597696
     admin: False
     power: 0
     permissions:
