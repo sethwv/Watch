@@ -2,7 +2,7 @@
   <artifact type="jar" name="SeThink:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/SeThink_jar</output-path>
     <root id="archive" name="SeThink.jar">
-      <element id="module-output" name="SeThink" />
+      <element id="module-output" name="Watch" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/mashape/unirest/unirest-java/1.4.9/unirest-java-1.4.9.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.1/gson-2.8.1.jar" path-in-jar="/" />

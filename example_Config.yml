@@ -1,4 +1,4 @@
-token: BOT TOKEN
+botToken: BOT TOKEN
 rebrandlyToken: REBRANDY API KEY
 rebrandlyURL: REBRANDY URL
 whitelist: NOT USED ANYMORE :(
