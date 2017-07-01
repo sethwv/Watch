@@ -1,7 +1,7 @@
 token: BOT TOKEN
 rebrandlyToken: REBRANDY API KEY
 rebrandlyURL: REBRANDY URL
-whitelist: NOT USED ANYMORE
+whitelist: NOT USED ANYMORE :(
 
 groups:
   AdministerMODERATION:
