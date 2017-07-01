@@ -9,7 +9,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import com.vdurmont.emoji.EmojiManager;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -754,12 +753,10 @@ class BotCommands {
                 if(BotReady.isDevelopmentEnvironment()){
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.IDLE);
-                        jda.getPresence().setGame(Game.of(BotEvent.icon.get(jdaShard)+""));
                     }
                 } else {
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.ONLINE);
-                        jda.getPresence().setGame(Game.of(BotEvent.icon.get(jdaShard)));
                     }
                 }
             }
@@ -862,7 +859,6 @@ class BotCommands {
                 engine.put("message", commandMessage);
                 engine.put("guild", commandGuild);
                 engine.put("user",commandUser);
-                engine.put("moji",EmojiManager.getAllTags());
                 commandChannel.sendMessage("```java\n//Evaluating\n" + commandArgs.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(commandArgs).toString();
                 if(res!=null)  commandChannel.sendMessage("```js\n//Response\n" + res + "```").queue();
@@ -922,14 +918,6 @@ class BotCommands {
             connection.disconnect();
         }
     };
-    public static BotCommand icon = new BotCommand("command.icon") {
-        @Override
-        void command() throws Exception {
-            BotReady.newIcons();
-            commandChannel.sendMessage("<:Watch:326815513550389249>` Changed shard emojis.`").queue(m->m.delete().queueAfter(10,TimeUnit.SECONDS));
-        }
-    };
-
 
     // RuneScape commands
     public static BotCommand clan = new BotCommand("command.clan") {
