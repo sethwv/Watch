@@ -1,3 +1,7 @@
 general:
   artifacts:
     - "~/Watch/target/*.jar"
+test:
+  post:
+    - mkdir $CIRCLE_ARTIFACTS/jar
+    - mv Watch/target/*.jar $CIRCLE_ARTIFACTS/jar
