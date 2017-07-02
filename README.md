@@ -1,10 +1,9 @@
 [![Codacy Badge](https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.svg?style=flat-square)](https://www.codacy.com/app/swvn10/Watch?utm_source=github.com&utm_medium=referral&utm_content=swvn9/Watch&utm_campaign=badger) [![CircleCI](https://img.shields.io/circleci/project/github/swvn9/Watch.svg?style=flat-square)](https://circleci.com/gh/swvn9/Watch)
 
-# ![Watch](http://u.swvn9.net/2017/SQAne.png)
-
-Watch is my first ever Discord bot, written with the JDA library. What better way to learn the Discord API than to give it a try.
-
+![Watch](http://u.swvn9.net/2017/SQAne.png)
+[![Latest](http://u.swvn9.net/2017/CJMMd.png)](https://github.com/swvn9/Watch/releases/latest)
 ## ![Info](http://u.swvn9.net/2017/q9Spz.png)
+Watch is my first ever Discord bot, written with the JDA library. What better way to learn the Discord API than to give it a try.
 
 Trust me, You don't want to use Watch. There are so many better options written by more experienced people. Watch is intended for my personal use, and is updated to fit my needs at the time. The latest stable release can be found in the releases tab if you do want to run this for some reason.
 
