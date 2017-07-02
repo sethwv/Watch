@@ -851,18 +851,19 @@ class BotCommands {
                 //badges.addField("CI Build","[![CircleCI](https://circleci.com/gh/swvn9/Watch.png)](https://circleci.com/gh/swvn9/Watch)",true);
                 //commandChannel.sendMessage(badges.build()).queue();
                 try{
-                    File picutreFile = new File("badges/ci.svg");
+                    File picutreFile = new File("badges/ci.png");
                     picutreFile.delete();
-                    URL url=new URL("https://circleci.com/gh/swvn9/Watch.svg?style=shield");
+                    URL url=new URL("https://circleci.com/gh/swvn9/Watch.png");
                     URLConnection conn = url.openConnection();
                     conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
-                    conn.setRequestProperty("Content-Type","image/svg+xml");
+                    //conn.setRequestProperty("Content-Type","image/svg+xml");
                     conn.connect();
 
                     FileUtils.copyInputStreamToFile(conn.getInputStream(), picutreFile);
 
-
+                    commandChannel.sendMessage("CircleCI Result:").queue();
                     commandChannel.sendFile(picutreFile,null).queue();
+                    commandChannel.sendMessage("https://circleci.com/gh/swvn9/Watch").queue();
                 }catch(Exception eeeeee){eeeeee.printStackTrace();}
 
             }
