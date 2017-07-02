@@ -1,4 +1,4 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0588c343f5514f0ebdd8e2b67cbd47fb)](https://www.codacy.com/app/swvn10/Watch?utm_source=github.com&utm_medium=referral&utm_content=swvn9/Watch&utm_campaign=badger) [![CircleCI](https://circleci.com/gh/swvn9/Watch.svg?style=shield)](https://circleci.com/gh/swvn9/Watch)
+[![Codacy Badge](https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.svg?style=flat-square)](https://www.codacy.com/app/swvn10/Watch?utm_source=github.com&utm_medium=referral&utm_content=swvn9/Watch&utm_campaign=badger) [![CircleCI](https://img.shields.io/circleci/project/github/swvn9/Watch.svg?style=flat-square)](https://circleci.com/gh/swvn9/Watch)
 
 # ![Watch](http://u.swvn9.net/2017/SQAne.png)
 
