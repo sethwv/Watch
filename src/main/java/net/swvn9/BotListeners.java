@@ -24,8 +24,8 @@ class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
         if (System.getenv("deven") == null) {
             isDev = false;
         }
-        return isDev;
-        //return false;
+        //return isDev;
+        return false;
     }
     @Override
     public void onEvent(Event event) {
@@ -67,8 +67,10 @@ class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
                 if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
                     //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
                     event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
+                    event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150"));
                 } else {
-                    event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
+                    event.getJDA().getPresence().setGame(Game.of("☕"));
+                    //event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
                 }
             }
         }
