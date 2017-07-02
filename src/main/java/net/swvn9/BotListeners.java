@@ -6,15 +6,12 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
@@ -115,8 +112,8 @@ class BotListeners extends ListenerAdapter {
         if (System.getenv("deven") == null) {
             isDev = false;
         }
-        //return isDev;
-        return false;
+        return isDev;
+        //return false;
     }
     static void logger(String input) {
         try {
