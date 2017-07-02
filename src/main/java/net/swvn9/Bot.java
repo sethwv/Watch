@@ -23,7 +23,7 @@ class Bot{
             BotConfig.loadConfig();
             for(int i=0;i<toShard;i++){
                 BotListeners.logger(logPrefix(8)+"Starting Shard "+i+".");
-                jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners()).addEventListener(new BotGeneric()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
+                jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
             }
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             System.out.println(e.getMessage());
@@ -39,7 +39,7 @@ class Bot{
             jdas.remove(jdas.get(s));
             BotConfig.loadConfig();
             BotListeners.logger(logPrefix(7)+"Starting Shard "+shard+".");
-            jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners()).addEventListener(new BotGeneric()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
+            jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners()).addEventListener(new BotLogging()).setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             System.out.println(e.getMessage());
         }

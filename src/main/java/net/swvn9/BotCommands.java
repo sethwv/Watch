@@ -730,12 +730,6 @@ class BotCommands {
 
         @Override
         void command() {
-            if (commandChannel.getType().equals(ChannelType.TEXT)) commandMessage.delete().queue();
-            try {
-                TimeUnit.MILLISECONDS.sleep(200);
-            } catch (InterruptedException eeee) {
-                eeee.getMessage();
-            }
             Bot.restart(jdaShard);
         }
     };
@@ -757,7 +751,7 @@ class BotCommands {
                 }
             } else {
                 this.commandWaiting = false;
-                if(BotGeneric.isDevelopmentEnvironment()){
+                if(BotListeners.isDevelopmentEnvironment()){
                     for(JDA jda:Bot.jdas){
                         jda.getPresence().setStatus(OnlineStatus.IDLE);
                     }

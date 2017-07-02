@@ -6,6 +6,7 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.*;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
@@ -19,62 +20,16 @@ import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
-    public static boolean isDevelopmentEnvironment() {
-        boolean isDev = true;
-        if (System.getenv("deven") == null) {
-            isDev = false;
-        }
-        //return isDev;
-        return false;
-    }
+
     @Override
     public void onEvent(Event event) {
+        /*
         if (event instanceof ReadyEvent) {
-            for (Guild a : event.getJDA().getGuilds()) {
-                switch (a.getId()) {
-                    default:
-                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
-                        break;
-                    case "aa123527831664852992":
-                        //event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
-                        break;
-                    case "aa243112682142695446":
-                        event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
-                        break;
-                    case "aa254861442799370240":
-                        //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
-                        break;
-                    case "aa319606739550863360":
-                        //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                        BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
-                        break;
-                }
-            }
-            BotCommands.bot.start = System.nanoTime();
-            if (isDevelopmentEnvironment()) {
-                event.getJDA().getPresence().setStatus(OnlineStatus.IDLE);
-                if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
-                    //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-                    event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
-                } else {
-                    event.getJDA().getPresence().setGame(Game.of("☕in Dev mode, "+(event.getJDA().getShardInfo().getShardId()+1)));
-                }
-            } else {
-                event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
-                    //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-                    event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
-                    event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150"));
-                } else {
-                    event.getJDA().getPresence().setGame(Game.of("☕"));
-                    //event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
-                }
-            }
+            UNUSED
         }
+        */
     }
+
 }
 
 @SuppressWarnings("unused")
@@ -127,7 +82,6 @@ class BotListeners extends ListenerAdapter {
         }
         return "[" + timeStamp + "] [" + logType + "] [Log]: "; //create and return the log prefix
     }
-
     static String logPrefix(int type, int shard) {
         String timeStamp = new SimpleDateFormat("HH:mm:ss").format(new Date()); //ge tthe current timestamp
         String logType; //prepare the log type string
@@ -156,8 +110,14 @@ class BotListeners extends ListenerAdapter {
         }
         return "[" + timeStamp + "] [" + logType + "] [" + (shard + 1) + "] [Log]: "; //create and return the log prefix
     }
-
-    @SuppressWarnings("unused")
+    public static boolean isDevelopmentEnvironment() {
+        boolean isDev = true;
+        if (System.getenv("deven") == null) {
+            isDev = false;
+        }
+        //return isDev;
+        return false;
+    }
     static void logger(String input) {
         try {
             BotListeners.log = new FileWriter("Logs" + File.separator + "LOG_" + LOGTIME + ".txt", true);
@@ -168,7 +128,6 @@ class BotListeners extends ListenerAdapter {
             e.printStackTrace();
         }
     }
-
     private static boolean isCommand(Message m) {
         for (int i = 0; i < LITERAL.length(); i++) {
             if (m.getContent().indexOf(LITERAL) != 0) {
@@ -176,6 +135,53 @@ class BotListeners extends ListenerAdapter {
             }
         }
         return true;
+    }
+
+    @Override
+    public void onReady(ReadyEvent event){
+        for (Guild a : event.getJDA().getGuilds()) {
+            switch (a.getId()) {
+                default:
+                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
+                    break;
+                case "aa123527831664852992":
+                    //event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
+                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
+                    break;
+                case "aa243112682142695446":
+                    event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
+                    break;
+                case "aa254861442799370240":
+                    //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
+                    break;
+                case "aa319606739550863360":
+                    //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
+                    break;
+            }
+        }
+        BotCommands.bot.start = System.nanoTime();
+        if (isDevelopmentEnvironment()) {
+            event.getJDA().getPresence().setStatus(OnlineStatus.IDLE);
+            /*if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+                //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
+            } else*/ {
+                event.getJDA().getPresence().setGame(Game.of("☕in Dev mode, "+(event.getJDA().getShardInfo().getShardId()+1)));
+            }
+        } else {
+            event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
+            /*if (LocalDateTime.now().getMonth() == Month.JULY && LocalDateTime.now().getDayOfMonth() == 1) {
+                //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+                event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
+                event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150"));
+            } else*/ {
+                //event.getJDA().getPresence().setGame(Game.of("☕"));
+                event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
+            }
+        }
     }
 
     @Override //any commandMessage sent that the bot can see
