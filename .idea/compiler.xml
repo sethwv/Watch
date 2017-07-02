@@ -12,7 +12,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="SeThink" target="1.8" />
-      <module name="Watch" target="1.5" />
+      <module name="Watch" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
