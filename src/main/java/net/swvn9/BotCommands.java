@@ -869,13 +869,30 @@ class BotCommands {
                     conn.connect();
                     FileUtils.copyInputStreamToFile(conn.getInputStream(), ciBadge);
                     BufferedImage image = ImageIO.read(ciBadge);
-                    int c = image.getRGB(80,2);
+                    int c = image.getRGB(51,2);
                     int  red = (c & 0x00ff0000) >> 16;
                     int  green = (c & 0x0000ff00) >> 8;
                     int  blue = c & 0x000000ff;
+                    System.out.println(red+","+green+","+blue);
                     Color color1 = new Color(red,green,blue);
+                    System.out.println(color1.toString());
 
-                    File codBadge = new File("badges/ci.png");
+                    EmbedBuilder build = new EmbedBuilder();
+                    //build.setThumbnail("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
+                    //build.setImage("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
+                    //build.setTitle("CI Build");
+                    //build.addField("Latest CI build:","[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
+                    if(color1.getRGB()==-2464434){
+                        build.addField("Latest CI build:","**FAILING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
+                    } else {
+                        build.addField("Latest CI build:","**PASSING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
+                    }
+                    //build.setDescription("[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)");
+                    build.setColor(color1);
+                    commandChannel.sendMessage(build.build()).queue();
+
+
+                    File codBadge = new File("badges/cod.png");
                     codBadge.delete();
                     URL url2=new URL("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
                     URLConnection conn2 = url2.openConnection();
@@ -883,28 +900,21 @@ class BotCommands {
                     conn2.connect();
                     FileUtils.copyInputStreamToFile(conn2.getInputStream(), codBadge);
                     BufferedImage image2 = ImageIO.read(codBadge);
-                    int c2 = image.getRGB(80,2);
-                    int  red2 = (c & 0x00ff0000) >> 16;
-                    int  green2 = (c & 0x0000ff00) >> 8;
-                    int  blue2 = c & 0x000000ff;
-                    Color color2 = new Color(red,green,blue);
+                    int c2 = image2.getRGB(80,3);
+                    int  red2 = (c2 & 0x00ff0000) >> 16;
+                    int  green2 = (c2 & 0x0000ff00) >> 8;
+                    int  blue2 = c2 & 0x000000ff;
+                    Color color2 = new Color(red2,green2,blue2);
 
-                    EmbedBuilder build = new EmbedBuilder();
-                    //build.setThumbnail("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
-                    build.setImage("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
-                    build.setTitle("CI Build");
-                    //build.addField("Latest CI build:","[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
-                    build.setDescription("[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)");
-                    build.setColor(color1);
-                    commandChannel.sendMessage(build.build()).queue();
+
                     EmbedBuilder build2 = new EmbedBuilder();
                     //build2.setThumbnail("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
                     build2.setImage("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
-                    build2.setTitle("Code Grade");
-                    //build2.addField("Codacy Grade:","[codacy.com](https://www.codacy.com/app/swvn10/Watch)",false);
-                    build2.setDescription("[codacy.com](https://www.codacy.com/app/swvn10/Watch)");
+                    //build2.setTitle("Code Grade");
+                    build2.addField("Codacy Grade:","[codacy.com](https://www.codacy.com/app/swvn10/Watch)",false);
+                    //build2.setDescription("[codacy.com](https://www.codacy.com/app/swvn10/Watch)");
                     build2.setColor(color2);
-                    commandChannel.sendMessage(build2.build()).queue();
+                    //commandChannel.sendMessage(build2.build()).queue();
 
                 }catch(Exception eeeeee){eeeeee.printStackTrace();}
 

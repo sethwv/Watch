@@ -3,7 +3,7 @@ machine:
       PROJECT_NAME: Watch
 test:
   post:
-    - mv /home/ubuntu/Watch/target/*jar-with-dependencies.jar /home/ubuntu/Watch/target/*-with-dependencies.jar
+#    - mv /home/ubuntu/Watch/target/*jar-with-dependencies.jar /home/ubuntu/Watch/target/*-with-dependencies.jar
     - mv /home/ubuntu/Watch/target/*.jar $CIRCLE_ARTIFACTS
 #dependencies:
 #  pre:
