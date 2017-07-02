@@ -138,24 +138,9 @@ class BotListeners extends ListenerAdapter {
     public void onReady(ReadyEvent event){
         for (Guild a : event.getJDA().getGuilds()) {
             switch (a.getId()) {
+                //Possibility for special actions per-guild
                 default:
                     BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in " + a.getName() + "! ID:" + a.getId());
-                    break;
-                case "aa123527831664852992":
-                    //event.getJDA().getPresence().setStatus(OnlineStatus.INVISIBLE);
-                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in seb's server!");
-                    break;
-                case "aa243112682142695446":
-                    event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the test server!");
-                    break;
-                case "aa254861442799370240":
-                    //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult public server");
-                    break;
-                case "aa319606739550863360":
-                    //event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
-                    BotListeners.logger(BotListeners.logPrefix(0, event.getJDA().getShardInfo().getShardId()) + "I'm in the Zamorak Cult Administer Server");
                     break;
             }
         }

@@ -14,14 +14,14 @@ Watch currently splits to two shards, I realize this is not needed, it is just a
 If for some reason you want to run this bot, it is pretty simple.
 1. Download the Latest jar-with-dependencies. (Looks like `Watch-####-jar-with-dependencies.jar`)
 1. Download the most up-to-date `example_config.yml`
-1. Put the jar and config file in thier own folder, give them a home! (Something like `Watch/`)
+1. Put the jar and config file in their own folder, give them a home! (Something like `Watch/`)
 1. Remove the `example_` from the config filename.
 1. Fill the config file with any relevant information.
 1. Run the bot, from the `Watch/` folder, run something along the lines of `java -jar Watch-####-jar-with-dependencies.jar`.*If you want to use a shell or bash script to run the bot, that part is up to you.*
-1. You're ready to rock! You'll need to leave the command prompt window open, If you're running on some linux distro, I reccomend using screen to detach so you can safely disconnect from the session without killing the bot.
+1. You're ready to rock! You'll need to leave the command prompt window open, If you're running on some linux distro, I recommend using screen to detach so you can safely disconnect from the session without killing the bot.
 
 ## ![Disclaimer](http://u.swvn9.net/2017/l5gIk.png)
-Watch is (currently) licensed under the MIT license, I'm cool with you using snippets from my project, just give credit as you feel nessecary.
+Watch is (currently) licensed under the MIT license, I'm cool with you using snippets from my project, just give credit as you feel necessary.
 
 The source and software is provided with no warranty what-so-ever. Any damage done to your system is up to you. If you really need help with something, contact me on discord `Seth#4431` and I'll see what I can do for you.
 
