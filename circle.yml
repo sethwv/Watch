@@ -3,16 +3,17 @@ machine:
       PROJECT_NAME: Watch
 test:
   post:
+    - mv /home/ubuntu/Watch/target/*jar-with-dependencies.jar /home/ubuntu/Watch/target/*-with-dependencies.jar
     - mv /home/ubuntu/Watch/target/*.jar $CIRCLE_ARTIFACTS
-dependencies:
-  pre:
-    - go get github.com/aktau/github-release
-    - npm install github-release-notes -g
-deployment:
-  release:
-    tag: /v[0-9]+(\.[0-9]+)*/
-    commands:
-      - zip -r $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
-      - git config user.name $CIRCLE_PROJECT_USERNAME
-      - gren --override --data-source=commits
-      - github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --tag $CIRCLE_TAG --file $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
+#dependencies:
+#  pre:
+#    - go get github.com/aktau/github-release
+#    - npm install github-release-notes -g
+#deployment:
+#  release:
+#    tag: /v[0-9]+(\.[0-9]+)*/
+#    commands:
+#      - zip -r $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
+#      - git config user.name $CIRCLE_PROJECT_USERNAME
+#      - gren --override --data-source=commits
+#      - github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --tag $CIRCLE_TAG --file $CIRCLE_ARTIFACTS/$PROJECT_NAME.zip
