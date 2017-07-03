@@ -993,7 +993,6 @@ class BotCommands {
     public static BotCommand stest = new BotCommand("command.stest") {
         @Override
         void command() throws Exception {
-            Sentry.init();
             EventBuilder eventBuilder = new EventBuilder()
                     .withMessage("This is a test")
                     .withLevel(io.sentry.event.Event.Level.INFO)

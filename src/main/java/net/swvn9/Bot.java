@@ -1,5 +1,6 @@
 package net.swvn9;
 
+import io.sentry.Sentry;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -18,7 +19,9 @@ class Bot{
     static List<JDA> jdas = new ArrayList<>();
     static int toShard = 2;
 
+
     public static void main(String[] args) {
+        Sentry.init();
         try{
             BotConfig.loadConfig();
             for(int i=0;i<toShard;i++){
