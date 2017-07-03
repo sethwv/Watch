@@ -1,4 +1,4 @@
-package net.swvn9;
+package net.swvn9.Watch;
 
 import io.sentry.Sentry;
 import net.dv8tion.jda.core.EmbedBuilder;

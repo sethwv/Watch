@@ -1,4 +1,4 @@
-package net.swvn9;
+package net.swvn9.Watch;
 
 import com.mikebull94.rsapi.RuneScapeAPI;
 import com.mikebull94.rsapi.hiscores.ClanMate;
@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static net.swvn9.BotListeners.WHITELIST;
-
 @SuppressWarnings("unused")
 class BotCommand {
     //BotCommand(String commandNode,Long rateLimit){
@@ -73,7 +71,7 @@ class BotCommand {
 
     protected BotCommand(String commandNode) {
         this.commandNode = commandNode;
-        this.rateLimit = 10L;
+        this.rateLimit = 1L;
         this.watchFile = new File("Commands" + File.separator + (commandNode.replace("command.", "").replace("#all", "")) + ".watch");
         this.help();
         BotCommands.commandList.add(this);
@@ -590,7 +588,7 @@ class BotCommands {
             EmbedBuilder other = new EmbedBuilder();
             //StringBuilder whitelisted = new StringBuilder();
             other.setColor(new Color(148, 168, 249));
-            for (String a : WHITELIST)
+            for (String a : BotListeners.WHITELIST)
                 //whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
                 //other.addField("Whitelist", whitelisted.toString(), false);
                 for (String key : BotConfig.config.getGroups().keySet()) {
@@ -653,7 +651,7 @@ class BotCommands {
         @Override
         void command() {
             BotConfig.loadConfig();
-            WHITELIST = BotConfig.getWhitelist();
+            BotListeners.WHITELIST = BotConfig.getWhitelist();
             //commandChannel.addReactionById(commandMessage.getId(), "👍").queue();
         }
     };
@@ -829,15 +827,15 @@ class BotCommands {
                     String chosenL = ln.next();
                     switch (chosenL.toLowerCase()) {
                         case "botlisteners":
-                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotListeners>```").queue();
+                            commandChannel.sendMessage("```Markdown\nYou have added a listener <BotListeners>```").queue();
                             Bot.jdas.get(jdaShard).addEventListener(new BotListeners());
                             break;
                         case "botgeneric":
-                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotGeneric>```").queue();
+                            commandChannel.sendMessage("```Markdown\nYou have added a listener <BotGeneric>```").queue();
                             Bot.jdas.get(jdaShard).addEventListener(new BotGeneric());
                             break;
                         case "botlogging":
-                            commandChannel.sendMessage("```Markdown\nYou have added a listener <net.swvn9.BotLogging>```").queue();
+                            commandChannel.sendMessage("```Markdown\nYou have added a listener <BotLogging>```").queue();
                             Bot.jdas.get(jdaShard).addEventListener(new BotLogging());
                             break;
                     }

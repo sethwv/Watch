@@ -1,4 +1,4 @@
-package net.swvn9;
+package net.swvn9.Watch;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;

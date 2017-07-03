@@ -1,4 +1,4 @@
-package net.swvn9;
+package net.swvn9.Watch;
 
 import io.sentry.Sentry;
 import io.sentry.event.Event;

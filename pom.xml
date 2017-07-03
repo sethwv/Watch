@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.swvn9</groupId>
+    <groupId>net.swvn9.Watch</groupId>
     <artifactId>Watch</artifactId>
     <version>1.20</version>
     <packaging>jar</packaging>
@@ -50,7 +50,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.swvn9.Bot</mainClass>
+                            <mainClass>net.swvn9.Watch.Bot</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -77,7 +77,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                net.swvn9.Bot
+                            Bot.Bot
                             </mainClass>
                         </manifest>
                     </archive>

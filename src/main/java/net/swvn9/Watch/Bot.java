@@ -1,4 +1,4 @@
-package net.swvn9;
+package net.swvn9.Watch;
 
 import io.sentry.Sentry;
 import net.dv8tion.jda.core.AccountType;
@@ -12,7 +12,7 @@ import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.swvn9.BotListeners.logPrefix;
+import static net.swvn9.Watch.BotListeners.logPrefix;
 
 class Bot{
 
@@ -25,7 +25,7 @@ class Bot{
         Sentry.init();
         try{
             for(int i=0;i<toShard;i++){
-                BotListeners.logger(logPrefix(8)+"Starting Shard "+i+".");
+                BotListeners.logger(BotListeners.logPrefix(8)+"Starting Shard "+i+".");
                 jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
             }
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
@@ -35,14 +35,14 @@ class Bot{
     }
     static void restart(int s){
         try{
-            BotListeners.logger(logPrefix(8)+"Restarting Shard "+s+".");
+            BotListeners.logger(BotListeners.logPrefix(8)+"Restarting Shard "+s+".");
             int shard = jdas.get(s).getShardInfo().getShardId();
             int total = jdas.get(s).getShardInfo().getShardTotal();
             jdas.get(s).getPresence().setStatus(OnlineStatus.INVISIBLE);
             jdas.get(s).shutdown(false);
             jdas.remove(jdas.get(s));
             BotConfig.loadConfig();
-            BotListeners.logger(logPrefix(7)+"Starting Shard "+shard+".");
+            BotListeners.logger(BotListeners.logPrefix(7)+"Starting Shard "+shard+".");
             jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             Sentry.capture(e);
