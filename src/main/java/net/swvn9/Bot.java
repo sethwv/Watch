@@ -29,6 +29,7 @@ class Bot{
                 jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
             }
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
+            Sentry.capture(e);
             System.out.println(e.getMessage());
         }
     }
@@ -44,6 +45,7 @@ class Bot{
             BotListeners.logger(logPrefix(7)+"Starting Shard "+shard+".");
             jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
+            Sentry.capture(e);
             System.out.println(e.getMessage());
         }
     }

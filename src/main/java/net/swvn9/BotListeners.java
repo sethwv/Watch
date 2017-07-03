@@ -1,5 +1,6 @@
 package net.swvn9;
 
+import io.sentry.Sentry;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
@@ -11,10 +12,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
@@ -122,8 +121,8 @@ class BotListeners extends ListenerAdapter {
             log.write(input + System.lineSeparator());
             log.close();
             System.out.println(input);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Sentry.capture(ex);
         }
     }
     private static boolean isCommand(Message m) {

@@ -2,6 +2,7 @@ package net.swvn9;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.sentry.Sentry;
 
 import java.io.*;
 import java.util.*;
@@ -27,9 +28,10 @@ class BotConfig {
 			if(!Ldir.exists()) //noinspection ResultOfMethodCallIgnored
 				Ldir.mkdir();
 			BotConfig.config = mapper.readValue(new File("Config.yml"), YamlBean.class);
-		} catch(IOException | NullPointerException ee){
+		} catch(Exception ex){
 			System.out.println("There was an error with the configuration file."+System.lineSeparator()+"Please ensure that you copy the \"example_Config.yml\""+System.lineSeparator()+"fill it with your configuration choices"+System.lineSeparator()+"and rename it to \"Config.yml\"");
-			System.out.println("Below is the error commandMessage.\u001B[34m"+System.lineSeparator()+ee.getLocalizedMessage()+"\u001B[0m");
+			System.out.println("Below is the error commandMessage.\u001B[34m"+System.lineSeparator()+ex.getLocalizedMessage()+"\u001B[0m");
+			Sentry.capture(ex);
 			Runtime.getRuntime().exit(0);
 		}
 		Scanner a = new Scanner(config.getChannelWhitelist());

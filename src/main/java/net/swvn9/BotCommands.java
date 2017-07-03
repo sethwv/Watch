@@ -6,7 +6,6 @@ import com.mikebull94.rsapi.hiscores.Hiscores;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
@@ -92,8 +91,8 @@ class BotCommand {
                     readfile.close();
                     openfile.close();
                 }
-            } catch (IOException ignored) {
-
+            } catch (Exception ex) {
+                Sentry.capture(ex);
             }
         }
     }
@@ -119,7 +118,8 @@ class BotCommand {
                 FileWriter writefile = new FileWriter(watchFile, false);
                 writefile.append(memstring);
                 writefile.close();
-            } catch (IOException ignored) {
+            } catch (Exception ex) {
+                Sentry.capture(ex);
             }
         }
     }
@@ -140,7 +140,9 @@ class BotCommand {
         //commandChannel.sendTyping().queue();
         try{
             TimeUnit.MILLISECONDS.sleep(250);
-        }catch(InterruptedException ignored){}
+        }catch(Exception ex){
+            Sentry.capture(ex);
+        }
         if (commandNode.contains("#all")) {
             this.commandArgs = commandMessage.getContent().replaceFirst("(?i)::" + (commandNode.replace("command.", "")).replace("#all", ""), "");
         } else {
@@ -156,8 +158,8 @@ class BotCommand {
             this.lastRun = LocalDateTime.now().plusSeconds(rateLimit);
             try {
                 this.command();
-            } catch (Exception eeeeee) {
-                eeeeee.getStackTrace();
+            } catch (Exception ex) {
+                Sentry.capture(ex);
             }
             this.cleanup(true);
         } else {
@@ -514,9 +516,10 @@ class BotCommands {
                 try {
                     commandGuild.getTextChannelById(commandChannel.getId()).deleteMessages(toPurge).queue();
 
-                }catch(Exception exc){
+                }catch(Exception ex){
                     if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     if(total!=1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+                    Sentry.capture(ex);
                     break;
                 }
             }
@@ -685,8 +688,8 @@ class BotCommands {
             if (commandChannel.getType().equals(ChannelType.TEXT)) commandMessage.delete().queue();
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
-            } catch (InterruptedException eeee) {
-                eeee.getMessage();
+            } catch (Exception ex) {
+                Sentry.capture(ex);
             }
             Runtime.getRuntime().exit(0);
         }
@@ -705,8 +708,8 @@ class BotCommands {
             if (commandChannel.getType().equals(ChannelType.TEXT)) commandMessage.delete().queue();
             try {
                 TimeUnit.MILLISECONDS.sleep(200);
-            } catch (InterruptedException eeee) {
-                eeee.getMessage();
+            } catch (Exception ex) {
+                Sentry.capture(ex);
             }
             Bot.jdas.get(jdaShard).removeEventListener(Bot.jdas.get(jdaShard).getRegisteredListeners());
             Bot.jdas.get(jdaShard).shutdown(true);
@@ -855,7 +858,7 @@ class BotCommands {
                     */
 
                     File ciBadge = new File("badges/ci.png");
-                    ciBadge.delete();
+                    //ciBadge.delete();
                     URL url=new URL("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
                     URLConnection conn = url.openConnection();
                     conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
@@ -886,7 +889,7 @@ class BotCommands {
 
 
                     File codBadge = new File("badges/cod.png");
-                    codBadge.delete();
+                    //codBadge.delete();
                     URL url2=new URL("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
                     URLConnection conn2 = url2.openConnection();
                     conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
@@ -909,7 +912,9 @@ class BotCommands {
                     build2.setColor(color2);
                     //commandChannel.sendMessage(build2.build()).queue();
 
-                }catch(Exception eeeeee){eeeeee.printStackTrace();}
+                }catch(Exception ex){
+                    Sentry.capture(ex);
+                }
 
             }
         }
@@ -934,8 +939,9 @@ class BotCommands {
                 commandChannel.sendMessage("```java\n//Evaluating\n" + commandArgs.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(commandArgs).toString();
                 if(res!=null)  commandChannel.sendMessage("```js\n//Response\n" + res + "```").queue();
-            } catch (Exception se) {
-                if(se.getClass()!=NullPointerException.class) commandChannel.sendMessage("```js\n//Exception\n" + se + "```").queue();
+            } catch (Exception ex) {
+                Sentry.capture(ex);
+                if(ex.getClass()!=NullPointerException.class) commandChannel.sendMessage("```js\n//Exception\n" + ex + "```").queue();
             }
         }
     };
@@ -1120,9 +1126,8 @@ class BotCommands {
                 String time = new SimpleDateFormat("MM/dd/YYYY hh:mma zzz").format(new Date());
                 ranks.setFooter("Generated " + time + " For " + clan, Bot.jdas.get(jdaShard).getSelfUser().getAvatarUrl());
                 commandChannel.sendMessage(ranks.build()).queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
-            } catch (java.lang.NoClassDefFoundError | IOException eeeee) {
-                System.out.println(eeeee.getMessage());
-                eeeee.printStackTrace();
+            } catch (Exception eeeee) {
+                Sentry.capture(eeeee);
             }
 
         }
@@ -1164,7 +1169,8 @@ class BotCommands {
                 }
                 test.append("```");
                 commandChannel.sendMessage(test.toString()).queue(msg -> msg.delete().queueAfter(10, TimeUnit.MINUTES));
-            } catch (IOException | FeedException e) {
+            } catch (Exception ex) {
+                Sentry.capture(ex);
                 commandMessage.getChannel().sendMessage("<:Watch:326815513550389249> `" + commandUser.getName() + ", the name you've entered is invalid! (" + name.toString().replace("+", " ") + ")`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                 this.lastRun = LocalDateTime.now().minusSeconds(getratelimit());
             }
