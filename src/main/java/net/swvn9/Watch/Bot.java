@@ -16,7 +16,7 @@ import static net.swvn9.Watch.BotListeners.logPrefix;
 
 class Bot{
 
-    static List<JDA> jdas = new ArrayList<>();
+    static List<JDA> shards = new ArrayList<>();
     static int toShard = 2;
 
 
@@ -26,7 +26,7 @@ class Bot{
         try{
             for(int i=0;i<toShard;i++){
                 BotListeners.logger(BotListeners.logPrefix(8)+"Starting Shard "+i+".");
-                jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
+                shards.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
             }
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             Sentry.capture(e);
@@ -36,14 +36,14 @@ class Bot{
     static void restart(int s){
         try{
             BotListeners.logger(BotListeners.logPrefix(8)+"Restarting Shard "+s+".");
-            int shard = jdas.get(s).getShardInfo().getShardId();
-            int total = jdas.get(s).getShardInfo().getShardTotal();
-            jdas.get(s).getPresence().setStatus(OnlineStatus.INVISIBLE);
-            jdas.get(s).shutdown(false);
-            jdas.remove(jdas.get(s));
+            int shard = shards.get(s).getShardInfo().getShardId();
+            int total = shards.get(s).getShardInfo().getShardTotal();
+            shards.get(s).getPresence().setStatus(OnlineStatus.INVISIBLE);
+            shards.get(s).shutdown(false);
+            shards.remove(shards.get(s));
             BotConfig.loadConfig();
             BotListeners.logger(BotListeners.logPrefix(7)+"Starting Shard "+shard+".");
-            jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
+            shards.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(shard,total).buildBlocking());
         } catch (LoginException | IllegalArgumentException | InterruptedException | RateLimitedException e) {
             Sentry.capture(e);
             System.out.println(e.getMessage());

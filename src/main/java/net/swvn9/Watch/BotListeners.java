@@ -39,7 +39,7 @@ class BotListeners extends ListenerAdapter {
     private static Guild Home;
     private static Random rand = new Random();
 
-    //check if a specific commandChannel ID is on the whitelist
+    //check if a specific channel ID is on the whitelist
     private boolean channelWhitelisted(String channelID) {
         for (String value : WHITELIST) { //for each value in the whitelist array
             if (value.equalsIgnoreCase(channelID)) return true; //if the id is whitelisted, return true.
@@ -166,7 +166,7 @@ class BotListeners extends ListenerAdapter {
         }
     }
 
-    @Override //any commandMessage sent that the bot can see
+    @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
         if ((e.getAuthor().isBot() || e.getChannelType().equals(ChannelType.PRIVATE))) {
             return;
@@ -179,7 +179,7 @@ class BotListeners extends ListenerAdapter {
         }
          */
 
-        if (BotCommands.input.commandWaiting && !e.getMessage().getContent().contains("::input")) {
+        if (BotCommands.input.waiting && !e.getMessage().getContent().contains("::input")) {
             return;
         }
 
@@ -192,7 +192,7 @@ class BotListeners extends ListenerAdapter {
             logger(logPrefix(2, e.getJDA().getShardInfo().getShardId()) + "(Private Message) " + e.getAuthor().getName() + ": " + input);
 
 
-        for (String s : BotCommands.watch.commandMemory) {
+        for (String s : BotCommands.watch.memory) {
             if (input.toLowerCase().contains(s) && !input.contains("::watch")) {
                 TextChannel send = null;
                 for (TextChannel c : e.getGuild().getTextChannels()) {
@@ -223,7 +223,7 @@ class BotListeners extends ListenerAdapter {
         if (e.getGuild().getId().equals("319606739550863360")) {
             Scanner message = new Scanner(input);
             if (input.contains("vote") || input.contains("poll") || input.contains("Vote") || input.contains("Poll")) {
-                e.getChannel().sendMessage("<@&319607280540712961>, " + e.getMember().getEffectiveName() + " has called a vote! Leave your vote in the form of a reaction on this commandMessage!\n\n" + input).queue(msg -> {
+                e.getChannel().sendMessage("<@&319607280540712961>, " + e.getMember().getEffectiveName() + " has called a vote! Leave your vote in the form of a reaction on this message!\n\n" + input).queue(msg -> {
                     while (message.hasNext()) {
                         String z = message.next();
                         switch (z) {
