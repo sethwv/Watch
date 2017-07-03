@@ -53,7 +53,6 @@ class BotConfig {
 	static String[] getWhitelist(){
 		return Whitelist;
 	}
-
 	static String[] getAdminRoles(){
 		return AdminRoles;
 	}

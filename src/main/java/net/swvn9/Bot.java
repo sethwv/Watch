@@ -21,9 +21,9 @@ class Bot{
 
 
     public static void main(String[] args) {
+        BotConfig.loadConfig();
         Sentry.init();
         try{
-            BotConfig.loadConfig();
             for(int i=0;i<toShard;i++){
                 BotListeners.logger(logPrefix(8)+"Starting Shard "+i+".");
                 jdas.add(new JDABuilder(AccountType.BOT).addEventListener(new BotListeners())/*.addEventListener(new BotLogging()).addEventListener(new BotGeneric())*/.setStatus(OnlineStatus.INVISIBLE).setToken(BotConfig.getToken()).useSharding(i,toShard).buildBlocking());
