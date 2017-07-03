@@ -11,10 +11,13 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
+import io.sentry.Sentry;
+import io.sentry.event.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
@@ -985,6 +988,17 @@ class BotCommands {
                 }
             }
             connection.disconnect();
+        }
+    };
+    public static BotCommand stest = new BotCommand("command.stest") {
+        @Override
+        void command() throws Exception {
+            Sentry.init();
+            EventBuilder eventBuilder = new EventBuilder()
+                    .withMessage("This is a test")
+                    .withLevel(io.sentry.event.Event.Level.INFO)
+                    .withLogger(BotSentry.class.getName());
+            Sentry.capture(eventBuilder);
         }
     };
 

@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
@@ -213,7 +214,6 @@ class BotListeners extends ListenerAdapter {
                 }
             }
         }
-
 
         if (e.getChannel().getId().equals("320615332840472576") && !e.getAuthor().isBot()) {
             if (input.charAt(0) == '<') {
