@@ -55,7 +55,7 @@ class BotCommand {
     protected Message message;
     protected Guild guild;
     protected MessageChannel channel;
-    protected User user;
+    protected User author;
     protected String arguments;
     protected BotUser botUser;
     protected boolean waiting = false;
@@ -133,8 +133,8 @@ class BotCommand {
         this.message = m;
         this.guild = m.getGuild();
         this.channel = m.getChannel();
-        this.user = m.getAuthor();
-        this.botUser = new BotUser(user, guild);
+        this.author = m.getAuthor();
+        this.botUser = new BotUser(author, guild);
         //channel.sendTyping().queue();
         try{
             TimeUnit.MILLISECONDS.sleep(250);
@@ -169,7 +169,7 @@ class BotCommand {
         this.message = null;
         this.guild = null;
         this.channel = null;
-        this.user = null;
+        this.author = null;
         this.botUser = null;
         this.arguments = null;
         saveMemory();
@@ -228,8 +228,8 @@ class BotCommands {
             if (arguments.contains("-c") && botUser.isadmin()) {
                 channel.sendMessage(showCommands.build()).queue();
             } else {
-                user.openPrivateChannel().complete().sendMessage(showCommands.build()).queue();
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + ", check your DMs!`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                author.openPrivateChannel().complete().sendMessage(showCommands.build()).queue();
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", check your DMs!`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
     };
@@ -247,26 +247,26 @@ class BotCommands {
             String invcode;
             invcode = guild.getPublicChannel().createInvite().setMaxUses(1).setMaxAge(24L, TimeUnit.HOURS).setUnique(true).complete().getCode();
             channel.sendMessage("<:Watch:326815513550389249> `An invite has been created and sent to you `").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
-            user.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/" + invcode).queue();
+            author.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/" + invcode).queue();
         }
     };
     public static BotCommand info = new BotCommand("command.info#all") {
         @Override
         void command() {
             EmbedBuilder stuff = new EmbedBuilder();
-            stuff.setTitle(user.getName() + "#" + user.getDiscriminator());
-            stuff.setThumbnail(user.getAvatarUrl());
+            stuff.setTitle(author.getName() + "#" + author.getDiscriminator());
+            stuff.setThumbnail(author.getAvatarUrl());
             stuff.setColor(new Color(148, 168, 249));
             DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("dd MMM yyyy");
-            stuff.addField("ID", "`" + user.getId() + "`", true);
-            stuff.addField("Effective Name", "`" + guild.getMember(user).getEffectiveName() + "`", true);
-            stuff.addField("Discord Join Date", "`" + user.getCreationTime().format(dateformat) + "`", true);
-            stuff.addField("Status", "`" + guild.getMember(user).getOnlineStatus().name() + "`", false);
+            stuff.addField("ID", "`" + author.getId() + "`", true);
+            stuff.addField("Effective Name", "`" + guild.getMember(author).getEffectiveName() + "`", true);
+            stuff.addField("Discord Join Date", "`" + author.getCreationTime().format(dateformat) + "`", true);
+            stuff.addField("Status", "`" + guild.getMember(author).getOnlineStatus().name() + "`", false);
             StringBuilder userroles = new StringBuilder();
-            for (Role e : guild.getMember(user).getRoles()) {
+            for (Role e : guild.getMember(author).getRoles()) {
                 userroles.append("- ").append(e.getAsMention()).append("\n");
             }
-            if (guild.getMember(user).getRoles().isEmpty()) userroles.append("`(none)`");
+            if (guild.getMember(author).getRoles().isEmpty()) userroles.append("`(none)`");
             stuff.addField("User Roles", userroles.toString(), false);
             channel.sendMessage(stuff.build()).queue();
 
@@ -275,7 +275,7 @@ class BotCommands {
             rolecases.setColor(new Color(255, 255, 255));
             if (!message.getMentionedRoles().isEmpty()) {
                 for (Role r : message.getMentionedRoles()) {
-                    rolecases.addField(r.getName(), r.getAsMention() + "\t" + guild.getMember(user).canInteract(r), false);
+                    rolecases.addField(r.getName(), r.getAsMention() + "\t" + guild.getMember(author).canInteract(r), false);
                 }
                 channel.sendMessage(rolecases.build()).queue();
             }
@@ -285,7 +285,7 @@ class BotCommands {
             usercases.setColor(new Color(255, 255, 255));
             if (!message.getMentionedUsers().isEmpty()) {
                 for (User u : message.getMentionedUsers()) {
-                    usercases.addField(guild.getMember(u).getEffectiveName(), u.getAsMention() + "\t" + guild.getMember(user).canInteract(guild.getMember(u)), false);
+                    usercases.addField(guild.getMember(u).getEffectiveName(), u.getAsMention() + "\t" + guild.getMember(author).canInteract(guild.getMember(u)), false);
                 }
                 channel.sendMessage(usercases.build()).queue();
             }
@@ -329,25 +329,25 @@ class BotCommands {
                 }
                 for (User u : message.getMentionedUsers()) {
                     this.arguments = arguments.replace("@" + u.getName(), "").trim();
-                    if (guild.getMember(user).canInteract(guild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from " + guild.getName() + " by " + user.getAsMention() + " with the message `" + arguments + "`.").queue();
+                    if (guild.getMember(author).canInteract(guild.getMember(u))) if (!u.isBot())
+                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue();
                 }
                 arguments = arguments.substring(0, Math.min(arguments.length(), 512));
                 for (User u : message.getMentionedUsers()) {
-                    if (guild.getMember(user).canInteract(guild.getMember(u))) {
+                    if (guild.getMember(author).canInteract(guild.getMember(u))) {
                         if (send != null) {
                             EmbedBuilder log = new EmbedBuilder();
                             log.setColor(new Color(255, 0, 0));
                             log.addField("Action", "Ban", false);
                             log.addField("User", u.getName() + "#" + u.getDiscriminator() + " (" + u.getId() + ")", false);
-                            log.addField("Moderator:", user.getName() + "#" + user.getDiscriminator(), false);
+                            log.addField("Moderator:", author.getName() + "#" + author.getDiscriminator(), false);
                             log.addField("Reason", arguments, false);
                             log.setFooter(Bot.shards.get(shard).getSelfUser().getName() + "#" + Bot.shards.get(shard).getSelfUser().getDiscriminator(), Bot.shards.get(1).getSelfUser().getAvatarUrl());
                             log.setTimestamp(LocalDateTime.now());
                             send.sendMessage(log.build()).queue();
                         }
-                        if (!u.equals(user)) guild.getController().ban(u, 6, arguments).queue();
-                        message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + " banned " + u.getName() + "#" + u.getDiscriminator() + " (" + arguments + ")`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                        if (!u.equals(author)) guild.getController().ban(u, 6, arguments).queue();
+                        message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + " banned " + u.getName() + "#" + u.getDiscriminator() + " (" + arguments + ")`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                     } else {
                         message.getChannel().sendMessage("<:WatchError:326815514129072131> `Unable to ban " + u.getName() + "#" + u.getDiscriminator() + "`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                     }
@@ -355,7 +355,7 @@ class BotCommands {
                 if (send != null)
                     message.getChannel().sendMessage("<:Watch:326815513550389249> `Bans have been logged in the `" + send.getAsMention() + "` channel.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             } else {
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
     };
@@ -379,32 +379,32 @@ class BotCommands {
             if (!arguments.equals("")) {
                 for (User u : message.getMentionedUsers()) {
                     this.arguments = arguments.replace("@" + u.getName(), "").trim();
-                    if (guild.getMember(user).canInteract(guild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from " + guild.getName() + " by " + user.getAsMention() + " with the message `" + arguments + "`.").queue();
+                    if (guild.getMember(author).canInteract(guild.getMember(u))) if (!u.isBot())
+                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue();
                 }
                 arguments = arguments.substring(0, Math.min(arguments.length(), 512));
                 for (User u : message.getMentionedUsers()) {
-                    if (guild.getMember(user).canInteract(guild.getMember(u))) {
+                    if (guild.getMember(author).canInteract(guild.getMember(u))) {
                         if (send != null) {
                             EmbedBuilder log = new EmbedBuilder();
                             log.setColor(new Color(0, 0, 255));
                             log.addField("Action", "Kick", false);
                             log.addField("User", u.getName() + "#" + u.getDiscriminator() + " (" + u.getId() + ")", false);
-                            log.addField("Moderator:", user.getName() + "#" + user.getDiscriminator(), false);
+                            log.addField("Moderator:", author.getName() + "#" + author.getDiscriminator(), false);
                             log.addField("Reason", arguments, false);
                             log.setFooter(Bot.shards.get(shard).getSelfUser().getName() + "#" + Bot.shards.get(shard).getSelfUser().getDiscriminator(), Bot.shards.get(1).getSelfUser().getAvatarUrl());
                             log.setTimestamp(LocalDateTime.now());
                             send.sendMessage(log.build()).queue();
                         }
-                        if (!u.equals(user)) guild.getController().kick(u.getId(), arguments).queue();
-                        message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + " kicked " + u.getName() + "#" + u.getDiscriminator() + " (" + arguments + ")`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                        if (!u.equals(author)) guild.getController().kick(u.getId(), arguments).queue();
+                        message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + " kicked " + u.getName() + "#" + u.getDiscriminator() + " (" + arguments + ")`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                     } else {
                         message.getChannel().sendMessage("<:WatchError:326815514129072131> `Unable to kick " + u.getName() + "#" + u.getDiscriminator() + "`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                     }
                 }
 
             } else {
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
     };
@@ -538,7 +538,7 @@ class BotCommands {
 
         @Override
         void command() {
-            channel.sendMessage(user.getAsMention() + ", Your ID is " + user + ".").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            channel.sendMessage(author.getAsMention() + ", Your ID is " + author + ".").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             channel.sendMessage(botUser.getPermissions().toString()).queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             channel.sendMessage(botUser.isadmin() + "").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
         }
@@ -841,22 +841,8 @@ class BotCommands {
                     }
                 }
             } else if (arguments.contains("-b")){
-                //EmbedBuilder badges = new EmbedBuilder();
-                //badges.addField("CI Build","[![CircleCI](https://circleci.com/gh/swvn9/Watch.png)](https://circleci.com/gh/swvn9/Watch)",true);
-                //channel.sendMessage(badges.build()).queue();
                 try{
-                    /*
-                    File picutreFile = new File("badges/grade.svg");
-                    picutreFile.delete();
-                    URL url2=new URL("https://api.codacy.com/project/badge/Grade/0588c343f5514f0ebdd8e2b67cbd47fb");
-                    URLConnection conn = url2.openConnection();
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
-                    conn.connect();
-                    FileUtils.copyInputStreamToFile(conn.getInputStream(), picutreFile);
-                    */
-
                     File ciBadge = new File("badges/ci.png");
-                    //ciBadge.delete();
                     URL url=new URL("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
                     URLConnection conn = url.openConnection();
                     conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
@@ -867,49 +853,16 @@ class BotCommands {
                     int  red = (c & 0x00ff0000) >> 16;
                     int  green = (c & 0x0000ff00) >> 8;
                     int  blue = c & 0x000000ff;
-                    System.out.println(red+","+green+","+blue);
                     Color color1 = new Color(red,green,blue);
-                    System.out.println(color1.toString());
-
                     EmbedBuilder build = new EmbedBuilder();
-                    //build.setThumbnail("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
-                    //build.setImage("https://img.shields.io/circleci/project/github/swvn9/Watch.png");
-                    //build.setTitle("CI Build");
-                    //build.addField("Latest CI build:","[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
                     if(color1.getRGB()==-2464434){
-                        build.addField("Latest CI build:","**FAILING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
+                        build.addField("Latest CI build:","**FAILING**",false);
                     } else {
-                        build.addField("Latest CI build:","**PASSING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
+                        build.addField("Latest CI build:","**PASSING**",false);
                     }
-                    //build.setDescription("[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)");
+                    build.setDescription("https://circleci.com/gh/swvn9/Watch/tree/master");
                     build.setColor(color1);
                     channel.sendMessage(build.build()).queue();
-
-
-                    File codBadge = new File("badges/cod.png");
-                    //codBadge.delete();
-                    URL url2=new URL("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
-                    URLConnection conn2 = url2.openConnection();
-                    conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
-                    conn2.connect();
-                    FileUtils.copyInputStreamToFile(conn2.getInputStream(), codBadge);
-                    BufferedImage image2 = ImageIO.read(codBadge);
-                    int c2 = image2.getRGB(80,3);
-                    int  red2 = (c2 & 0x00ff0000) >> 16;
-                    int  green2 = (c2 & 0x0000ff00) >> 8;
-                    int  blue2 = c2 & 0x000000ff;
-                    Color color2 = new Color(red2,green2,blue2);
-
-
-                    EmbedBuilder build2 = new EmbedBuilder();
-                    //build2.setThumbnail("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
-                    build2.setImage("https://img.shields.io/codacy/grade/0588c343f5514f0ebdd8e2b67cbd47fb.png");
-                    //build2.setTitle("Code Grade");
-                    build2.addField("Codacy Grade:","[codacy.com](https://www.codacy.com/app/swvn10/Watch)",false);
-                    //build2.setDescription("[codacy.com](https://www.codacy.com/app/swvn10/Watch)");
-                    build2.setColor(color2);
-                    //channel.sendMessage(build2.build()).queue();
-
                 }catch(Exception ex){
                     Sentry.capture(ex);
                 }
@@ -933,7 +886,7 @@ class BotCommands {
                 engine.put("channel", channel);
                 engine.put("message", message);
                 engine.put("guild", guild);
-                engine.put("user", user);
+                engine.put("user", author);
                 channel.sendMessage("```java\n//Evaluating\n" + arguments.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(arguments).toString();
                 if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
@@ -1150,7 +1103,7 @@ class BotCommands {
                         name.append("+").append(rsn.next());
                     }
                 } else {
-                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + ", you need to enter a name! ::alog NAME`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to enter a name! ::alog NAME`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                     return;
                 }
                 URL url = new URL("http://services.runescape.com/m=adventurers-log/c=tB0ermS1flc/rssfeed?searchName=" + name);
@@ -1169,7 +1122,7 @@ class BotCommands {
                 channel.sendMessage(test.toString()).queue(msg -> msg.delete().queueAfter(10, TimeUnit.MINUTES));
             } catch (Exception ex) {
                 Sentry.capture(ex);
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + user.getName() + ", the name you've entered is invalid! (" + name.toString().replace("+", " ") + ")`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", the name you've entered is invalid! (" + name.toString().replace("+", " ") + ")`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                 this.lastRun = LocalDateTime.now().minusSeconds(getratelimit());
             }
         }
@@ -1181,10 +1134,10 @@ class BotCommands {
         void command() {
             if (guild.getId().equals("319606739550863360")) {
                 Role maintain[] = new Role[]{guild.getRoleById("319606870606217217")};
-                if (guild.getMemberById(user.getId()).getRoles().contains(guild.getRoleById("319606870606217217"))) {
-                    guild.getController().removeRolesFromMember(guild.getMemberById(user.getId()), Arrays.asList(maintain)).queue();
+                if (guild.getMemberById(author.getId()).getRoles().contains(guild.getRoleById("319606870606217217"))) {
+                    guild.getController().removeRolesFromMember(guild.getMemberById(author.getId()), Arrays.asList(maintain)).queue();
                 } else {
-                    guild.getController().addRolesToMember(guild.getMemberById(user.getId()), Arrays.asList(maintain)).queue();
+                    guild.getController().addRolesToMember(guild.getMemberById(author.getId()), Arrays.asList(maintain)).queue();
                 }
             }
         }
@@ -1198,13 +1151,13 @@ class BotCommands {
                 String mention = watch.next();
                 for (Member m : guild.getMembers()) {
                     if (mention.equals(m.getAsMention())) {
-                        if (m.equals(guild.getMember(user)) || m.isOwner() || m.getUser().isBot()) {
+                        if (m.equals(guild.getMember(author)) || m.isOwner() || m.getUser().isBot()) {
                             break;
                         }
                         if (m.getRoles().contains(guild.getRoleById("320300565789802497"))) {
                             cont.removeRolesFromMember(m, guild.getRoleById("320300565789802497")).queue();
                             cont.setNickname(m, "").queue();
-                            channel.sendMessage("`" + m.getUser().getName() + " has been un-verified by " + guild.getMember(user).getEffectiveName() + ".`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                            channel.sendMessage("`" + m.getUser().getName() + " has been un-verified by " + guild.getMember(author).getEffectiveName() + ".`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                         } else {
                             StringBuilder name = new StringBuilder(m.getEffectiveName());
                             if (watch.hasNext()) {
@@ -1215,7 +1168,7 @@ class BotCommands {
                             }
                             cont.setNickname(m, name.toString()).queue();
                             cont.addRolesToMember(m, guild.getRoleById("320300565789802497")).queue();
-                            channel.sendMessage("`" + m.getEffectiveName() + " has been verified by " + guild.getMember(user).getEffectiveName() + " as " + name + ".`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                            channel.sendMessage("`" + m.getEffectiveName() + " has been verified by " + guild.getMember(author).getEffectiveName() + " as " + name + ".`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                         }
                     }
                 }

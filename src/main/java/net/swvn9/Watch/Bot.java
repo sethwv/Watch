@@ -12,8 +12,6 @@ import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.swvn9.Watch.BotListeners.logPrefix;
-
 class Bot{
 
     static List<JDA> shards = new ArrayList<>();
