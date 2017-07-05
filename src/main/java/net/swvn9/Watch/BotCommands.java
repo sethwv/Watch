@@ -950,6 +950,14 @@ class BotCommands {
     //Music Bot commands
     public static BotCommand summon = new BotCommand("command.summon") {
         @Override
+        void help() {
+            this.helpName = "Music: Summon";
+            this.helpUsage = "::summon";
+            this.helpDesc = "Summon the bot to your channel.";
+            this.helpSkip = false;
+        }
+
+        @Override
         void command() throws Exception {
             BotAudio.init();
             guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
@@ -958,35 +966,53 @@ class BotCommands {
     };
     public static BotCommand play = new BotCommand("command.play") {
         @Override
+        void help() {
+            this.helpName = "Music: Play";
+            this.helpUsage = "::play <youtube/playlist-link/watch-link/soundcloud>";
+            this.helpDesc = "!REQUIRES BOT TO BE IN A VOICE CHANNEL WITH ::SUMMON.\nIf the queue is empty, play the linked song. If not empty, add to the queue.";
+            this.helpSkip = false;
+        }
+
+        @Override
         void command() throws Exception {
-            if(guild.getMember(author).getVoiceState().getChannel()!=null){
+            channel.sendTyping().queue();
+            if(guild.getMember(author).getVoiceState().getChannel().equals(guild.getMember(Bot.shards.get(shard).getSelfUser()).getVoiceState().getChannel())){
                 play.lastChannel = channel;
-                System.out.println(message.getRawContent().replaceFirst("(?i)::play","").trim());
+                System.out.println(arguments);
                 BotAudio.playerManager.loadItem(message.getRawContent().replaceFirst("(?i)::play","").trim(), new AudioLoadResultHandler() {
                     MessageChannel channel = BotCommands.play.lastChannel;
                     @Override
                     public void trackLoaded(AudioTrack audioTrack) {
                         if(BotAudio.player.getPlayingTrack()==null){
-                            channel.sendMessage("<:Watch:326815513550389249> Now Playing **"+audioTrack.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+                            channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioTrack.getInfo().title+"**").queue(msg->{
+                                BotCommands.play.memory.add(msg.getId());
+                            });
                         } else {
-                            channel.sendMessage("<:Watch:326815513550389249> Added **"+audioTrack.getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                            channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioTrack.getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
                         }
                         BotAudio.trackScheduler.queue(audioTrack);
                     }
 
                     @Override
                     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-
+                        BotCommands.play.lastChannel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().size()+"** songs to the queue.").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioPlaylist.getTracks().get(0).getInfo().title+"**").queue(msg->{
+                            BotCommands.play.memory.add(msg.getId());
+                        });
+                        for(AudioTrack at:audioPlaylist.getTracks()){
+                            BotAudio.trackScheduler.queue(at);
+                            //System.out.println(at.getInfo().toString());
+                        }
                     }
 
                     @Override
                     public void noMatches() {
-
+                        System.out.println("No Matches");
                     }
 
                     @Override
                     public void loadFailed(FriendlyException e) {
-
+                        System.out.println(e.getMessage());
                     }
                 });
             }
@@ -994,8 +1020,47 @@ class BotCommands {
     };
     public static BotCommand queue = new BotCommand("command.queue"){
         @Override
+        void help() {
+            this.helpName = "Music: Queue";
+            this.helpUsage = "::queue";
+            this.helpDesc = "Display the current music queue.";
+            this.helpSkip = false;
+        }
+
+        @Override
         void command() throws Exception {
-            super.command();
+            StringBuilder queue = new StringBuilder();
+            if(BotAudio.trackScheduler.queue.isEmpty()){
+                queue.append("```The Queue is Empty```");
+            } else {
+                queue.append("```Markdown\n");
+                int i = 1;
+                for(AudioTrack at:BotAudio.trackScheduler.queue){
+                    if(i<10){ queue.append(i++).append(".  ").append(at.getInfo().title).append("\n\tLink: ").append(at.getInfo().uri).append("\n\n");}
+                    else { queue.append(i++).append(". ").append(at.getInfo().title).append("\n\tLink: ").append(at.getInfo().uri).append("\n\n");}
+
+                }
+                queue.append("```");
+            }
+            channel.sendMessage("<:WatchMusic:331969464121950209> **Music Bot Queue**"+queue.toString()).queue(msg->msg.delete().queueAfter(2,TimeUnit.MINUTES));
+        }
+    };
+    public static BotCommand skip = new BotCommand("command.skip"){
+        @Override
+        void help() {
+            this.helpName = "Music: Skip";
+            this.helpUsage = "::skip";
+            this.helpDesc = "Skip the current song. If the queue is empty, the bot will stop playing.";
+            this.helpSkip = false;
+        }
+
+        @Override
+        void command() throws Exception {
+            if(!BotCommands.play.memory.isEmpty()){
+                BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
+                BotCommands.play.memory.clear();
+            }
+            BotAudio.trackScheduler.nextTrack();
         }
     };
 

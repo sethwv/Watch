@@ -14,9 +14,11 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.TextChannel;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class BotAudio {
     public static AudioPlayerManager playerManager;
@@ -28,30 +30,6 @@ public class BotAudio {
         player = playerManager.createPlayer();
         trackScheduler = new TrackScheduler(player);
         player.addListener(trackScheduler);
-    }
-    public static void action(){
-        playerManager.loadItem("https://www.youtube.com/watch?v=lJrejNZhbb0", new AudioLoadResultHandler() {
-
-            @Override
-            public void trackLoaded(AudioTrack audioTrack) {
-                trackScheduler.queue(audioTrack);
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist audioPlaylist) {
-
-            }
-
-            @Override
-            public void noMatches() {
-
-            }
-
-            @Override
-            public void loadFailed(FriendlyException e) {
-
-            }
-        });
     }
 }
 
@@ -93,11 +71,13 @@ class TrackScheduler extends AudioEventAdapter {
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         AudioTrack next = queue.poll();
         player.startTrack(next, false);
-        if(BotCommands.play.memory.toArray()[0]!=null){
+        if(!BotCommands.play.memory.isEmpty()){
             BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
             BotCommands.play.memory.clear();
         }
-        channel.sendMessage("<:Watch:326815513550389249> Now Playing **"+next.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->{
+            BotCommands.play.memory.add(msg.getId());
+        });
     }
 
     @Override
