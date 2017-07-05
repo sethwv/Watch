@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {

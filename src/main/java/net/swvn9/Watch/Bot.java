@@ -17,7 +17,6 @@ class Bot{
     static List<JDA> shards = new ArrayList<>();
     static int toShard = 2;
 
-
     public static void main(String[] args) {
         BotConfig.loadConfig();
         Sentry.init();

@@ -3,6 +3,10 @@ package net.swvn9.Watch;
 import com.mikebull94.rsapi.RuneScapeAPI;
 import com.mikebull94.rsapi.hiscores.ClanMate;
 import com.mikebull94.rsapi.hiscores.Hiscores;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -20,6 +24,7 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.imageio.ImageIO;
 import javax.script.ScriptEngine;
@@ -47,20 +52,20 @@ class BotCommand {
     //    this.rateLimit = rateLimit;
     //}
     protected final String commandNode;
+    protected final HashSet<String> memory = new HashSet<>();
     private final Long rateLimit;
     private final File watchFile;
-
+    public MessageChannel channel;
     protected int shard =0;
-    protected final HashSet<String> memory = new HashSet<>();
     protected Message message;
     protected Guild guild;
-    protected MessageChannel channel;
     protected User author;
     protected String arguments;
     protected BotUser botUser;
     protected boolean waiting = false;
     protected LocalDateTime lastRun = LocalDateTime.now().minusYears(10L);
     protected MessageChannel lastChannel;
+    protected Guild lastGuild;
     protected boolean saveMemory = false;
     protected long start;
 
@@ -157,6 +162,7 @@ class BotCommand {
             try {
                 this.command();
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Sentry.capture(ex);
             }
             this.cleanup(true);
@@ -185,13 +191,6 @@ class BotCommand {
 class BotCommands {
     public static final HashSet<BotCommand> commandList = new HashSet<>();
     public static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-
-    // Command utility methods
-    private static boolean comapare(String a, String b) {
-        Levenshtein l = new Levenshtein();
-        JaroWinkler jw = new JaroWinkler();
-        return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
-    }
 
     // General commands
     public static BotCommand help = new BotCommand("command.help#all") {
@@ -856,11 +855,10 @@ class BotCommands {
                     Color color1 = new Color(red,green,blue);
                     EmbedBuilder build = new EmbedBuilder();
                     if(color1.getRGB()==-2464434){
-                        build.addField("Latest CI build:","**FAILING**",false);
+                        build.addField("Latest CI build:","**FAILING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
                     } else {
-                        build.addField("Latest CI build:","**PASSING**",false);
+                        build.addField("Latest CI build:","**PASSING**\n[circleci.com](https://circleci.com/gh/swvn9/Watch/tree/master)",false);
                     }
-                    build.setDescription("https://circleci.com/gh/swvn9/Watch/tree/master");
                     build.setColor(color1);
                     channel.sendMessage(build.build()).queue();
                 }catch(Exception ex){
@@ -887,6 +885,7 @@ class BotCommands {
                 engine.put("message", message);
                 engine.put("guild", guild);
                 engine.put("user", author);
+
                 channel.sendMessage("```java\n//Evaluating\n" + arguments.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
                 String res = engine.eval(arguments).toString();
                 if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
@@ -947,14 +946,56 @@ class BotCommands {
             connection.disconnect();
         }
     };
-    public static BotCommand stest = new BotCommand("command.stest") {
+
+    //Music Bot commands
+    public static BotCommand summon = new BotCommand("command.summon") {
         @Override
         void command() throws Exception {
-            EventBuilder eventBuilder = new EventBuilder()
-                    .withMessage("This is a test")
-                    .withLevel(io.sentry.event.Event.Level.INFO)
-                    .withLogger(BotSentry.class.getName());
-            Sentry.capture(eventBuilder);
+            BotAudio.init();
+            guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
+            guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+        }
+    };
+    public static BotCommand play = new BotCommand("command.play") {
+        @Override
+        void command() throws Exception {
+            if(guild.getMember(author).getVoiceState().getChannel()!=null){
+                play.lastChannel = channel;
+                System.out.println(message.getRawContent().replaceFirst("(?i)::play","").trim());
+                BotAudio.playerManager.loadItem(message.getRawContent().replaceFirst("(?i)::play","").trim(), new AudioLoadResultHandler() {
+                    MessageChannel channel = BotCommands.play.lastChannel;
+                    @Override
+                    public void trackLoaded(AudioTrack audioTrack) {
+                        if(BotAudio.player.getPlayingTrack()==null){
+                            channel.sendMessage("<:Watch:326815513550389249> Now Playing **"+audioTrack.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+                        } else {
+                            channel.sendMessage("<:Watch:326815513550389249> Added **"+audioTrack.getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                        }
+                        BotAudio.trackScheduler.queue(audioTrack);
+                    }
+
+                    @Override
+                    public void playlistLoaded(AudioPlaylist audioPlaylist) {
+
+                    }
+
+                    @Override
+                    public void noMatches() {
+
+                    }
+
+                    @Override
+                    public void loadFailed(FriendlyException e) {
+
+                    }
+                });
+            }
+        }
+    };
+    public static BotCommand queue = new BotCommand("command.queue"){
+        @Override
+        void command() throws Exception {
+            super.command();
         }
     };
 
@@ -1175,4 +1216,12 @@ class BotCommands {
             }
         }
     };
+
+    // Command utility methods
+    private static boolean comapare(String a, String b) {
+        Levenshtein l = new Levenshtein();
+        JaroWinkler jw = new JaroWinkler();
+        return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
+    }
 }
+
