@@ -33,7 +33,7 @@ class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
 @SuppressWarnings("unused")
 class BotListeners extends ListenerAdapter {
 
-    private static final String LITERAL = "::";
+    public static String LITERAL = "!";
     static String WHITELIST[] = BotConfig.getWhitelist();
     private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
     private static FileWriter log;
@@ -180,7 +180,7 @@ class BotListeners extends ListenerAdapter {
         }
          */
 
-        if (BotCommands.input.waiting && !e.getMessage().getContent().contains("::input")) {
+        if (BotCommands.input.waiting && !e.getMessage().getContent().contains(LITERAL+"input")) {
             return;
         }
 
@@ -194,7 +194,7 @@ class BotListeners extends ListenerAdapter {
 
 
         for (String s : BotCommands.watch.memory) {
-            if (input.toLowerCase().contains(s) && !input.contains("::watch")) {
+            if (input.toLowerCase().contains(s) && !input.contains(LITERAL+"watch")) {
                 TextChannel send = null;
                 for (TextChannel c : e.getGuild().getTextChannels()) {
                     if (c.getName().contains("logs")) {

@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -147,9 +148,9 @@ class BotCommand {
             Sentry.capture(ex);
         }
         if (commandNode.contains("#all")) {
-            this.arguments = message.getContent().replaceFirst("(?i)::" + (commandNode.replace("command.", "")).replace("#all", ""), "");
+            this.arguments = message.getContent().replaceFirst("(?i)"+BotListeners.LITERAL + (commandNode.replace("command.", "")).replace("#all", ""), "");
         } else {
-            this.arguments = message.getContent().replaceFirst("(?i)::" + (commandNode.replace("command.", "")), "");
+            this.arguments = message.getContent().replaceFirst("(?i)"+BotListeners.LITERAL + (commandNode.replace("command.", "")), "");
         }
         if (botUser.hasPermission(commandNode) || botUser.isadmin() || commandNode.contains("#all")) {
             if (LocalDateTime.now().isBefore(lastRun) && !botUser.isadmin()) {
@@ -197,7 +198,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Help (This command)";
-            this.helpUsage = "::help <keyword> <-a,c>";
+            this.helpUsage = BotListeners.LITERAL+"help <keyword> <-a,c>";
             this.helpDesc = "See all of the commands associated with the bot that you can use, sent to you in a dm unless specified otherwise.\n#Flags:\n<-a> All commands\n<-c> In current channel";
             this.helpSkip = false;
         }
@@ -236,7 +237,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Invite";
-            this.helpUsage = "::inv";
+            this.helpUsage = BotListeners.LITERAL+"inv";
             this.helpDesc = "Generate a one-time-use invite that is valid for 24 hours";
             this.helpSkip = false;
         }
@@ -296,7 +297,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Say";
-            this.helpUsage = "::say <Message>";
+            this.helpUsage = BotListeners.LITERAL+"say <Message>";
             this.helpDesc = "Send a Message as the bot";
             this.helpSkip = false;
         }
@@ -304,7 +305,7 @@ class BotCommands {
         @Override
         void command() {
             if (!arguments.equals("")) {
-                channel.sendMessage(message.getRawContent().replaceFirst("(?i)::say", "")).queue();
+                channel.sendMessage(message.getRawContent().replaceFirst("(?i)"+BotListeners.LITERAL+"say", "")).queue();
             }
         }
     };
@@ -312,7 +313,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Ban";
-            this.helpUsage = "::ban <mention(s)> <reason>";
+            this.helpUsage = BotListeners.LITERAL+"ban <mention(s)> <reason>";
             this.helpDesc = "Ban user(s) with an optional Message";
             this.helpSkip = false;
         }
@@ -354,7 +355,7 @@ class BotCommands {
                 if (send != null)
                     message.getChannel().sendMessage("<:Watch:326815513550389249> `Bans have been logged in the `" + send.getAsMention() + "` channel.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             } else {
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user "+BotListeners.LITERAL+"ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
     };
@@ -362,7 +363,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Kick";
-            this.helpUsage = "::kick <mention(s)> <reason>";
+            this.helpUsage = BotListeners.LITERAL+"kick <mention(s)> <reason>";
             this.helpDesc = "Kick user(s) with an optional Message";
             this.helpSkip = false;
         }
@@ -403,7 +404,7 @@ class BotCommands {
                 }
 
             } else {
-                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user ::ban @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to mention at least one user "+BotListeners.LITERAL+"kick @mention(s)`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
     };
@@ -411,7 +412,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Watch";
-            this.helpUsage = "::watch <list/del/add> <keyword>";
+            this.helpUsage = BotListeners.LITERAL+"watch <list/del/add> <keyword>";
             this.helpDesc = "Have the bot \"watch\" for certain keywords in chat, and log any occurrences to a channel called #logs\nKeywords are not case-sensitive";
             this.helpSkip = false;
             this.saveMemory = true;
@@ -431,7 +432,7 @@ class BotCommands {
                                 String keyword = read.next().toLowerCase();
                                 if (!memory.contains(keyword)) {
                                     memory.add(keyword);
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + keyword + " has been added to the watch filter. type ::watch del " + keyword + " to remove it.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + keyword + " has been added to the watch filter. type "+BotListeners.LITERAL+"watch del " + keyword + " to remove it.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                                 } else {
                                     message.getChannel().sendMessage("<:Watch:326815513550389249> `I am already watching for " + keyword + ".`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                                 }
@@ -446,7 +447,7 @@ class BotCommands {
                                     memory.remove(keyword);
                                     message.getChannel().sendMessage("<:Watch:326815513550389249> `" + keyword + " has been removed from the watch filter.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                                 } else {
-                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am not currently watching for " + keyword + ". Do ::watch add " + keyword + " to add it to the list.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                                    message.getChannel().sendMessage("<:Watch:326815513550389249> `I am not currently watching for " + keyword + ". Do "+BotListeners.LITERAL+"watch add " + keyword + " to add it to the list.`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
                                 }
                             } else {
                                 message.getChannel().sendMessage("<:Watch:326815513550389249> `You must specify a keyword!` `" + helpUsage + "`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
@@ -471,14 +472,14 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Purge Messages";
-            this.helpUsage = "::purge <mentions> <number>";
+            this.helpUsage = BotListeners.LITERAL+"purge <mentions> <number>";
             this.helpDesc = "Mentions are optional, if a number of messages to purge is not specified, it will be 10. Pinned messages will not be deleted.";
             this.helpSkip = false;
         }
 
         @Override
         void command() throws Exception {
-            this.arguments = message.getRawContent().replaceFirst("(?i)::purge", "");
+            this.arguments = message.getRawContent().replaceFirst("(?i)"+BotListeners.LITERAL+"purge", "");
             this.arguments = arguments.replaceAll("<(?:@(?:[!&])?|#|:\\w{2,}:)\\d{17,}>", "").trim();
             List<String> remove = new ArrayList<>();
             Scanner args = new Scanner(arguments);
@@ -514,14 +515,14 @@ class BotCommands {
                     guild.getTextChannelById(channel.getId()).deleteMessages(toPurge).queue();
 
                 }catch(Exception ex){
-                    if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
-                    if(total!=1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+                    if(total==1&&msg!=null) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").queue(m->m.delete().queueAfter(30,TimeUnit.SECONDS));
+                    if(total!=1&&msg!=null) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").queue(m->m.delete().queueAfter(30,TimeUnit.SECONDS));
                     Sentry.capture(ex);
                     break;
                 }
             }
-            if(total==1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
-            if(total!=1) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            if(total==1&&msg!=null) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " message.`").queue(m->m.delete().queueAfter(30,TimeUnit.SECONDS));
+            if(total!=1&&msg!=null) msg.editMessage("<:Watch:326815513550389249> `Purged " + total + " messages.`").queue(m->m.delete().queueAfter(30,TimeUnit.SECONDS));
         }
     };
 
@@ -530,7 +531,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "ID";
-            this.helpUsage = "::id";
+            this.helpUsage = BotListeners.LITERAL+"id";
             this.helpDesc = "Grab the ID and any permissions associated with your user ID.";
             this.helpSkip = false;
         }
@@ -546,7 +547,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Roles";
-            this.helpUsage = "::roles";
+            this.helpUsage = BotListeners.LITERAL+"roles";
             this.helpDesc = "Get all of the role-names and IDs associated with the current discord guild.";
             this.helpSkip = false;
         }
@@ -577,7 +578,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Show Config";
-            this.helpUsage = "::showconfig";
+            this.helpUsage = BotListeners.LITERAL+"showconfig";
             this.helpDesc = "Spit out the contents of the Config.yml file to a rich embed.";
             this.helpSkip = false;
         }
@@ -642,7 +643,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Pull Config";
-            this.helpUsage = "::pullconfig";
+            this.helpUsage = BotListeners.LITERAL+"pullconfig";
             this.helpDesc = "Pull the latest configuration from the Config.yml file.";
             this.helpSkip = false;
         }
@@ -675,7 +676,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Kill";
-            this.helpUsage = "::kill";
+            this.helpUsage = BotListeners.LITERAL+"kill";
             this.helpDesc = "Kill the bot and return the host machine to the command line/desktop.";
             this.helpSkip = false;
         }
@@ -695,7 +696,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Stop";
-            this.helpUsage = "::stop";
+            this.helpUsage = BotListeners.LITERAL+"stop";
             this.helpDesc = "Stop the shard that the guild is running on. (There is no way to restart)";
             this.helpSkip = false;
         }
@@ -722,7 +723,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Restart";
-            this.helpUsage = "::restart";
+            this.helpUsage = BotListeners.LITERAL+"restart";
             this.helpDesc = "Restart the bot, re-initialise everything.";
             this.helpSkip = false;
         }
@@ -736,7 +737,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Enable/Disable Input";
-            this.helpUsage = "::input";
+            this.helpUsage = BotListeners.LITERAL+"input";
             this.helpDesc = "Enable or disable input for the bot so that the bot can stay running while testing.";
             this.helpSkip = false;
         }
@@ -766,8 +767,8 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Bot Utility";
-            this.helpUsage = "::bot <-s/-a/-k> <?listener>";
-            this.helpDesc = "You should probably stay away from everything this command does except for ::bot -s";
+            this.helpUsage = BotListeners.LITERAL+"bot <-s/-a/-k> <?listener>";
+            this.helpDesc = "You should probably stay away from everything this command does except for "+BotListeners.LITERAL+"bot -s";
             this.helpSkip = false;
         }
 
@@ -872,7 +873,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Javascript Eval";
-            this.helpUsage = "::eval <line>";
+            this.helpUsage = BotListeners.LITERAL+"eval <line>";
             this.helpDesc = "Evaluate a line of JS";
             this.helpSkip = false;
         }
@@ -899,7 +900,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Rebrandly Link";
-            this.helpUsage = "::link <url> <redirect>";
+            this.helpUsage = BotListeners.LITERAL+"link <url> <redirect>";
             this.helpDesc = "Using the rebrandly api token defined in the config file, create redirect links.";
             this.helpSkip = false;
         }
@@ -952,7 +953,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Music: Summon";
-            this.helpUsage = "::summon";
+            this.helpUsage = BotListeners.LITERAL+"summon";
             this.helpDesc = "Summon the bot to your channel.";
             this.helpSkip = false;
         }
@@ -968,8 +969,8 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Music: Play";
-            this.helpUsage = "::play <youtube/playlist-link/watch-link/soundcloud>";
-            this.helpDesc = "!REQUIRES BOT TO BE IN A VOICE CHANNEL WITH ::SUMMON.\nIf the queue is empty, play the linked song. If not empty, add to the queue.";
+            this.helpUsage = BotListeners.LITERAL+"play <youtube/playlist-link/watch-link/soundcloud>";
+            this.helpDesc = "!REQUIRES BOT TO BE IN A VOICE CHANNEL WITH "+BotListeners.LITERAL+"SUMMON.\nIf the queue is empty, play the linked song. If not empty, add to the queue.";
             this.helpSkip = false;
         }
 
@@ -978,8 +979,13 @@ class BotCommands {
             channel.sendTyping().queue();
             if(guild.getMember(author).getVoiceState().getChannel().equals(guild.getMember(Bot.shards.get(shard).getSelfUser()).getVoiceState().getChannel())){
                 play.lastChannel = channel;
+                this.arguments = arguments.trim();
+                if(!message.getContent().contains("youtube.com")){
+                    this.arguments = "ytsearch:"+arguments;
+                    this.waiting=true;
+                }
                 System.out.println(arguments);
-                BotAudio.playerManager.loadItem(message.getRawContent().replaceFirst("(?i)::play","").trim(), new AudioLoadResultHandler() {
+                BotAudio.playerManager.loadItem(arguments, new AudioLoadResultHandler() {
                     MessageChannel channel = BotCommands.play.lastChannel;
                     @Override
                     public void trackLoaded(AudioTrack audioTrack) {
@@ -995,14 +1001,22 @@ class BotCommands {
 
                     @Override
                     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                        BotCommands.play.lastChannel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().size()+"** songs to the queue.").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioPlaylist.getTracks().get(0).getInfo().title+"**").queue(msg->{
-                            BotCommands.play.memory.add(msg.getId());
-                        });
+                        if(BotAudio.player.getPlayingTrack()==null){
+                            channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioPlaylist.getTracks().get(0).getInfo().title+"**").queue(msg->{
+                                BotCommands.play.memory.add(msg.getId());
+                            });
+                        } else if(BotCommands.play.waiting) {
+                            channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().get(0).getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                        }
                         for(AudioTrack at:audioPlaylist.getTracks()){
                             BotAudio.trackScheduler.queue(at);
+                            if(BotCommands.play.waiting){
+                                break;
+                            }
                             //System.out.println(at.getInfo().toString());
                         }
+                        if(!BotCommands.play.waiting)BotCommands.play.lastChannel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().size()+"** songs to the queue.").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                        BotCommands.play.waiting=false;
                     }
 
                     @Override
@@ -1022,7 +1036,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Music: Queue";
-            this.helpUsage = "::queue";
+            this.helpUsage = BotListeners.LITERAL+"queue";
             this.helpDesc = "Display the current music queue.";
             this.helpSkip = false;
         }
@@ -1049,18 +1063,32 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "Music: Skip";
-            this.helpUsage = "::skip";
-            this.helpDesc = "Skip the current song. If the queue is empty, the bot will stop playing.";
+            this.helpUsage = BotListeners.LITERAL+"skip <pos>";
+            this.helpDesc = "Skip the current song. If the queue is empty, the bot will stop playing. If you specify a position, the song will be removed from the queue.";
             this.helpSkip = false;
         }
 
         @Override
         void command() throws Exception {
-            if(!BotCommands.play.memory.isEmpty()){
-                BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
-                BotCommands.play.memory.clear();
+            if(new Scanner(arguments.trim()).hasNextInt()){
+                int toSkip = new Scanner(arguments.trim()).nextInt()-1;
+                System.out.println(toSkip);
+                if(toSkip>=0&&toSkip<BotAudio.trackScheduler.queue.size()){
+                    for(AudioTrack a:BotAudio.trackScheduler.queue){
+                        if(BotAudio.trackScheduler.queue.toArray()[toSkip].equals(a)){
+                            channel.sendMessage("<:WatchMusic:331969464121950209> Removed **"+a.getInfo().title+"** from position "+(toSkip+1)+" of the queue.").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                            BotAudio.trackScheduler.queue.remove(a);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if(!BotCommands.play.memory.isEmpty()){
+                    BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
+                    BotCommands.play.memory.clear();
+                }
+                BotAudio.trackScheduler.nextTrack();
             }
-            BotAudio.trackScheduler.nextTrack();
         }
     };
 
@@ -1069,7 +1097,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "RuneScape Clan Ranks";
-            this.helpUsage = "::clan";
+            this.helpUsage = BotListeners.LITERAL+"clan";
             this.helpDesc = "(for now) Pull the upper ranks of the RuneScape clan Zamorak Cult, and match any names with those on the current discord guild.";
             this.helpSkip = false;
         }
@@ -1193,7 +1221,7 @@ class BotCommands {
         @Override
         void help() {
             this.helpName = "RuneScape Adventurer's Log";
-            this.helpUsage = "::alog <RunescapeName>";
+            this.helpUsage = BotListeners.LITERAL+"alog <RunescapeName>";
             this.helpDesc = "Fetch the RuneScape adventurer's log for the specified player name.";
             this.helpSkip = false;
         }
@@ -1209,7 +1237,7 @@ class BotCommands {
                         name.append("+").append(rsn.next());
                     }
                 } else {
-                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to enter a name! ::alog NAME`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                    message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", you need to enter a name! "+BotListeners.LITERAL+"alog NAME`").queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
                     return;
                 }
                 URL url = new URL("http://services.runescape.com/m=adventurers-log/c=tB0ermS1flc/rssfeed?searchName=" + name);
