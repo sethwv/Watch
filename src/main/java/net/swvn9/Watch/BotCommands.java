@@ -1106,6 +1106,13 @@ class BotCommands {
             }
         }
     };
+    public static BotCommand clear = new BotCommand("command.clear"){
+        @Override
+        void command() throws Exception {
+            BotAudio.trackScheduler.queue.clear();
+            channel.sendMessage("<:WatchMusic:331969464121950209> The queue has been cleared!").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+        }
+    };
 
     // RuneScape commands
     public static BotCommand clan = new BotCommand("command.clan") {
