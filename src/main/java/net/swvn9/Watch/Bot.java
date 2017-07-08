@@ -20,6 +20,7 @@ class Bot{
     public static void main(String[] args) {
         BotConfig.loadConfig();
         Sentry.init();
+        BotAudio.init();
         try{
             for(int i=0;i<toShard;i++){
                 BotListeners.logger(BotListeners.logPrefix(8)+"Starting Shard "+i+".");

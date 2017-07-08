@@ -15,7 +15,6 @@ import com.sun.syndication.io.XmlReader;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
 import io.sentry.Sentry;
-import io.sentry.event.*;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -24,7 +23,6 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.imageio.ImageIO;
 import javax.script.ScriptEngine;
@@ -42,16 +40,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 class BotCommand {
-    //BotCommand(String commandNode,Long rateLimit){
-    //    this.commandNode = commandNode;
-    //    this.rateLimit = rateLimit;
-    //}
     protected final String commandNode;
     protected final HashSet<String> memory = new HashSet<>();
     private final Long rateLimit;
@@ -952,7 +945,7 @@ class BotCommands {
     public static BotCommand summon = new BotCommand("command.summon") {
         @Override
         void help() {
-            this.helpName = "Music: Summon";
+            this.helpName = "Music: Summon DEPRICATED";
             this.helpUsage = BotListeners.LITERAL+"summon";
             this.helpDesc = "Summon the bot to your channel.";
             this.helpSkip = false;
@@ -960,12 +953,15 @@ class BotCommands {
 
         @Override
         void command() throws Exception {
-            BotAudio.init();
-            guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
-            guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+            if(guild.getAudioManager().getConnectedChannel()==null){
+                if(guild.getAudioManager().getSendingHandler()==null){
+                    guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
+                }
+                guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+            }
         }
     };
-    public static BotCommand play = new BotCommand("command.play") {
+    public static BotCommand play = new BotCommand("command.play#all") {
         @Override
         void help() {
             this.helpName = "Music: Play";
@@ -976,60 +972,77 @@ class BotCommands {
 
         @Override
         void command() throws Exception {
-            channel.sendTyping().queue();
-            if(guild.getMember(author).getVoiceState().getChannel().equals(guild.getMember(Bot.shards.get(shard).getSelfUser()).getVoiceState().getChannel())){
-                play.lastChannel = channel;
-                this.arguments = arguments.trim();
-                if(!message.getContent().contains("youtube.com")){
-                    this.arguments = "ytsearch:"+arguments;
-                    this.waiting=true;
-                }
-                System.out.println(arguments);
-                BotAudio.playerManager.loadItem(arguments, new AudioLoadResultHandler() {
-                    MessageChannel channel = BotCommands.play.lastChannel;
-                    @Override
-                    public void trackLoaded(AudioTrack audioTrack) {
-                        if(BotAudio.player.getPlayingTrack()==null){
-                            channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioTrack.getInfo().title+"**").queue(msg->{
-                                BotCommands.play.memory.add(msg.getId());
-                            });
-                        } else {
-                            channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioTrack.getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
-                        }
-                        BotAudio.trackScheduler.queue(audioTrack);
-                    }
-
-                    @Override
-                    public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                        if(BotAudio.player.getPlayingTrack()==null){
-                            channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioPlaylist.getTracks().get(0).getInfo().title+"**").queue(msg->{
-                                BotCommands.play.memory.add(msg.getId());
-                            });
-                        } else if(BotCommands.play.waiting) {
-                            channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().get(0).getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
-                        }
-                        for(AudioTrack at:audioPlaylist.getTracks()){
-                            BotAudio.trackScheduler.queue(at);
-                            if(BotCommands.play.waiting){
-                                break;
-                            }
-                            //System.out.println(at.getInfo().toString());
-                        }
-                        if(!BotCommands.play.waiting)BotCommands.play.lastChannel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().size()+"** songs to the queue.").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
-                        BotCommands.play.waiting=false;
-                    }
-
-                    @Override
-                    public void noMatches() {
-                        System.out.println("No Matches");
-                    }
-
-                    @Override
-                    public void loadFailed(FriendlyException e) {
-                        System.out.println(e.getMessage());
-                    }
-                });
+            VoiceChannel uservc = guild.getMember(author).getVoiceState().getChannel();
+            VoiceChannel botvc = guild.getMember(Bot.shards.get(shard).getSelfUser()).getVoiceState().getChannel();
+            if(guild.getId().equals("254861442799370240")&&(!uservc.getId().equals("254864458927702018")||!channel.getId().equals("303651971829727233"))){
+                channel.sendMessage("<:WatchMusic:331969464121950209> You must be in the "+guild.getVoiceChannelById("254864458927702018").getName()+" voice channel, and use the commands in "+guild.getTextChannelById("303651971829727233").getAsMention()+" to use the music bot.").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                return;
             }
+
+            if(uservc==null){
+                channel.sendMessage("<:WatchMusic:331969464121950209> You must be in a voice channel to queue songs!").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
+
+            if(uservc!=botvc&&BotAudio.player!=null){
+                if(BotAudio.player.getPlayingTrack()!=null){
+                    channel.sendMessage("<:WatchMusic:331969464121950209> The music bot is in use in a different channel, Wait a while and try again.").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                    return;
+                }
+            }
+
+            if(guild.getAudioManager().getConnectedChannel()==null){
+                if(guild.getAudioManager().getSendingHandler()==null){
+                    guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
+                }
+                guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+            }
+
+            play.lastChannel = channel;
+            this.arguments = arguments.trim();
+            if(!message.getContent().contains("youtube.com")){
+                this.arguments = "ytsearch:"+arguments;
+                this.waiting=true;
+            }
+            BotAudio.playerManager.loadItem(arguments, new AudioLoadResultHandler() {
+                MessageChannel channel = BotCommands.play.lastChannel;
+                @Override
+                public void trackLoaded(AudioTrack audioTrack) {
+                    if(BotAudio.player.getPlayingTrack()==null){
+                        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioTrack.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+                    } else {
+                        channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioTrack.getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    }
+                    BotAudio.trackScheduler.queue(audioTrack);
+                }
+
+                @Override
+                public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                    if(BotAudio.player.getPlayingTrack()==null){
+                        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+audioPlaylist.getTracks().get(0).getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+                    } else if(BotCommands.play.waiting) {
+                        channel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().get(0).getInfo().title+"** to Queue").queue(msg->msg.delete().queueAfter(30,TimeUnit.SECONDS));
+                    }
+                    for(AudioTrack at:audioPlaylist.getTracks()){
+                        BotAudio.trackScheduler.queue(at);
+                        if(BotCommands.play.waiting){
+                            break;
+                        }
+                        //System.out.println(at.getInfo().toString());
+                    }
+                    if(!BotCommands.play.waiting)BotCommands.play.lastChannel.sendMessage("<:WatchMusic:331969464121950209> Added **"+audioPlaylist.getTracks().size()+"** songs to the queue.").queue(msg->msg.delete().queueAfter(30, TimeUnit.SECONDS));
+                    BotCommands.play.waiting=false;
+                }
+
+                @Override
+                public void noMatches() {
+                    System.out.println("No Matches");
+                }
+
+                @Override
+                public void loadFailed(FriendlyException e) {
+                    System.out.println(e.getMessage());
+                }
+            });
         }
     };
     public static BotCommand queue = new BotCommand("command.queue"){

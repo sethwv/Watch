@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
@@ -33,7 +32,7 @@ class BotGeneric implements net.dv8tion.jda.core.hooks.EventListener {
 @SuppressWarnings("unused")
 class BotListeners extends ListenerAdapter {
 
-    public static String LITERAL = "!";
+    public static String LITERAL = "::";
     static String WHITELIST[] = BotConfig.getWhitelist();
     private static final String LOGTIME = new SimpleDateFormat("MMMDDYY_HHmmss").format(new Date());
     private static FileWriter log;
@@ -127,12 +126,7 @@ class BotListeners extends ListenerAdapter {
         }
     }
     private static boolean isCommand(Message m) {
-        for (int i = 0; i < LITERAL.length(); i++) {
-            if (m.getContent().indexOf(LITERAL) != 0) {
-                return false;
-            }
-        }
-        return true;
+        return m.getContent().indexOf(LITERAL) == 0;
     }
 
     @Override
@@ -169,17 +163,14 @@ class BotListeners extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
+        if(e.getGuild().getId().equals("254861442799370240")){
+            BotListeners.LITERAL = "!";
+        } else {
+            BotListeners.LITERAL = "::";
+        }
         if ((e.getAuthor().isBot() || e.getChannelType().equals(ChannelType.PRIVATE))) {
             return;
         }
-        /*
-                if((e.getAuthor().isBot()||
-		        e.getAuthor().getAsMention().equals(Bot.jda.getSelfUser().getAsMention())||
-		        (!channelWhitelisted(e.getChannel().getId()+"")&&!e.getMessage().getContent().contains("::pullconfig")&&!e.getMessage().getContent().contains("::say")&&!e.getMessage().getContent().contains("::help")&&!e.getMessage().getContent().contains("::kill")||e.getChannelType().equals(ChannelType.PRIVATE)))){
-            return;
-        }
-         */
-
         if (BotCommands.input.waiting && !e.getMessage().getContent().contains(LITERAL+"input")) {
             return;
         }

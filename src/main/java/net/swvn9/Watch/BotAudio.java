@@ -1,24 +1,18 @@
 package net.swvn9.Watch;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.TextChannel;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class BotAudio {
     public static AudioPlayerManager playerManager;
@@ -31,10 +25,6 @@ public class BotAudio {
         trackScheduler = new TrackScheduler(player);
         player.addListener(trackScheduler);
     }
-}
-
-abstract class Handler implements AudioLoadResultHandler {
-
 }
 
 class TrackScheduler extends AudioEventAdapter {
@@ -70,14 +60,14 @@ class TrackScheduler extends AudioEventAdapter {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         AudioTrack next = queue.poll();
-        player.startTrack(next, false);
-        if(!BotCommands.play.memory.isEmpty()){
-            BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
-            BotCommands.play.memory.clear();
+        if(next!=null){
+            player.startTrack(next, false);
+            if(!BotCommands.play.memory.isEmpty()){
+                BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
+                BotCommands.play.memory.clear();
+            }
+            channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
         }
-        channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->{
-            BotCommands.play.memory.add(msg.getId());
-        });
     }
 
     @Override
