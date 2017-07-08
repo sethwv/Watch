@@ -75,6 +75,7 @@ class TrackScheduler extends AudioEventAdapter {
             nextTrack();
         } else {
             BotCommands.play.lastGuild.getAudioManager().closeAudioConnection();
+            BotAudio.player.destroy();
         }
     }
 }
