@@ -5,7 +5,7 @@ import io.sentry.event.Event;
 import io.sentry.event.EventBuilder;
 import io.sentry.event.interfaces.ExceptionInterface;
 
-public class BotSentry {
+class BotSentry {
     public static void main(String... args) {
         Sentry.init();
     }

@@ -14,7 +14,7 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class BotAudio {
+class BotAudio {
     public static AudioPlayerManager playerManager;
     public static AudioPlayer player;
     public static TrackScheduler trackScheduler;
@@ -60,14 +60,12 @@ class TrackScheduler extends AudioEventAdapter {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         AudioTrack next = queue.poll();
-        if(next!=null){
             player.startTrack(next, false);
             if(!BotCommands.play.memory.isEmpty()){
                 BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
                 BotCommands.play.memory.clear();
             }
             channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
-        }
     }
 
     @Override
@@ -75,6 +73,8 @@ class TrackScheduler extends AudioEventAdapter {
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             nextTrack();
+        } else {
+            BotCommands.play.lastGuild.getAudioManager().closeAudioConnection();
         }
     }
 }

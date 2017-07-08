@@ -708,6 +708,7 @@ class BotCommands {
         @Override
         void cleanup(boolean delete) {}
     };
+    /*
     public static BotCommand restart = new BotCommand("command.restart") {
         @Override
         void cleanup(boolean delete) {
@@ -726,6 +727,7 @@ class BotCommands {
             Bot.restart(shard);
         }
     };
+    */
     public static BotCommand input = new BotCommand("command.input") {
         @Override
         void help() {
@@ -997,6 +999,7 @@ class BotCommands {
                     guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
                 }
                 guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+                this.lastGuild = guild;
             }
 
             play.lastChannel = channel;
