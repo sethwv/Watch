@@ -942,6 +942,7 @@ class BotCommands {
     };
 
     //Music Bot commands
+    /*
     public static BotCommand summon = new BotCommand("command.summon") {
         @Override
         void help() {
@@ -961,12 +962,13 @@ class BotCommands {
             }
         }
     };
+    */
     public static BotCommand play = new BotCommand("command.play#all") {
         @Override
         void help() {
             this.helpName = "Music: Play";
             this.helpUsage = BotListeners.LITERAL+"play <youtube/playlist-link/watch-link/soundcloud>";
-            this.helpDesc = "!REQUIRES BOT TO BE IN A VOICE CHANNEL WITH "+BotListeners.LITERAL+"SUMMON.\nIf the queue is empty, play the linked song. If not empty, add to the queue.";
+            this.helpDesc = "If the queue is empty, play the linked song. If not empty, add to the queue.";
             this.helpSkip = false;
         }
 
@@ -1045,7 +1047,7 @@ class BotCommands {
             });
         }
     };
-    public static BotCommand queue = new BotCommand("command.queue"){
+    public static BotCommand queue = new BotCommand("command.queue#all"){
         @Override
         void help() {
             this.helpName = "Music: Queue";
