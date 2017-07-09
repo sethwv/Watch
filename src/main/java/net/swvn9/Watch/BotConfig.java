@@ -70,17 +70,17 @@ class BotConfig {
 }
 @SuppressWarnings("unused")
 class UserBean {
-	public String userId = "";
+	public String userId = "none";
 	public boolean admin = false;
 	public int power = 0;
-	public List<String> permissions = new ArrayList<>(Collections.singletonList("group.all#default"));
+	public List<String> permissions = new ArrayList<>(Collections.singletonList("none"));
 }
 @SuppressWarnings("unused")
 class GroupBean {
-	public List<String> groupId = new ArrayList<>(Collections.singletonList(""));
+	public List<String> groupId = new ArrayList<>(Collections.singletonList("none"));
 	public boolean admin = false;
 	public int power = 0;
-	public List<String> permissions = new ArrayList<>(Collections.singletonList("group.all#default"));
+	public List<String> permissions = new ArrayList<>(Collections.singletonList("none"));
 }
 @SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
