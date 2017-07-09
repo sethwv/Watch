@@ -146,7 +146,8 @@ class BotListeners extends ListenerAdapter {
                 //event.getJDA().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
                 event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
             } else*/ {
-                event.getJDA().getPresence().setGame(Game.of("☕in Dev mode, "+(event.getJDA().getShardInfo().getShardId()+1)));
+                //event.getJDA().getPresence().setGame(Game.of("☕in Dev mode, "+(event.getJDA().getShardInfo().getShardId()+1)));
+                event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
             }
         } else {
             event.getJDA().getPresence().setStatus(OnlineStatus.ONLINE);
@@ -163,7 +164,9 @@ class BotListeners extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
-        if(e.getGuild().getId().equals("254861442799370240")){
+        if(isDevelopmentEnvironment()){
+            BotListeners.LITERAL = ";;";
+        }else if(e.getGuild().getId().equals("254861442799370240")){
             BotListeners.LITERAL = "!";
         } else {
             BotListeners.LITERAL = "::";

@@ -21,6 +21,9 @@ class Bot{
         BotConfig.loadConfig();
         Sentry.init();
         BotAudio.init();
+        if(BotListeners.isDevelopmentEnvironment()){
+            BotListeners.LITERAL=";;";
+        }
         try{
             for(int i=0;i<toShard;i++){
                 BotListeners.logger(BotListeners.logPrefix(8)+"Starting Shard "+i+".");
