@@ -650,7 +650,6 @@ class BotCommands {
         void command() {
             BotConfig.loadConfig();
             BotListeners.WHITELIST = BotConfig.getWhitelist();
-            //channel.addReactionById(message.getId(), "👍").queue();
         }
     };
 
