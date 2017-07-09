@@ -7,11 +7,11 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 class BotUser {
+    public String noperms[] ={"none"};
     BotUser(User u, Guild g){
-        String noperms[] ={"none"};
         this.isadmin = false;
         this.id = u.getId();
-        for(String key: BotConfig.config.getUsers().keySet()){
+        if(BotConfig.config.getUsers()!=null)for(String key: BotConfig.config.getUsers().keySet()){
             if(u.getId().equals(BotConfig.config.getUsers().get(key).userId)){
                 if(BotConfig.config.getUsers().get(key).permissions==null) this.permissions= new ArrayList<>(Arrays.asList(noperms));
                 this.id = u.getId();
@@ -20,16 +20,15 @@ class BotUser {
                 if(BotConfig.config.getUsers().get(key).permissions!=null) this.permissions = BotConfig.config.getUsers().get(key).permissions;
             }
         }
-        for(String key: BotConfig.config.getGroups().keySet()) {
+        if(BotConfig.config.getGroups()!=null) for(String key: BotConfig.config.getGroups().keySet()) {
             for (String gid : BotConfig.config.getGroups().get(key).groupId) {
                 if (g.getMember(u).getRoles().toString().contains(gid)) {
                     if (!isadmin) this.isadmin = BotConfig.config.getGroups().get(key).admin;
                     if(this.permissions==null){
                         this.permissions = BotConfig.config.getGroups().get(key).permissions;
-                    } else {
+                    } else if(BotConfig.config.getGroups().get(key).permissions!=null) {
                         this.permissions.addAll(BotConfig.config.getGroups().get(key).permissions);
                     }
-                    this.permissions.addAll(BotConfig.config.getGroups().get(key).permissions);
                     if (power < BotConfig.config.getGroups().get(key).power) this.power = BotConfig.config.getGroups().get(key).power;
                     break;
                 }

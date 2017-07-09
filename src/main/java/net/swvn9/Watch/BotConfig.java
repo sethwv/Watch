@@ -1,5 +1,6 @@
 package net.swvn9.Watch;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.sentry.Sentry;
@@ -69,25 +70,26 @@ class BotConfig {
 }
 @SuppressWarnings("unused")
 class UserBean {
-	public String userId;
-	public boolean admin;
-	public int power;
-	public List<String> permissions;
+	public String userId = "";
+	public boolean admin = false;
+	public int power = 0;
+	public List<String> permissions = new ArrayList<>(Collections.singletonList("group.all#default"));
 }
 @SuppressWarnings("unused")
 class GroupBean {
-	public List<String> groupId;
-	public boolean admin;
-	public int power;
-	public List<String> permissions;
+	public List<String> groupId = new ArrayList<>(Collections.singletonList(""));
+	public boolean admin = false;
+	public int power = 0;
+	public List<String> permissions = new ArrayList<>(Collections.singletonList("group.all#default"));
 }
 @SuppressWarnings("unused")
+@JsonIgnoreProperties(ignoreUnknown = true)
 class YamlBean { //this is my yaml bean thingamahooza
 
-	private String botToken;
-	private String rebrandlyToken;
-	private String rebrandlyURL;
-	private String channelWhitelist;
+	private String botToken = "";
+	private String rebrandlyToken = "";
+	private String rebrandlyURL = "";
+	private String channelWhitelist = "";
 	private Map<String,UserBean> users;
 	private Map<String,GroupBean> groups;
 

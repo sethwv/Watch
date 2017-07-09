@@ -1,5 +1,7 @@
 package net.swvn9.Watch;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.mikebull94.rsapi.RuneScapeAPI;
 import com.mikebull94.rsapi.hiscores.ClanMate;
 import com.mikebull94.rsapi.hiscores.Hiscores;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.awt.*;
@@ -584,7 +587,7 @@ class BotCommands {
             for (String a : BotListeners.WHITELIST)
                 //whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
                 //other.addField("Whitelist", whitelisted.toString(), false);
-                for (String key : BotConfig.config.getGroups().keySet()) {
+                if(BotConfig.config.getGroups()!=null)for (String key : BotConfig.config.getGroups().keySet()) {
                     StringBuilder ids = new StringBuilder();
                     ids.append("Group IDs").append(System.lineSeparator());
                     for (String zz : BotConfig.config.getGroups().get(key).groupId)
@@ -607,7 +610,7 @@ class BotCommands {
                     other.addBlankField(true);
                 }
             other.addBlankField(false);
-            for (String key : BotConfig.config.getUsers().keySet()) {
+            if(BotConfig.config.getUsers()!=null)for (String key : BotConfig.config.getUsers().keySet()) {
                 other.addField(key, "User ID" + System.lineSeparator() + "`" + BotConfig.config.getUsers().get(key).userId + "`", true);
                 StringBuilder perms = new StringBuilder();
                 perms.append("Permissions").append(System.lineSeparator());
@@ -659,7 +662,7 @@ class BotCommands {
             sharding.setFooter("Watch #6969 ",Bot.shards.get(shard).getSelfUser().getAvatarUrl());
             if(arguments.contains("-l")){
                 for(int i = 0; i<Bot.shards.size(); i++){
-                    sharding.addField("Shard "+Bot.shards.get(i).getShardInfo().getShardId()+" of "+Bot.shards.get(i).getShardInfo().getShardTotal(),"```java\n"+Bot.shards.get(i).getGuilds().toString()+"```",false);
+                    sharding.addField("Shard "+(Bot.shards.get(i).getShardInfo().getShardId()+1)+" of "+Bot.shards.get(i).getShardInfo().getShardTotal(),"```java\n "+Bot.shards.get(i).getGuilds().toString().replace("),",")\n").replace("]","").replaceAll(" \\n", "\n").replaceAll("([\\[\\]])","")+"```",false);
                 }
             }
             channel.sendMessage(sharding.build()).queue();
@@ -876,13 +879,14 @@ class BotCommands {
         @Override
         void command() {
             try {
+                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
                 engine.put("jda",Bot.shards.get(shard));
                 engine.put("channel", channel);
                 engine.put("message", message);
                 engine.put("guild", guild);
                 engine.put("user", author);
-
-                channel.sendMessage("```java\n//Evaluating\n" + arguments.replaceAll("\n","").replaceAll(";",";\n").trim() + "```").queue();
+                engine.put("config", mapper.readValue(new File("Config.yml"), YamlBean.class));
+                channel.sendMessage("```java\n//Evaluating\n" + arguments.trim() + "```").queue();
                 String res = engine.eval(arguments).toString();
                 if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
             } catch (Exception ex) {
