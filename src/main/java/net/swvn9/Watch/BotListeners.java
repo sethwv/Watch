@@ -164,15 +164,15 @@ class BotListeners extends ListenerAdapter {
 
     @Override //any message sent that the bot can see
     public void onMessageReceived(MessageReceivedEvent e) {
+        if ((e.getAuthor().isBot() || e.getChannelType().equals(ChannelType.PRIVATE))) {
+            return;
+        }
         if(isDevelopmentEnvironment()){
             BotListeners.LITERAL = ";;";
-        }else if(e.getGuild().getId().equals("254861442799370240")){
+        }else if(e.getGuild().getIdLong()==254861442799370240L){
             BotListeners.LITERAL = "!";
         } else {
             BotListeners.LITERAL = "::";
-        }
-        if ((e.getAuthor().isBot() || e.getChannelType().equals(ChannelType.PRIVATE))) {
-            return;
         }
         if (BotCommands.input.waiting && !e.getMessage().getContent().contains(LITERAL+"input")) {
             return;

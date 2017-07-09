@@ -223,7 +223,7 @@ class BotCommands {
             if (arguments.contains("-c") && botUser.isadmin()) {
                 channel.sendMessage(showCommands.build()).queue();
             } else {
-                author.openPrivateChannel().complete().sendMessage(showCommands.build()).queue();
+                author.openPrivateChannel().queue(c->c.sendMessage(showCommands.build()).queue());
                 message.getChannel().sendMessage("<:Watch:326815513550389249> `" + author.getName() + ", check your DMs!`").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
             }
         }
@@ -242,7 +242,7 @@ class BotCommands {
             String invcode;
             invcode = guild.getPublicChannel().createInvite().setMaxUses(1).setMaxAge(24L, TimeUnit.HOURS).setUnique(true).complete().getCode();
             channel.sendMessage("<:Watch:326815513550389249> `An invite has been created and sent to you `").queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
-            author.openPrivateChannel().complete().sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/" + invcode).queue();
+            author.openPrivateChannel().queue(c->c.sendMessage("Your invite is valid for **24 hours and one use**. the link is: http://discord.gg/" + invcode).queue());
         }
     };
     public static BotCommand info = new BotCommand("command.info#all") {
@@ -325,7 +325,7 @@ class BotCommands {
                 for (User u : message.getMentionedUsers()) {
                     this.arguments = arguments.replace("@" + u.getName(), "").trim();
                     if (guild.getMember(author).canInteract(guild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been banned from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue();
+                        u.openPrivateChannel().queue(c->c.sendMessage("<:Watch:326815513550389249> You've been banned from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue());
                 }
                 arguments = arguments.substring(0, Math.min(arguments.length(), 512));
                 for (User u : message.getMentionedUsers()) {
@@ -375,7 +375,7 @@ class BotCommands {
                 for (User u : message.getMentionedUsers()) {
                     this.arguments = arguments.replace("@" + u.getName(), "").trim();
                     if (guild.getMember(author).canInteract(guild.getMember(u))) if (!u.isBot())
-                        u.openPrivateChannel().complete().sendMessage("<:Watch:326815513550389249> You've been kicked from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue();
+                        u.openPrivateChannel().queue(c->c.sendMessage("<:Watch:326815513550389249> You've been kicked from " + guild.getName() + " by " + author.getAsMention() + " with the message `" + arguments + "`.").queue());
                 }
                 arguments = arguments.substring(0, Math.min(arguments.length(), 512));
                 for (User u : message.getMentionedUsers()) {
