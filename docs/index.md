@@ -1,7 +1,3 @@
----
-layout: page
-permalink: /watch/
----
 ![Watch](http://u.swvn9.net/2017/SQAne.png)[![Repo](http://u.swvn9.net/2017/Ziaoe.png)](https://github.com/swvn9/Watch/)
 ## ![Info](http://u.swvn9.net/2017/q9Spz.png)
 
