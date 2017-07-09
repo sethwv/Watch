@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.awt.*;
@@ -202,7 +201,7 @@ class BotCommands {
         @Override
         void command() {
             EmbedBuilder showCommands = new EmbedBuilder();
-            showCommands.setColor(new Color(148, 168, 249));
+            showCommands.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
             showCommands.setFooter("List of commands.", Bot.shards.get(shard).getSelfUser().getAvatarUrl());
             boolean specific = false;
             String noargs = arguments.replace("-a", "").replace("-c", "").trim();
@@ -252,7 +251,7 @@ class BotCommands {
             EmbedBuilder stuff = new EmbedBuilder();
             stuff.setTitle(author.getName() + "#" + author.getDiscriminator());
             stuff.setThumbnail(author.getAvatarUrl());
-            stuff.setColor(new Color(148, 168, 249));
+            stuff.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
             DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("dd MMM yyyy");
             stuff.addField("ID", "`" + author.getId() + "`", true);
             stuff.addField("Effective Name", "`" + guild.getMember(author).getEffectiveName() + "`", true);
@@ -566,11 +565,11 @@ class BotCommands {
                 }
                 roles.addField(sname.toString(), "`" + sid.toString() + "`", true);
             }
-            roles.setColor(new Color(148, 168, 249));
+            roles.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
             channel.sendMessage(roles.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
         }
     };
-    public static BotCommand showconfig = new BotCommand("command.showconfig") {
+    public static BotCommand config = new BotCommand("command.config") {
         @Override
         void help() {
             this.helpName = "Show Config";
@@ -581,37 +580,36 @@ class BotCommands {
 
         @Override
         void command() {
-            EmbedBuilder other = new EmbedBuilder();
-            //StringBuilder whitelisted = new StringBuilder();
-            other.setColor(new Color(148, 168, 249));
-            for (String a : BotListeners.WHITELIST)
-                //whitelisted.append("- `").append(a).append("`").append(System.lineSeparator());
-                //other.addField("Whitelist", whitelisted.toString(), false);
-                if(BotConfig.config.getGroups()!=null)for (String key : BotConfig.config.getGroups().keySet()) {
-                    StringBuilder ids = new StringBuilder();
-                    ids.append("Group IDs").append(System.lineSeparator());
-                    for (String zz : BotConfig.config.getGroups().get(key).groupId)
-                        ids.append("- `").append(zz).append("`").append(System.lineSeparator());
-                    other.addField(key, ids.toString(), true);
-                    StringBuilder perms = new StringBuilder();
-                    perms.append("Permissions").append(System.lineSeparator());
-                    if (BotConfig.config.getGroups().get(key).permissions != null) {
-                        for (String zz : BotConfig.config.getGroups().get(key).permissions)
-                            perms.append("- `").append(zz).append("`").append(System.lineSeparator());
-                    } else {
-                        perms.append("`none`");
-                    }
-                    if (BotConfig.config.getGroups().get(key).admin) {
-                        other.addField("Type: SuperUser Group", perms.toString(), true);
-                    } else {
-                        other.addField("Type: User Group", perms.toString(), true);
-                    }
-                    //other.addField("Power: " + Config.config.getGroups().get(key).power, "\u200B", true);
-                    other.addBlankField(true);
+            EmbedBuilder botGroups = new EmbedBuilder();
+            EmbedBuilder botUsers = new EmbedBuilder();
+
+            botGroups.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
+            botUsers.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
+
+            if(BotConfig.config.getGroups()!=null)for (String key : BotConfig.config.getGroups().keySet()) {
+                StringBuilder ids = new StringBuilder();
+                ids.append("Group IDs").append(System.lineSeparator());
+                for (String zz : BotConfig.config.getGroups().get(key).groupId)
+                    ids.append("- `").append(zz).append("`").append(System.lineSeparator());
+                botGroups.addField(key, ids.toString(), true);
+                StringBuilder perms = new StringBuilder();
+                perms.append("Permissions").append(System.lineSeparator());
+                if (BotConfig.config.getGroups().get(key).permissions != null) {
+                    for (String zz : BotConfig.config.getGroups().get(key).permissions)
+                        perms.append("- `").append(zz).append("`").append(System.lineSeparator());
+                } else {
+                    perms.append("`none`");
                 }
-            other.addBlankField(false);
+                if (BotConfig.config.getGroups().get(key).admin) {
+                    botGroups.addField("Type: SuperUser Group", perms.toString(), true);
+                } else {
+                    botGroups.addField("Type: User Group", perms.toString(), true);
+                }
+                botGroups.addBlankField(true);
+            }
+
             if(BotConfig.config.getUsers()!=null)for (String key : BotConfig.config.getUsers().keySet()) {
-                other.addField(key, "User ID" + System.lineSeparator() + "`" + BotConfig.config.getUsers().get(key).userId + "`", true);
+                botUsers.addField(key, "User ID" + System.lineSeparator() + "`" + BotConfig.config.getUsers().get(key).userId + "`", true);
                 StringBuilder perms = new StringBuilder();
                 perms.append("Permissions").append(System.lineSeparator());
                 HashSet<String> thing = new HashSet<>();
@@ -623,16 +621,20 @@ class BotCommands {
                 for (String zz : thing)
                     perms.append("- `").append(zz).append("`").append(System.lineSeparator());
                 if (BotConfig.config.getUsers().get(key).admin) {
-                    other.addField("Type: SuperUser", perms.toString(), true);
+                    botUsers.addField("Type: SuperUser", perms.toString(), true);
                 } else {
-                    other.addField("Type: User", perms.toString(), true);
+                    botUsers.addField("Type: User", perms.toString(), true);
                 }
-                //other.addField("Power: " + Config.config.getUsers().get(key).power, "\u200B", true);
-                other.addBlankField(true);
+                botUsers.addBlankField(true);
             }
-            other.setFooter("Config.yml (May not show all entries)", Bot.shards.get(shard).getSelfUser().getAvatarUrl());
-            other.setTimestamp(LocalDateTime.now());
-            channel.sendMessage(other.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+
+            botGroups.setFooter("Groups ", Bot.shards.get(shard).getSelfUser().getAvatarUrl());
+            botUsers.setFooter("Users ", Bot.shards.get(shard).getSelfUser().getAvatarUrl());
+            botGroups.setTimestamp(LocalDateTime.now());
+            botUsers.setTimestamp(LocalDateTime.now());
+
+            if(BotConfig.config.getGroups()!=null) channel.sendMessage(botGroups.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+            if(BotConfig.config.getUsers()!=null) channel.sendMessage(botUsers.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
         }
     };
     public static BotCommand pullconfig = new BotCommand("command.pullconfig") {
@@ -657,7 +659,7 @@ class BotCommands {
         @Override
         void command() throws Exception {
             EmbedBuilder sharding = new EmbedBuilder();
-            sharding.setColor(new Color(114, 137, 218));
+            sharding.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
             sharding.setTimestamp(LocalDateTime.now());
             sharding.setFooter("Watch #6969 ",Bot.shards.get(shard).getSelfUser().getAvatarUrl());
             if(arguments.contains("-l")){
@@ -775,7 +777,7 @@ class BotCommands {
             if (arguments.contains("-s")) {
                 EmbedBuilder stats = new EmbedBuilder();
                 stats.setTimestamp(LocalDateTime.now());
-                stats.setColor(new Color(114, 137, 218));
+                stats.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
                 stats.addField("Status", Bot.shards.get(shard).getStatus().name(), false);
                 stats.addField("Heartbeat", "" + Bot.shards.get(shard).getPing() + "ms", true);
                 stats.addField("API Responses", "" +Bot.shards.get(shard).getResponseTotal() + "", true);
@@ -878,20 +880,21 @@ class BotCommands {
 
         @Override
         void command() {
-            try {
-                ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                engine.put("jda",Bot.shards.get(shard));
-                engine.put("channel", channel);
-                engine.put("message", message);
-                engine.put("guild", guild);
-                engine.put("user", author);
-                engine.put("config", mapper.readValue(new File("Config.yml"), YamlBean.class));
-                channel.sendMessage("```java\n//Evaluating\n" + arguments.trim() + "```").queue();
-                String res = engine.eval(arguments).toString();
-                if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
-            } catch (Exception ex) {
-                Sentry.capture(ex);
-                if(ex.getClass()!=NullPointerException.class) channel.sendMessage("```js\n//Exception\n" + ex + "```").queue();
+            if(botUser.isadmin()){
+                try {
+                    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+                    engine.put("jda",Bot.shards.get(shard));
+                    engine.put("channel", channel);
+                    engine.put("message", message);
+                    engine.put("guild", guild);
+                    engine.put("user", author);
+                    channel.sendMessage("```java\n//Evaluating\n" + arguments.trim() + "```").queue();
+                    String res = engine.eval(arguments).toString();
+                    if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
+                } catch (Exception ex) {
+                    Sentry.capture(ex);
+                    if(ex.getClass()!=NullPointerException.class) channel.sendMessage("```js\n//Exception\n" + ex + "```").queue();
+                }
             }
         }
     };
@@ -1235,7 +1238,7 @@ class BotCommands {
                 ranks.addField("Coordinator", four.toString(), false);
                 ranks.addField("Admin", five.toString(), true);
                 if (admincount > admins) ranks.addField("\u200B", six.toString(), true);
-                ranks.setColor(new Color(148, 168, 249));
+                ranks.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
                 ranks.setDescription("The bot has matched the accounts with it's best guess of what their discord tag might be. There is still a significant margin for error, so let me know if something goes wrong, or something is omitted that should not be. However if you're running the command for a clan other than that which owns the discord server, things will be matched wrong.");
                 String time = new SimpleDateFormat("MM/dd/YYYY hh:mma zzz").format(new Date());
                 ranks.setFooter("Generated " + time + " For " + clan, Bot.shards.get(shard).getSelfUser().getAvatarUrl());
@@ -1344,6 +1347,25 @@ class BotCommands {
         Levenshtein l = new Levenshtein();
         JaroWinkler jw = new JaroWinkler();
         return a.contains(b) || b.contains(a) || a.equalsIgnoreCase(b) || l.distance(a, b) < 2 || jw.similarity(a, b) > 0.89d;
+    }
+    private static Color botColour(String in,int x,int y) {
+        try{
+            File ciBadge = new File("temp/sample.png");
+            URL url = new URL(in);
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
+            conn.connect();
+            FileUtils.copyInputStreamToFile(conn.getInputStream(), ciBadge);
+            BufferedImage image = ImageIO.read(ciBadge);
+            int c = image.getRGB(x,y);
+            int  red = (c & 0x00ff0000) >> 16;
+            int  green = (c & 0x0000ff00) >> 8;
+            int  blue = c & 0x000000ff;
+            return new Color(red,green,blue);
+        }catch(Exception ex){
+            Sentry.capture(ex);
+            return Color.black;
+        }
     }
 }
 
