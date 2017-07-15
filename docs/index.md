@@ -26,4 +26,4 @@ The source and software is provided with no warranty what-so-ever. Any damage do
 I am a programming student, and therefore am not fantastic at what I do. Don't set your expectations high if you do choose to run Watch.
 
 ___
-[![swvn9.net](https://u.swvn9.net/2017/QxyPZ.png)](https://swvn9.net)
+[![swvn9.net](https://u.swvn9.net/2017/LjdBw.png)](https://swvn9.net)
