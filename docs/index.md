@@ -24,5 +24,6 @@ Watch is (currently) licensed under the MIT license, I'm cool with you using sni
 The source and software is provided with no warranty what-so-ever. Any damage done to your system is up to you. If you really need help with something, contact me on discord `Seth#4431` and I'll see what I can do for you.
 
 I am a programming student, and therefore am not fantastic at what I do. Don't set your expectations high if you do choose to run Watch.
+
 ___
 [![swvn9.net](https://u.swvn9.net/2017/QxyPZ.png)](https://swvn9.net)
