@@ -18,7 +18,7 @@ class BotSentry {
         // This sends an event to Sentry.
         EventBuilder eventBuilder = new EventBuilder()
                 .withMessage("This is a test")
-                .withLevel(Event.Level.INFO)
+                .withLevel(Event.Level.DEBUG)
                 .withLogger(BotSentry.class.getName());
 
         // Note that the *unbuilt* EventBuilder instance is passed in so that

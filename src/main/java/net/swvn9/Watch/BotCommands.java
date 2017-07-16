@@ -14,6 +14,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import groovy.util.Eval;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
 import io.sentry.Sentry;
@@ -707,7 +708,7 @@ class BotCommands {
                 Sentry.capture(ex);
             }
             Bot.shards.get(shard).removeEventListener(Bot.shards.get(shard).getRegisteredListeners());
-            Bot.shards.get(shard).shutdown(true);
+            Bot.shards.get(shard).shutdown();
         }
         @Override
         void cleanup(boolean delete) {}
@@ -880,20 +881,19 @@ class BotCommands {
         @Override
         void command() {
             if(botUser.isadmin()){
-                try {
-                    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-                    engine.put("jda",Bot.shards.get(shard));
-                    engine.put("channel", channel);
-                    engine.put("message", message);
-                    engine.put("guild", guild);
-                    engine.put("user", author);
-                    channel.sendMessage("```java\n//Evaluating\n" + arguments.trim() + "```").queue();
-                    String res = engine.eval(arguments).toString();
-                    if(res!=null)  channel.sendMessage("```js\n//Response\n" + res + "```").queue();
-                } catch (Exception ex) {
-                    Sentry.capture(ex);
-                    if(ex.getClass()!=NullPointerException.class) channel.sendMessage("```js\n//Exception\n" + ex + "```").queue();
+                EmbedBuilder out = new EmbedBuilder();
+                out.setColor(botColour(Bot.shards.get(shard).getSelfUser().getAvatarUrl(),1,1));
+                out.addField("Input","```java\n" + (message.getRawContent().replaceFirst(BotListeners.LITERAL+"(?i)eval","").replaceAll("(?im)((get)?token)","getPizza").trim()) + "```",false);
+                try{
+                    //message.getChannel().sendMessage("```groovy\n"+Eval.me("import net.swvn9.WatchDoot.*;\nimport net.dv8tion.jda.core.*;\nimport static net.swvn9.WatchDoot.Bot.*;\n"+(message.getRawContent().replaceFirst(literal+"(?i)groo","").replaceAll("(?im)((get)?token)","getPizza").trim()))+"```").queue();
+                    String val = Eval.me("import net.swvn9.Watch.*;\nimport net.dv8tion.jda.core.*;\nimport static net.swvn9.Watch.Bot.*;\nimport static net.swvn9.Watch.BotCommands.*;\n"+(message.getRawContent().replaceFirst(BotListeners.LITERAL+"(?i)eval","").replaceAll("(?im)((get)?token)","getPizza").trim())).toString();
+                    if(val!=null) out.addField("Output","```java\n"+val+"```",false);
+                } catch (Exception e){
+                    //message.getChannel().sendMessage(("**```exception\n" + e + "```")).queue();
+                    if(!e.getClass().equals(NullPointerException.class))out.addField("Exception",("```exception\n" + e + "```"),false);
                 }
+                //message.delete().queue();
+                channel.sendMessage(out.build()).queue();
             }
         }
     };
@@ -999,12 +999,11 @@ class BotCommands {
                     return;
                 }
             }
-
             if(guild.getAudioManager().getConnectedChannel()==null){
                 if(guild.getAudioManager().getSendingHandler()==null){
-                    guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
+                    guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
                 }
-                guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(BotAudio.player));
+                if(uservc!=null)guild.getAudioManager().openAudioConnection(guild.getMember(author).getVoiceState().getChannel());
                 this.lastGuild = guild;
             }
 
@@ -1046,11 +1045,19 @@ class BotCommands {
 
                 @Override
                 public void noMatches() {
+                    if(BotAudio.player.getPlayingTrack()==null){
+                        BotCommands.play.lastGuild.getAudioManager().closeAudioConnection();
+                        BotAudio.player.destroy();
+                    }
                     System.out.println("No Matches");
                 }
 
                 @Override
                 public void loadFailed(FriendlyException e) {
+                    if(BotAudio.player.getPlayingTrack()==null){
+                        BotCommands.play.lastGuild.getAudioManager().closeAudioConnection();
+                        BotAudio.player.destroy();
+                    }
                     System.out.println(e.getMessage());
                 }
             });
@@ -1068,19 +1075,49 @@ class BotCommands {
         @Override
         void command() throws Exception {
             StringBuilder queue = new StringBuilder();
-            if(BotAudio.trackScheduler.queue.isEmpty()){
+            if(BotAudio.trackScheduler.queue==null||BotAudio.player.getPlayingTrack()==null){
                 queue.append("```The Queue is Empty```");
+            }else if(BotAudio.trackScheduler.queue.isEmpty()&&BotAudio.player.getPlayingTrack()!=null){
+                queue//.append(" (Now Playing **")
+                        //.append(BotAudio.player.getPlayingTrack().getInfo().title)
+                        .append("```markdown\n> Playing ")
+                        .append(BotAudio.player.getPlayingTrack().getInfo().title)
+                        .append("\n\tLink: ")
+                        .append(BotAudio.player.getPlayingTrack().getInfo().uri)
+                        .append("\nThe Queue is Empty```");
             } else {
-                queue.append("```Markdown\n");
+                queue.append("```markdown\n")
+                        .append("> Playing ")
+                        .append(BotAudio.player.getPlayingTrack().getInfo().title)
+                        .append("\n\tLink: ")
+                        .append(BotAudio.player.getPlayingTrack().getInfo().uri)
+                        .append("\n\n");
                 int i = 1;
                 for(AudioTrack at:BotAudio.trackScheduler.queue){
-                    if(i<10){ queue.append(i++).append(".  ").append(at.getInfo().title).append("\n\tLink: ").append(at.getInfo().uri).append("\n\n");}
-                    else { queue.append(i++).append(". ").append(at.getInfo().title).append("\n\tLink: ").append(at.getInfo().uri).append("\n\n");}
+                    if(i<10){ queue.append("#")
+                            .append(i++)
+                            .append("  ")
+                            .append(at.getInfo().title)
+                            .append("\n\tLink: ")
+                            .append(at.getInfo().uri)
+                            .append("\n\n");
+                    } else { queue.append("#")
+                            .append(i++)
+                            .append(" ")
+                            .append(at.getInfo().title)
+                            .append("\n\tLink: ")
+                            .append(at.getInfo().uri)
+                            .append("\n\n");
+                    }
 
                 }
                 queue.append("```");
             }
-            channel.sendMessage("<:WatchMusic:331969464121950209> **Music Bot Queue**"+queue.toString()).queue(msg->msg.delete().queueAfter(2,TimeUnit.MINUTES));
+            try{
+                channel.sendMessage("<:WatchMusic:331969464121950209> **Music Bot Queue**"+queue.toString()).queue(msg->msg.delete().queueAfter(2,TimeUnit.MINUTES));
+            }catch(Exception ex){
+                channel.sendMessage("<:WatchError:326815514129072131> Exception when sending message.\n"+"```java\n"+ex+"```").queue();
+            }
         }
     };
     public static BotCommand skip = new BotCommand("command.skip"){
@@ -1108,10 +1145,12 @@ class BotCommands {
                 }
             } else {
                 if(!BotCommands.play.memory.isEmpty()){
-                    BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
-                    BotCommands.play.memory.clear();
+                    //BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
+                    //BotCommands.play.memory.clear();
                 }
-                BotAudio.trackScheduler.nextTrack();
+                //BotAudio.trackScheduler.nextTrack();
+                BotAudio.player.getPlayingTrack().setPosition(BotAudio.player.getPlayingTrack().getDuration());
+                //BotAudio.player.stopTrack();
             }
         }
     };
