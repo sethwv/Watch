@@ -1,4 +1,8 @@
 ![Watch](https://u.swvn9.net/2017/SQAne.png)[![Repo](https://u.swvn9.net/2017/Ziaoe.png)](https://github.com/swvn9/Watch/)
+[![Commands](https://u.swvn9.net/2017/bG1Ua.png)](https://botwat.ch/commands/)
+
+---
+
 ## ![Info](https://u.swvn9.net/2017/q9Spz.png)
 
 Watch is my first ever Discord bot, written with the JDA library. What better way to learn the Discord API than to give it a try.
