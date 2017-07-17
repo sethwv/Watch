@@ -6,6 +6,8 @@ permalink: /commands/
 
 ---
 
+![Help](https://u.swvn9.net/2017/gouXP.png)
+
 #### Help
 ```markdown
 #Node: 
@@ -18,6 +20,8 @@ See all of the commands associated with the bot that you can use, sent to you in
 <-a> All commands
 <-c> In current channel
 ```
+
+---
 
 ![Moderation](https://u.swvn9.net/2017/VDTx9.png)
 
@@ -72,6 +76,8 @@ command.say
 Send a Message as the bot
 ```
 
+---
+
 ![Info](https://u.swvn9.net/2017/oOB6u.png)
 
 #### Invite
@@ -114,6 +120,8 @@ command.roles
 Get all of the role-names and IDs associated with the current discord guild.
 ```
 
+---
+
 ![Music](https://u.swvn9.net/2017/dks8T.png)
 
 ### Music: Queue
@@ -146,6 +154,8 @@ command.play
 If the queue is empty, play the linked song. If not empty, add to the queue.
 ```
 
+---
+
 ![RuneScape](https://u.swvn9.net/2017/cj8zA.png)
 
 #### RS Adventurer's Log
@@ -167,6 +177,8 @@ command.clan
 #Description: 
 (for now) Pull the upper ranks of the RuneScape clan Zamorak Cult, and match any names with those on the current discord guild.
 ```
+
+---
 
 ![Utility](https://u.swvn9.net/2017/VK9rw.png)
 
