@@ -1,6 +1,11 @@
 ---
 permalink: /commands/
 ---
+![Watch](https://u.swvn9.net/2017/SQAne.png)[![Repo](https://u.swvn9.net/2017/Ziaoe.png)](https://github.com/swvn9/Watch/)
+[![Home](https://u.swvn9.net/2017/KNDW9.png)](https://botwat.ch)
+
+---
+
 #### Invite
 ```markdown
 #Node: 
