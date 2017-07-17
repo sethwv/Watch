@@ -14,7 +14,7 @@ If you self-host the bot, everything will 'work' for you, so long as you set up 
 
 ![Help](https://u.swvn9.net/2017/gouXP.png)
 
-#### Help
+## Help
 ```markdown
 #Node: 
 command.help
@@ -31,7 +31,7 @@ See all of the commands associated with the bot that you can use, sent to you in
 
 ![Moderation](https://u.swvn9.net/2017/VDTx9.png)
 
-#### Kick
+## Kick
 ```markdown
 #Node: 
 command.kick
@@ -41,7 +41,7 @@ command.kick
 Kick user(s) with an optional Message
 ```
 
-#### Ban
+## Ban
 ```markdown
 #Node: 
 command.ban
@@ -51,7 +51,7 @@ command.ban
 Ban user(s) with an optional Message
 ```
 
-#### Purge
+## Purge
 ```markdown
 #Node: 
 command.purge
@@ -61,7 +61,7 @@ command.purge
 Mentions are optional, if a number of messages to purge is not specified, it will be 10. Pinned messages will not be deleted.
 ```
 
-#### Watch
+## Watch
 ```markdown
 #Node: 
 command.watch
@@ -72,7 +72,7 @@ Have the bot "watch" for certain keywords in chat, and log any occurrences to a 
 Keywords are not case-sensitive
 ```
 
-#### Say
+## Say
 ```markdown
 #Node: 
 command.say
@@ -86,7 +86,7 @@ Send a Message as the bot
 
 ![Info](https://u.swvn9.net/2017/oOB6u.png)
 
-#### Invite
+## Invite
 ```markdown
 #Node: 
 command.inv
@@ -96,7 +96,7 @@ command.inv
 Generate a one-time-use invite that is valid for 24 hours
 ```
 
-#### ID
+## ID
 ```markdown
 #Node: 
 command.id
@@ -106,7 +106,7 @@ command.id
 Grab the ID and any permissions associated with your user ID.
 ```
 
-#### Bot Utility
+## Bot Utility
 ```markdown
 #Node: 
 command.bot
@@ -116,7 +116,7 @@ command.bot
 You should probably stay away from everything this command does except for ;;bot -s
 ```
 
-#### Roles
+## Roles
 ```markdown
 #Node: 
 command.roles
@@ -130,7 +130,7 @@ Get all of the role-names and IDs associated with the current discord guild.
 
 ![Music](https://u.swvn9.net/2017/dks8T.png)
 
-### Music: Queue
+## Music: Queue
 ```markdown
 #Node: 
 command.queue
@@ -140,7 +140,7 @@ command.queue
 Display the current music queue.
 ```
 
-#### Music: Skip
+## Music: Skip
 ```markdown
 #Node: 
 command.skip
@@ -150,7 +150,7 @@ command.skip
 Skip the current song. If the queue is empty, the bot will stop playing. If you specify a position, the song will be removed from the queue.
 ```
 
-#### Music: Play
+## Music: Play
 ```markdown
 #Node: 
 command.play
@@ -164,7 +164,7 @@ If the queue is empty, play the linked song. If not empty, add to the queue.
 
 ![RuneScape](https://u.swvn9.net/2017/cj8zA.png)
 
-#### RS Adventurer's Log
+## RS Adventurer's Log
 ```markdown
 #Node: 
 command.alog
@@ -174,7 +174,7 @@ command.alog
 Fetch the RuneScape adventurer's log for the specified player name.
 ```
 
-#### RS Clan Ranks
+## RS Clan Ranks
 ```markdown
 #Node: 
 command.clan
@@ -188,7 +188,7 @@ command.clan
 
 ![Utility](https://u.swvn9.net/2017/VK9rw.png)
 
-#### Stop
+## Stop
 ```markdown
 #Node: 
 command.stop
@@ -197,7 +197,8 @@ command.stop
 #Description: 
 Stop the shard that the guild is running on. (There is no way to restart)
 ```
-#### Kill
+
+## Kill
 ```markdown
 #Node: 
 command.kill
@@ -206,7 +207,8 @@ command.kill
 #Description: 
 Kill the bot and return the host machine to the command line/desktop.
 ```
-#### Show Config
+
+## Show Config
 ```markdown
 #Node: 
 command.config
@@ -215,7 +217,8 @@ command.config
 #Description: 
 Spit out the contents of the Config.yml file to a rich embed.
 ```
-#### Pull Config
+
+## Pull Config
 ```markdown
 #Node: 
 command.pullconfig
@@ -225,7 +228,7 @@ command.pullconfig
 Pull the latest configuration from the Config.yml file.
 ```
 
-#### Eval
+## Eval
 ```markdown
 #Node: 
 command.eval
@@ -235,7 +238,7 @@ command.eval
 Evaluate a line of code
 ```
 
-#### Rebrandly Link
+## Rebrandly Link
 ```markdown
 #Node: 
 command.link
@@ -245,7 +248,7 @@ command.link
 Using the rebrandly api token defined in the config file, create redirect links.
 ```
 
-#### Enable/Disable Input
+## Enable/Disable Input
 ```markdown
 Enable/Disable Input
 #Node: 
