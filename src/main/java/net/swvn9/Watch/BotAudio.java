@@ -65,7 +65,12 @@ class TrackScheduler extends AudioEventAdapter {
                 BotCommands.play.lastChannel.deleteMessageById(BotCommands.play.memory.toArray()[0]+"").queue();
                 BotCommands.play.memory.clear();
             }
-            if(next!=null)channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+            if(next!=null){
+                channel.sendMessage("<:WatchMusic:331969464121950209> Now Playing **"+next.getInfo().title+"**").queue(msg->BotCommands.play.memory.add(msg.getId()));
+            } else {
+                BotCommands.play.lastGuild.getAudioManager().closeAudioConnection();
+                BotAudio.player.destroy();
+            }
     }
 
     @Override

@@ -156,7 +156,7 @@ class BotListeners extends ListenerAdapter {
                 event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150 ("+(event.getJDA().getShardInfo().getShardId()+1)+")"));
                 event.getJDA().getPresence().setGame(Game.of("\uD83C\uDF41Happy 150"));
             } else*/ {
-                event.getJDA().getPresence().setGame(Game.of("☕1.31"));
+                event.getJDA().getPresence().setGame(Game.of("☕1.35"));
                 //event.getJDA().getPresence().setGame(Game.of("☕Shard "+(event.getJDA().getShardInfo().getShardId()+1)));
             }
         }
