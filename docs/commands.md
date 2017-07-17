@@ -6,6 +6,12 @@ permalink: /commands/
 
 ---
 
+This page has some sections that say "self-host only", I don't currently host this bot for anyone, those sections are only there in case I choose to host the bot publicly in the future, so I don't need to change any site assets.
+
+If you self-host the bot, everything will 'work' for you, so long as you set up the permissions and configuration properly.
+
+---
+
 ![Help](https://u.swvn9.net/2017/gouXP.png)
 
 #### Help
