@@ -61,3 +61,13 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+Logs/
+
+badges/
+
+Commands/
+
+Config\.yml
+
+temp/
