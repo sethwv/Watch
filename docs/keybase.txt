@@ -1,0 +1,55 @@
+==================================================================
+https://keybase.io/swvn9
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://botwat.ch
+  * I am swvn9 (https://keybase.io/swvn9) on keybase.
+  * I have a public key ASAdbeKVFgbiTs-Y0ORA7Lg6Y7wbeyFUf1rsAuDDfHuELwo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01201d6de2951606e24ecf98d0e440ecb83a63bc1b7b21547f5aec02e0c37c7b842f0a",
+      "host": "keybase.io",
+      "kid": "01201d6de2951606e24ecf98d0e440ecb83a63bc1b7b21547f5aec02e0c37c7b842f0a",
+      "uid": "cb5673bb917f582f3e0866464c36b319",
+      "username": "swvn9"
+    },
+    "merkle_root": {
+      "ctime": 1501516124,
+      "hash": "995d532d303147704643c55372fbecf8c1f1170e7564b8500aabc5f6ca172276115e4dbf81ba1a19be9794bb37bd35160ecfb5e397ae1a8058433a0f9de35c92",
+      "hash_meta": "b9cdf7e634bec655912b103c2d9231958604cd9a3aec1445e6a9e6a3b31f1676",
+      "seqno": 1293448
+    },
+    "service": {
+      "hostname": "botwat.ch",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "1.0.26"
+  },
+  "ctime": 1501516130,
+  "expire_in": 504576000,
+  "prev": "8fd9b914f2c3616835eb941ea95289273e6b5a308972054bc4ca13fe0f231cdb",
+  "seqno": 15,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgHW3ilRYG4k7PmNDkQOy4OmO8G3shVH9a7ALgw3x7hC8Kp3BheWxvYWTFAz97ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwMWQ2ZGUyOTUxNjA2ZTI0ZWNmOThkMGU0NDBlY2I4M2E2M2JjMWI3YjIxNTQ3ZjVhZWMwMmUwYzM3YzdiODQyZjBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMWQ2ZGUyOTUxNjA2ZTI0ZWNmOThkMGU0NDBlY2I4M2E2M2JjMWI3YjIxNTQ3ZjVhZWMwMmUwYzM3YzdiODQyZjBhIiwidWlkIjoiY2I1NjczYmI5MTdmNTgyZjNlMDg2NjQ2NGMzNmIzMTkiLCJ1c2VybmFtZSI6InN3dm45In0sIm1lcmtsZV9yb290Ijp7ImN0aW1lIjoxNTAxNTE2MTI0LCJoYXNoIjoiOTk1ZDUzMmQzMDMxNDc3MDQ2NDNjNTUzNzJmYmVjZjhjMWYxMTcwZTc1NjRiODUwMGFhYmM1ZjZjYTE3MjI3NjExNWU0ZGJmODFiYTFhMTliZTk3OTRiYjM3YmQzNTE2MGVjZmI1ZTM5N2FlMWE4MDU4NDMzYTBmOWRlMzVjOTIiLCJoYXNoX21ldGEiOiJiOWNkZjdlNjM0YmVjNjU1OTEyYjEwM2MyZDkyMzE5NTg2MDRjZDlhM2FlYzE0NDVlNmE5ZTZhM2IzMWYxNjc2Iiwic2Vxbm8iOjEyOTM0NDh9LCJzZXJ2aWNlIjp7Imhvc3RuYW1lIjoiYm90d2F0LmNoIiwicHJvdG9jb2wiOiJodHRwczoifSwidHlwZSI6IndlYl9zZXJ2aWNlX2JpbmRpbmciLCJ2ZXJzaW9uIjoxfSwiY2xpZW50Ijp7Im5hbWUiOiJrZXliYXNlLmlvIGdvIGNsaWVudCIsInZlcnNpb24iOiIxLjAuMjYifSwiY3RpbWUiOjE1MDE1MTYxMzAsImV4cGlyZV9pbiI6NTA0NTc2MDAwLCJwcmV2IjoiOGZkOWI5MTRmMmMzNjE2ODM1ZWI5NDFlYTk1Mjg5MjczZTZiNWEzMDg5NzIwNTRiYzRjYTEzZmUwZjIzMWNkYiIsInNlcW5vIjoxNSwidGFnIjoic2lnbmF0dXJlIn2jc2lnxECwvRy1c4NR75bsBj2mxU4RXtn5eNtp92T4T9MBGqUJ1VVRgb/Nkatk/vWIsHcJvXH4zoC+mcqF0+A5DhOkBWwNqHNpZ190eXBlIKRoYXNogqR0eXBlCKV2YWx1ZcQgoZTFq4ELDtNefUgDVY8JQkiks2fa9x2T4J8lD9yozzWjdGFnzQICp3ZlcnNpb24B
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/swvn9
+
+==================================================================
