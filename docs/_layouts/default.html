@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
+    { % if page.joe %}
+    <style>
+      body { background-color:#1D1F23 }
+      .main-content { color:white }
+    
+    </style>
+    { % endif %}
     <meta charset="UTF-8">
     <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title | default: site.github.repository_name }} by {{ site.github.owner_name }}{% endif %}</title>
     <meta name="description" content="{{ page.description | default: site.description | default: site.github.project_tagline }}"/>
